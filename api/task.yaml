@@ -1,0 +1,221 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Task List
+servers:
+  - url: http://127.0.0.1/api/v1
+paths:
+  /list/sprint/new:
+    post:
+      operationId: createTaskList
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/SprintOpts'
+
+  /list/{listId}:
+    get:
+      operationId: getTaskList
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ListId'
+      responses:
+        '200':
+          description: 'all tasks in list'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskList"
+
+  /list/{listId}/add:
+    post:
+      operationId: createTask
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ListId'
+      requestBody:
+        description: task to add
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: 'created task'
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/RespTask'
+
+  /list/{listId}/take/{taskId}:
+    post:
+      operationId: takeTask
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ListId'
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /list/{listId}/delete/{taskId}:
+    post:
+      operationId: deleteTask
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ListId'
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /task/{taskId}/done:
+    post:
+      operationId: doneTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /task/{taskId}/cancel:
+    post:
+      operationId: cancelTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /task/{taskId}/update:
+    post:
+      operationId: updateTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        description: task updates
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/UpdateOptions'
+
+components:
+  schemas:
+    SprintOpts:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+
+    Task:
+      type: object
+      properties:
+        text:
+          type: string
+        points:
+          type: integer
+        burnt:
+          type: integer
+        state:
+          type: string
+          enum: [todo, done, canceled]
+
+    RespTask:
+      type: object
+      required:
+        - id
+        - text
+        - points
+        - burnt
+        - state
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        points:
+          type: integer
+        burnt:
+          type: integer
+        state:
+          type: string
+          enum: [todo, done, canceled]
+
+    TaskList:
+      type: object
+      required:
+        - title
+        - tasks
+      properties:
+        title:
+          type: string
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/RespTask'
+
+    ListId:
+      type: string
+      enum: [sprint, todo, backlog]
+
+    UpdateOptions:
+      type: object
+      required:
+        - text
+        - burnt
+        - points
+      properties:
+        text:
+          type: string
+        burnt:
+          type: integer
+        points:
+          type: integer
+
+# /cal/{year}/{month} - get
+# /cal/{year}/{month}/add - post (добавить проект)
+# /cal/{year}/{month}/{date}/add - post

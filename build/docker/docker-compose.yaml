@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    image: postgres:12
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+    volumes:
+      - tl_pg_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432/tcp
+
+  db_migrations:
+    image: migrate/migrate
+    container_name: db_migrations
+    volumes:
+      - ./db/migrations:/migrations
+    depends_on:
+      - db
+    command: -path=/migrations -database "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB?sslmode=disable" up
+    # command: create -ext=sql -dir=/migrations create_todo_task_list
+    # command: -path=/migrations -database "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB?sslmode=disable" force 20200512152318
+
+volumes:
+  tl_pg_data:
+    driver: local
