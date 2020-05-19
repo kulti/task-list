@@ -122,7 +122,7 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 		}
 	}
 
-	rows, err := s.conn.Query(ctx, "SELECT tasks.id, tasks.text, tasks.points, tasks.burnt, tasks.state FROM tasks, task_list_map WHERE task_list_map.list_id = $1 AND tasks.id = task_list_map.task_id", listID)
+	rows, err := s.conn.Query(ctx, "SELECT tasks.id, tasks.text, tasks.points, tasks.burnt, tasks.state FROM tasks, task_list_map WHERE task_list_map.list_id = $1 AND tasks.id = task_list_map.task_id ORDER BY tasks.id", listID)
 	if err == nil {
 		defer rows.Close()
 	}
