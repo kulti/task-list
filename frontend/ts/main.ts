@@ -173,8 +173,10 @@ function fill_task_list(listId: models.ListId, tasks: Array<models.RespTask>, id
 
 function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElement {
     let points = ''
+    let percent = 0
     if (task.state != models.Task.StateEnum.Canceled) {
         points = task.burnt + "/" + task.points
+        percent = 100 * task.burnt / task.points
     }
 
     let task_properties = ""
@@ -195,6 +197,9 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     const taskPointsDiv = document.createElement('div') as HTMLDivElement;
     taskPointsDiv.className = "points";
     taskPointsDiv.innerText = points;
+    if (percent > 0) {
+        taskPointsDiv.style.background = "-webkit-linear-gradient(left, #f8f8f8 " + percent + "%, white " + percent + "%)";
+    }
 
     const taskDiv = document.createElement('div') as HTMLDivElement;
     taskDiv.className = "task " + task_properties;
