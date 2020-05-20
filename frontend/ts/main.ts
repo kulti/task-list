@@ -144,24 +144,24 @@ function draw_task_lists(todo_task_list: models.TaskList, sprint_task_list: mode
     prepare_task_list(todo_task_list)
     prepare_task_list(sprint_task_list)
 
-    update_task_list_header(todo_task_list, "#todo_list")
-    update_task_list_header(sprint_task_list, "#sprint_list")
+    update_task_list_header(todo_task_list, models.ListId.Todo)
+    update_task_list_header(sprint_task_list, models.ListId.Sprint)
 
-    fill_task_list(models.ListId.Todo, todo_task_list.tasks, "#todo_list")
-    fill_task_list(models.ListId.Sprint, sprint_task_list.tasks, "#sprint_list")
+    fill_task_list(models.ListId.Todo, todo_task_list.tasks)
+    fill_task_list(models.ListId.Sprint, sprint_task_list.tasks)
 }
 
-function update_task_list_header(task_list: models.TaskList, id: string) {
+function update_task_list_header(task_list: models.TaskList, listId: models.ListId) {
     const points = sum_points(task_list.tasks)
     const burnt = sum_burnt_points(task_list.tasks)
 
-    const task_list_html = $(id + " .list_header")[0]
+    const task_list_html = $(listHtmlId(listId) + " .list_header")[0]
     task_list_html.getElementsByClassName("title")[0].innerHTML = task_list.title
     task_list_html.getElementsByClassName("points")[0].innerHTML = burnt + "/" + points
 }
 
-function fill_task_list(listId: models.ListId, tasks: Array<models.RespTask>, id: string) {
-    const task_list_html = $(id + " .tasks")[0]
+function fill_task_list(listId: models.ListId, tasks: Array<models.RespTask>) {
+    const task_list_html = $(listHtmlId(listId) + " .tasks")[0]
 
     task_list_html.innerHTML = ""
     tasks.forEach(function (task) {
@@ -287,7 +287,6 @@ function build_new_task_input_html(listId: models.ListId): HTMLElement {
     taskDiv.className = "form-group task";
     taskDiv.append(taskTextInput, taskPointsInput);
 
-
     const handleKeyPress = function (ev: KeyboardEvent) {
         switch (ev.keyCode) {
             case 27:
@@ -300,6 +299,9 @@ function build_new_task_input_html(listId: models.ListId): HTMLElement {
                 }
                 api.createTask(listId, task).done(function () {
                     load_task_lists();
+                    setTimeout(function () {
+                        $(listHtmlId(listId) + " .text.form-control")[0].focus()
+                    }, 100);
                 }).fail(function (body) {
                     showErrorAlert("failed to create task")
                 });
@@ -344,4 +346,8 @@ function prepare_task_list(task_list: models.TaskList): void {
     }
 
     task_list.tasks.forEach(fix_points)
+}
+
+function listHtmlId(listId: models.ListId): string {
+    return "#" + listId + "_list";
 }
