@@ -3,7 +3,37 @@ import * as models from "./openapi_cli/model/models"
 
 const api = new DefaultApi("http://127.0.0.1:8090/api/v1")
 
-window.onload = load_task_lists;
+window.onload = function () {
+    const input = <HTMLInputElement>$("#new_sprint_title")[0]
+    input.placeholder = buildNewSprintTitle();
+
+    load_task_lists();
+}
+
+function buildNewSprintTitle(): string {
+    const numToString = function (v: number): string {
+        let s = v.toString()
+        if (v < 10) {
+            s = "0" + s
+        }
+        return s;
+    }
+
+    const dateToString = function (d: Date): string {
+        return numToString(d.getDate()) + "." + numToString(d.getMonth() + 1);
+    }
+
+    const date = new Date()
+    const dayOfWeek = date.getDay()
+
+    date.setDate(date.getDate() + 8 - dayOfWeek)
+    const beginDate = dateToString(date);
+
+    date.setDate(date.getDate() + 6)
+    const endDate = dateToString(date);
+
+    return beginDate + " - " + endDate;
+}
 
 class DropdownMenu {
     dropdownMenu: HTMLDivElement;
