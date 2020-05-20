@@ -3,7 +3,6 @@ package router
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -69,8 +68,7 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 	var opts models.SprintOpts
 	err := jsDecoder.Decode(&opts)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "failed to parse new sprint body: %v", err)
+		httpBadRequest(w, "failed to parse new sprint body", err)
 		return
 	}
 
@@ -80,8 +78,7 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 func (h listHandler) handleCreateTaskInList(w http.ResponseWriter, r *http.Request, listID string) {
 	task, err := h.parseTask(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "failed to parse task body: %v", err)
+		httpBadRequest(w, "failed to parse task body", err)
 		return
 	}
 
@@ -92,22 +89,12 @@ func (h listHandler) handleCreateTaskInList(w http.ResponseWriter, r *http.Reque
 	}
 	id, err := h.store.CreateTask(r.Context(), task, listIDs)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "failed to create task: %v", err)
+		httpInternalServerError(w, "failed to create task", err)
 		return
 	}
 
 	task.ID = id
-	data, err := json.Marshal(&task)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "failed to encode body: %v", err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(data)
+	httpJSON(w, &task)
 }
 
 func (h listHandler) handleTakeTaskToList(w http.ResponseWriter, r *http.Request, listID string) {
@@ -117,7 +104,10 @@ func (h listHandler) handleTakeTaskToList(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	h.store.TakeTaskToList(r.Context(), taskID, listID)
+	err := h.store.TakeTaskToList(r.Context(), taskID, listID)
+	if err != nil {
+		httpInternalServerError(w, "failed to store changes in db", err)
+	}
 }
 
 func (h listHandler) handleDeleteTask(w http.ResponseWriter, r *http.Request, listID string) {
@@ -127,9 +117,18 @@ func (h listHandler) handleDeleteTask(w http.ResponseWriter, r *http.Request, li
 		return
 	}
 
-	h.store.DeleteTaskFromList(r.Context(), taskID, listID)
+	err := h.store.DeleteTaskFromList(r.Context(), taskID, listID)
+	if err != nil {
+		httpInternalServerError(w, "failed to delete task from db", err)
+		return
+	}
+
 	if listID == sprintListID {
-		h.store.DeleteTaskFromList(r.Context(), taskID, todoListID)
+		err = h.store.DeleteTaskFromList(r.Context(), taskID, todoListID)
+		if err != nil {
+			httpInternalServerError(w, "failed to delete task from db", err)
+			return
+		}
 	}
 }
 
@@ -159,8 +158,8 @@ func (h listHandler) handleGetTaskList(w http.ResponseWriter, r *http.Request, l
 
 	taskList, err := h.store.ListTasks(r.Context(), listID)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "failed to get week task list: %v", err)
+		httpInternalServerError(w, "failed to get task list from db", err)
+		return
 	}
 
 	if len(taskList.Tasks) == 0 {
@@ -177,15 +176,7 @@ func (h listHandler) handleGetTaskList(w http.ResponseWriter, r *http.Request, l
 		})
 	}
 
-	data, err := json.Marshal(&taskList)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "failed to encode body: %v", err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
+	httpJSON(w, &taskList)
 }
 
 func (h listHandler) supportedListID(listID string) bool {

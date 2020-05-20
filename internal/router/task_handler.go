@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/kulti/task-list/internal/models"
@@ -48,18 +47,26 @@ func (h taskHandler) handleUpdateTask(w http.ResponseWriter, r *http.Request, ta
 	var opts models.UpdateOptions
 	err := jsDecoder.Decode(&opts)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "failed to parse new sprint body: %v", err)
+		httpBadRequest(w, "failed to parse body", err)
 		return
 	}
 
-	h.store.UpdateTask(r.Context(), taskID, opts)
+	err = h.store.UpdateTask(r.Context(), taskID, opts)
+	if err != nil {
+		httpInternalServerError(w, "failed to update task in db", err)
+	}
 }
 
-func (h taskHandler) handleDoneTask(_ http.ResponseWriter, r *http.Request, taskID string) {
-	h.store.DoneTask(r.Context(), taskID)
+func (h taskHandler) handleDoneTask(w http.ResponseWriter, r *http.Request, taskID string) {
+	err := h.store.DoneTask(r.Context(), taskID)
+	if err != nil {
+		httpInternalServerError(w, "failed to update task in db", err)
+	}
 }
 
-func (h taskHandler) handleCancelTask(_ http.ResponseWriter, r *http.Request, taskID string) {
-	h.store.CancelTask(r.Context(), taskID)
+func (h taskHandler) handleCancelTask(w http.ResponseWriter, r *http.Request, taskID string) {
+	err := h.store.CancelTask(r.Context(), taskID)
+	if err != nil {
+		httpInternalServerError(w, "failed to update task in db", err)
+	}
 }
