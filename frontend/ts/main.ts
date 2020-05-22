@@ -3,15 +3,15 @@ import * as models from "./openapi_cli/model/models"
 
 const api = new DefaultApi("http://127.0.0.1:8090/api/v1")
 
-window.onload = function () {
-    const input = <HTMLInputElement>$("#new_sprint_title")[0]
+window.onload = () => {
+    const input = $("#new_sprint_title")[0] as HTMLInputElement
     input.placeholder = buildNewSprintTitle();
 
     load_task_lists();
 }
 
 function buildNewSprintTitle(): string {
-    const numToString = function (v: number): string {
+    const numToString = (v: number): string => {
         let s = v.toString()
         if (v < 10) {
             s = "0" + s
@@ -19,7 +19,7 @@ function buildNewSprintTitle(): string {
         return s;
     }
 
-    const dateToString = function (d: Date): string {
+    const dateToString = (d: Date): string => {
         return numToString(d.getDate()) + "." + numToString(d.getMonth() + 1);
     }
 
@@ -54,9 +54,9 @@ class DropdownMenu {
 
         this.appendItem("Done", this.doneTask)
 
-        if (this.listId == models.ListId.Sprint) {
+        if (this.listId === models.ListId.Sprint) {
             const action = this.appendItem("Todo", this.todoTask)
-            if (taskState == models.RespTask.StateEnum.Todo) {
+            if (taskState === models.RespTask.StateEnum.Todo) {
                 action.className += " disabled"
             }
         }
@@ -68,33 +68,33 @@ class DropdownMenu {
     }
 
     doneTask() {
-        api.doneTask(this.taskId).done(function () {
+        api.doneTask(this.taskId).done(() => {
             load_task_lists();
-        }).fail(function () {
+        }).fail(() => {
             showErrorAlert("failed to done task")
         })
     }
 
     todoTask() {
-        api.takeTask(models.ListId.Todo, this.taskId).done(function () {
+        api.takeTask(models.ListId.Todo, this.taskId).done(() => {
             load_task_lists();
-        }).fail(function () {
+        }).fail(() => {
             showErrorAlert("failed to todo task")
         })
     }
 
     cancelTask() {
-        api.cancelTask(this.taskId).done(function () {
+        api.cancelTask(this.taskId).done(() => {
             load_task_lists();
-        }).fail(function () {
+        }).fail(() => {
             showErrorAlert("failed to cancel task")
         })
     }
 
     deleteTask() {
-        api.deleteTask(this.listId, this.taskId).done(function () {
+        api.deleteTask(this.listId, this.taskId).done(() => {
             load_task_lists();
-        }).fail(function () {
+        }).fail(() => {
             showErrorAlert("failed to delete task")
         })
     }
@@ -109,16 +109,16 @@ class DropdownMenu {
     }
 }
 
-$("#new_sprint_btn")[0].addEventListener("click", function () {
-    const input = <HTMLInputElement>$("#new_sprint_title")[0]
+$("#new_sprint_btn")[0].addEventListener("click", () => {
+    const input = $("#new_sprint_title")[0] as HTMLInputElement
     const sprintTitle = input.value || input.placeholder
     const sprintOpts: models.SprintOpts = {
         title: sprintTitle
     }
-    api.createTaskList(sprintOpts).done(function () {
+    api.createTaskList(sprintOpts).done(() => {
         showSuccessAlert("sprint created")
         load_task_lists();
-    }).fail(function (body) {
+    }).fail((body) => {
         showErrorAlert("failed to create sprint")
     });
 });
@@ -152,15 +152,15 @@ function showAlert(type: string, text: string) {
 }
 
 function load_task_lists() {
-    api.getTaskList(models.ListId.Sprint).fail(function (body) {
+    api.getTaskList(models.ListId.Sprint).fail((body) => {
         showErrorAlert("failed to load sprint tasks")
-    }).done(function (data) {
-        const sprint_task_list = data.body
-        api.getTaskList(models.ListId.Todo).fail(function (body) {
+    }).done((sprintListData) => {
+        const sprintTaskList = sprintListData.body
+        api.getTaskList(models.ListId.Todo).fail((body) => {
             showErrorAlert("failed to load todo tasks")
-        }).done(function (data) {
-            const todo_task_list = data.body
-            draw_task_lists(todo_task_list, sprint_task_list);
+        }).done((todoListData) => {
+            const todoTaskList = todoListData.body
+            draw_task_lists(todoTaskList, sprintTaskList);
         });
     });
 }
@@ -170,50 +170,50 @@ enum TaskProperty {
     Canceled = 'canceled',
 }
 
-function draw_task_lists(todo_task_list: models.TaskList, sprint_task_list: models.TaskList) {
-    prepare_task_list(todo_task_list)
-    prepare_task_list(sprint_task_list)
+function draw_task_lists(todoTaskList: models.TaskList, sprintTaskList: models.TaskList) {
+    prepare_task_list(todoTaskList)
+    prepare_task_list(sprintTaskList)
 
-    update_task_list_header(todo_task_list, models.ListId.Todo)
-    update_task_list_header(sprint_task_list, models.ListId.Sprint)
+    update_task_list_header(todoTaskList, models.ListId.Todo)
+    update_task_list_header(sprintTaskList, models.ListId.Sprint)
 
-    fill_task_list(models.ListId.Todo, todo_task_list.tasks)
-    fill_task_list(models.ListId.Sprint, sprint_task_list.tasks)
+    fill_task_list(models.ListId.Todo, todoTaskList.tasks)
+    fill_task_list(models.ListId.Sprint, sprintTaskList.tasks)
 }
 
-function update_task_list_header(task_list: models.TaskList, listId: models.ListId) {
-    const points = sum_points(task_list.tasks)
-    const burnt = sum_burnt_points(task_list.tasks)
+function update_task_list_header(taskList: models.TaskList, listId: models.ListId) {
+    const points = sum_points(taskList.tasks)
+    const burnt = sum_burnt_points(taskList.tasks)
 
-    const task_list_html = $(listHtmlId(listId) + " .list_header")[0]
-    task_list_html.getElementsByClassName("title")[0].innerHTML = task_list.title
-    task_list_html.getElementsByClassName("points")[0].innerHTML = burnt + "/" + points
+    const taskListHtml = $(listHtmlId(listId) + " .list_header")[0]
+    taskListHtml.getElementsByClassName("title")[0].innerHTML = taskList.title
+    taskListHtml.getElementsByClassName("points")[0].innerHTML = burnt + "/" + points
 }
 
-function fill_task_list(listId: models.ListId, tasks: Array<models.RespTask>) {
-    const task_list_html = $(listHtmlId(listId) + " .tasks")[0]
+function fill_task_list(listId: models.ListId, tasks: models.RespTask[]) {
+    const taskListHtml = $(listHtmlId(listId) + " .tasks")[0]
 
-    task_list_html.innerHTML = ""
-    tasks.forEach(function (task) {
-        task_list_html.append(build_task_html(listId, task))
+    taskListHtml.innerHTML = ""
+    tasks.forEach((task) => {
+        taskListHtml.append(build_task_html(listId, task))
     })
 
-    task_list_html.append(build_new_task_input_html(listId))
+    taskListHtml.append(build_new_task_input_html(listId))
 }
 
 function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElement {
     let points = ''
     let percent = 0
-    if (task.state != models.Task.StateEnum.Canceled) {
+    if (task.state !== models.Task.StateEnum.Canceled) {
         points = task.burnt + "/" + task.points
         percent = 100 * task.burnt / task.points
     }
 
-    let task_properties = ""
-    if (task.state == models.RespTask.StateEnum.Done) {
-        task_properties = TaskProperty.Completed
-    } else if (task.state == models.RespTask.StateEnum.Canceled) {
-        task_properties = TaskProperty.Canceled
+    let taskProperties = ""
+    if (task.state === models.RespTask.StateEnum.Done) {
+        taskProperties = TaskProperty.Completed
+    } else if (task.state === models.RespTask.StateEnum.Canceled) {
+        taskProperties = TaskProperty.Canceled
     }
 
     const taskIdDiv = document.createElement('div') as HTMLDivElement;
@@ -232,7 +232,7 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     }
 
     const taskDiv = document.createElement('div') as HTMLDivElement;
-    taskDiv.className = "task " + task_properties;
+    taskDiv.className = "task " + taskProperties;
     taskDiv.setAttribute("type", "button");
     taskDiv.setAttribute("data-toggle", "dropdown");
     taskDiv.append(taskIdDiv, taskTextDiv, taskPointsDiv);
@@ -241,11 +241,12 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     dropdown.className = "dropdown show";
     dropdown.append(taskDiv);
 
-    taskDiv.onclick = function () {
+    taskDiv.onclick = () => {
+        // tslint:disable-next-line: no-unused-expression
         new DropdownMenu(dropdown, listId, task.id, task.state)
     };
 
-    dropdown.ondblclick = function (): any {
+    dropdown.ondblclick = (): any => {
         dropdown.replaceWith(build_task_input_html(listId, task))
         return false
     }
@@ -267,7 +268,7 @@ function build_task_input_html(listId: models.ListId, task: models.RespTask): HT
 
     const autofocusPoints = ($(".text:hover").length === 0)
     const autofocusInput = autofocusPoints ? taskPointsInput : taskTextInput;
-    setTimeout(function () {
+    setTimeout(() => {
         autofocusInput.focus()
     }, 0);
 
@@ -275,7 +276,7 @@ function build_task_input_html(listId: models.ListId, task: models.RespTask): HT
     taskDiv.className = "form-group task";
     taskDiv.append(taskTextInput, taskPointsInput);
 
-    const handleKeyPress = function (ev: KeyboardEvent) {
+    const handleKeyPress = (ev: KeyboardEvent) => {
         switch (ev.keyCode) {
             case 27:
                 taskDiv.replaceWith(build_task_html(listId, task));
@@ -284,12 +285,12 @@ function build_task_input_html(listId: models.ListId, task: models.RespTask): HT
                 const points = taskPointsInput.value.split("/")
                 const opts: models.UpdateOptions = {
                     text: taskTextInput.value,
-                    points: parseInt(points[1]),
-                    burnt: parseInt(points[0]),
+                    points: parseInt(points[1], 10),
+                    burnt: parseInt(points[0], 10),
                 }
-                api.updateTask(task.id, opts).done(function () {
+                api.updateTask(task.id, opts).done(() => {
                     load_task_lists();
-                }).fail(function (body) {
+                }).fail((body) => {
                     showErrorAlert("failed to update task")
                 });
                 load_task_lists();
@@ -317,7 +318,7 @@ function build_new_task_input_html(listId: models.ListId): HTMLElement {
     taskDiv.className = "form-group task";
     taskDiv.append(taskTextInput, taskPointsInput);
 
-    const handleKeyPress = function (ev: KeyboardEvent) {
+    const handleKeyPress = (ev: KeyboardEvent) => {
         switch (ev.keyCode) {
             case 27:
                 taskDiv.replaceWith(build_new_task_input_html(listId));
@@ -325,14 +326,14 @@ function build_new_task_input_html(listId: models.ListId): HTMLElement {
             case 13:
                 const task: models.Task = {
                     text: taskTextInput.value,
-                    points: parseInt(taskPointsInput.value),
+                    points: parseInt(taskPointsInput.value, 10),
                 }
-                api.createTask(listId, task).done(function () {
+                api.createTask(listId, task).done(() => {
                     load_task_lists();
-                    setTimeout(function () {
+                    setTimeout(() => {
                         $(listHtmlId(listId) + " .text.form-control")[0].focus()
                     }, 100);
-                }).fail(function (body) {
+                }).fail((body) => {
                     showErrorAlert("failed to create task")
                 });
         }
@@ -343,20 +344,20 @@ function build_new_task_input_html(listId: models.ListId): HTMLElement {
     return taskDiv;
 }
 
-function sum_points(tasks: Array<models.RespTask>): number {
+function sum_points(tasks: models.RespTask[]): number {
     return tasks.reduce((sum, current) => {
         return sum + current.points;
     }, 0)
 }
 
-function sum_burnt_points(tasks: Array<models.RespTask>): number {
+function sum_burnt_points(tasks: models.RespTask[]): number {
     return tasks.reduce((sum, current) => {
         return sum + current.burnt;
     }, 0)
 }
 
-function prepare_task_list(task_list: models.TaskList): void {
-    const fix_points = (value: models.RespTask) => {
+function prepare_task_list(taskList: models.TaskList): void {
+    const fixPoints = (value: models.RespTask) => {
         switch (value.state) {
             case models.RespTask.StateEnum.Done:
                 value.burnt = value.points
@@ -375,7 +376,7 @@ function prepare_task_list(task_list: models.TaskList): void {
         }
     }
 
-    task_list.tasks.forEach(fix_points)
+    taskList.tasks.forEach(fixPoints)
 }
 
 function listHtmlId(listId: models.ListId): string {

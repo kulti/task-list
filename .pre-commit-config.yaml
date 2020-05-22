@@ -9,3 +9,8 @@ repos:
     rev: v1.27.0
     hooks:
     -   id: golangci-lint
+-   repo: https://github.com/awebdeveloper/pre-commit-tslint/
+    rev: master
+    hooks:
+    -   id: tslint
+        additional_dependencies: ['tslint@6.1.2', 'typescript']
