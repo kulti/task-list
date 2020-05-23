@@ -6,6 +6,7 @@ run:
 linters:
   disable-all: true
   enable:
+    - asciicheck
     - bodyclose
     - deadcode
     - depguard
@@ -13,16 +14,20 @@ linters:
     - dupl
     - errcheck
     - funlen
-    # - gochecknoglobals
+    - gochecknoglobals
     - gochecknoinits
     - gocognit
     - goconst
     - gocritic
     - gocyclo
+    - godot
+    # - godox
+    # - goerr113
     - gofmt
     - goimports
     - golint
     - gomnd
+    - gomodguard
     - goprintffuncname
     - gosec
     - gosimple
@@ -33,12 +38,15 @@ linters:
     - maligned
     - misspell
     - nakedret
+    - nestif
+    - nolintlint
     - prealloc
     - rowserrcheck
-    # - scopelint
+    - scopelint
     - staticcheck
     - structcheck
     - stylecheck
+    - testpackage
     - typecheck
     - unconvert
     - unparam

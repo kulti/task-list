@@ -1,3 +1,4 @@
+//nolint:testpackage
 package router
 
 import (
@@ -20,6 +21,7 @@ func TestShiftPath(t *testing.T) {
 		{"/path/path2/", "path", "/path2"},
 	}
 
+	//nolint:scopelint
 	for _, tc := range tests {
 		t.Run(tc.path, func(t *testing.T) {
 			head, tail := shiftPath(tc.path)

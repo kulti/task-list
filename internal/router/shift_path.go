@@ -7,7 +7,7 @@ import (
 
 func shiftPath(p string) (head, tail string) {
 	p = path.Clean("/" + p)
-	i := strings.Index(p[1:], "/") + 1 //nolint:gomnd
+	i := strings.Index(p[1:], "/") + 1
 	if i <= 0 {
 		return p[1:], "/"
 	}

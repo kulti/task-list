@@ -21,7 +21,7 @@ func Execute() {
 	zapLogger, err := config.Build()
 	if err != nil {
 		fmt.Println("failed to init db flags: ", err)
-		os.Exit(1) //nolint:gomnd
+		os.Exit(1)
 	}
 	zap.ReplaceGlobals(zapLogger)
 

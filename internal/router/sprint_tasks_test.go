@@ -59,7 +59,7 @@ func (s *SprintTestSuite) TestBurnPoints() {
 	s.newSprint()
 
 	respTask := s.createTask(openapi_cli.SPRINT, testTask)
-	respTask.Burnt = respTask.Points / 2 //nolint:gomnd
+	respTask.Burnt = respTask.Points / 2
 	s.updateTask(respTask)
 	s.checkTaskList(openapi_cli.SPRINT, respTask)
 }
