@@ -3,7 +3,7 @@ package router_test
 import (
 	"testing"
 
-	"github.com/kulti/task-list/internal/router/openapi_cli"
+	"github.com/kulti/task-list/internal/generated/openapicli"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -14,50 +14,50 @@ type TodoTestSuite struct {
 func (s *TodoTestSuite) TestCreateTask() {
 	s.newSprint()
 
-	respTask := s.createTask(openapi_cli.TODO, testTask)
+	respTask := s.createTask(openapicli.TODO, testTask)
 
-	s.checkTaskList(openapi_cli.TODO, respTask)
-	s.checkTaskList(openapi_cli.SPRINT, respTask)
+	s.checkTaskList(openapicli.TODO, respTask)
+	s.checkTaskList(openapicli.SPRINT, respTask)
 }
 
 func (s *TodoTestSuite) TestDeleteTaskFromSprintList() {
 	s.newSprint()
 
-	respTask := s.createTask(openapi_cli.TODO, testTask)
-	s.deleteTaskFromList(respTask.Id, openapi_cli.SPRINT)
+	respTask := s.createTask(openapicli.TODO, testTask)
+	s.deleteTaskFromList(respTask.Id, openapicli.SPRINT)
 
-	s.checkTaskList(openapi_cli.TODO)
-	s.checkTaskList(openapi_cli.SPRINT)
+	s.checkTaskList(openapicli.TODO)
+	s.checkTaskList(openapicli.SPRINT)
 }
 
 func (s *TodoTestSuite) TestDeleteTaskFromTodoList() {
 	s.newSprint()
 
-	respTask := s.createTask(openapi_cli.TODO, testTask)
-	s.deleteTaskFromList(respTask.Id, openapi_cli.TODO)
+	respTask := s.createTask(openapicli.TODO, testTask)
+	s.deleteTaskFromList(respTask.Id, openapicli.TODO)
 
-	s.checkTaskList(openapi_cli.TODO)
-	s.checkTaskList(openapi_cli.SPRINT, respTask)
+	s.checkTaskList(openapicli.TODO)
+	s.checkTaskList(openapicli.SPRINT, respTask)
 }
 
 func (s *TodoTestSuite) TestTakeTask() {
 	s.newSprint()
 
-	respTask := s.createTask(openapi_cli.SPRINT, testTask)
-	s.checkTaskList(openapi_cli.TODO)
+	respTask := s.createTask(openapicli.SPRINT, testTask)
+	s.checkTaskList(openapicli.TODO)
 
-	s.takeTaskToList(respTask.Id, openapi_cli.TODO)
+	s.takeTaskToList(respTask.Id, openapicli.TODO)
 	respTask.State = "todo"
-	s.checkTaskList(openapi_cli.TODO, respTask)
-	s.checkTaskList(openapi_cli.SPRINT, respTask)
+	s.checkTaskList(openapicli.TODO, respTask)
+	s.checkTaskList(openapicli.SPRINT, respTask)
 }
 
 func (s *TodoTestSuite) TestNewSprintCleanupTodoList() {
 	s.newSprint()
-	s.createTask(openapi_cli.TODO, testTask)
+	s.createTask(openapicli.TODO, testTask)
 	s.newSprint()
 
-	s.checkTaskList(openapi_cli.TODO)
+	s.checkTaskList(openapicli.TODO)
 }
 
 func TestTodoTasks(t *testing.T) {

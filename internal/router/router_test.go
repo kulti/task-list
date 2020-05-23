@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/kulti/task-list/internal/generated/openapicli"
 	"github.com/kulti/task-list/internal/router"
-	"github.com/kulti/task-list/internal/router/openapi_cli"
 	"github.com/kulti/task-list/internal/storages/memstore"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/net/context"
@@ -15,7 +15,7 @@ import (
 type RouterTestSuite struct {
 	suite.Suite
 	srv         *httptest.Server
-	cli         *openapi_cli.APIClient
+	cli         *openapicli.APIClient
 	ctx         context.Context
 	sprintTitle string
 }
@@ -35,14 +35,14 @@ func (s *RouterTestSuite) TearDownTest() {
 }
 
 func (s *RouterTestSuite) connectToAPI() {
-	apiCfg := openapi_cli.NewConfiguration()
-	s.cli = openapi_cli.NewAPIClient(apiCfg)
+	apiCfg := openapicli.NewConfiguration()
+	s.cli = openapicli.NewAPIClient(apiCfg)
 	s.cli.ChangeBasePath(s.srv.URL + "/api/v1")
 }
 
 func (s *RouterTestSuite) newSprint() {
 	s.sprintTitle = "test title"
-	opts := openapi_cli.SprintOpts{
+	opts := openapicli.SprintOpts{
 		Title: s.sprintTitle,
 	}
 	resp, err := s.cli.DefaultApi.CreateTaskList(s.ctx, opts)
@@ -51,7 +51,7 @@ func (s *RouterTestSuite) newSprint() {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *RouterTestSuite) checkTaskList(listID openapi_cli.ListId, tasks ...openapi_cli.RespTask) {
+func (s *RouterTestSuite) checkTaskList(listID openapicli.ListId, tasks ...openapicli.RespTask) {
 	taskList, resp, err := s.cli.DefaultApi.GetTaskList(s.ctx, listID)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
@@ -59,9 +59,9 @@ func (s *RouterTestSuite) checkTaskList(listID openapi_cli.ListId, tasks ...open
 	s.Require().Equal("application/json", resp.Header.Get("Content-Type"))
 
 	switch listID {
-	case openapi_cli.SPRINT:
+	case openapicli.SPRINT:
 		s.Require().Equal(s.sprintTitle, taskList.Title)
-	case openapi_cli.TODO:
+	case openapicli.TODO:
 		s.Require().Equal("Todo", taskList.Title)
 	}
 
@@ -70,7 +70,7 @@ func (s *RouterTestSuite) checkTaskList(listID openapi_cli.ListId, tasks ...open
 	}
 }
 
-func (s *RouterTestSuite) createTask(listID openapi_cli.ListId, task openapi_cli.Task) openapi_cli.RespTask {
+func (s *RouterTestSuite) createTask(listID openapicli.ListId, task openapicli.Task) openapicli.RespTask {
 	respTask, resp, err := s.cli.DefaultApi.CreateTask(s.ctx, listID, task)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
@@ -78,9 +78,9 @@ func (s *RouterTestSuite) createTask(listID openapi_cli.ListId, task openapi_cli
 	s.Require().Equal("application/json", resp.Header.Get("Content-Type"))
 
 	switch listID {
-	case openapi_cli.SPRINT:
+	case openapicli.SPRINT:
 		s.Require().Empty(respTask.State)
-	case openapi_cli.TODO:
+	case openapicli.TODO:
 		s.Require().Equal("todo", respTask.State)
 	}
 	s.Require().NotEmpty(respTask.Id)
@@ -93,14 +93,14 @@ func (s *RouterTestSuite) createTask(listID openapi_cli.ListId, task openapi_cli
 	return respTask
 }
 
-func (s *RouterTestSuite) takeTaskToList(taskID string, listID openapi_cli.ListId) {
+func (s *RouterTestSuite) takeTaskToList(taskID string, listID openapicli.ListId) {
 	resp, err := s.cli.DefaultApi.TakeTask(s.ctx, listID, taskID)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *RouterTestSuite) deleteTaskFromList(taskID string, listID openapi_cli.ListId) {
+func (s *RouterTestSuite) deleteTaskFromList(taskID string, listID openapicli.ListId) {
 	resp, err := s.cli.DefaultApi.DeleteTask(s.ctx, listID, taskID)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
@@ -121,8 +121,8 @@ func (s *RouterTestSuite) cancelTask(taskID string) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *RouterTestSuite) updateTask(task openapi_cli.RespTask) {
-	opts := openapi_cli.UpdateOptions{
+func (s *RouterTestSuite) updateTask(task openapicli.RespTask) {
+	opts := openapicli.UpdateOptions{
 		Text:   task.Text,
 		Burnt:  task.Burnt,
 		Points: task.Points,
@@ -133,11 +133,11 @@ func (s *RouterTestSuite) updateTask(task openapi_cli.RespTask) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *RouterTestSuite) taskToRespTask(task openapi_cli.Task) openapi_cli.RespTask {
+func (s *RouterTestSuite) taskToRespTask(task openapicli.Task) openapicli.RespTask {
 	data, err := json.Marshal(&task)
 	s.Require().NoError(err)
 
-	var respTask openapi_cli.RespTask
+	var respTask openapicli.RespTask
 	err = json.Unmarshal(data, &respTask)
 	s.Require().NoError(err)
 
@@ -145,7 +145,7 @@ func (s *RouterTestSuite) taskToRespTask(task openapi_cli.Task) openapi_cli.Resp
 }
 
 func (s *RouterTestSuite) errBody(err error) string {
-	if apiErr, ok := err.(openapi_cli.GenericOpenAPIError); ok {
+	if apiErr, ok := err.(openapicli.GenericOpenAPIError); ok {
 		return string(apiErr.Body())
 	}
 	return ""
