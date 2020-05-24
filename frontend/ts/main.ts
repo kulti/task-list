@@ -26,7 +26,7 @@ function buildNewSprintTitle(): string {
     const date = new Date()
     const dayOfWeek = date.getDay()
 
-    date.setDate(date.getDate() + 8 - dayOfWeek)
+    date.setDate(date.getDate() + 1 - dayOfWeek)
     const beginDate = dateToString(date);
 
     date.setDate(date.getDate() + 6)
