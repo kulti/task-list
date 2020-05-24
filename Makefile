@@ -20,3 +20,6 @@ gen-css:
 build-js:
 	tsc --strict --outDir frontend/js frontend/ts/main.ts && \
 	browserify frontend/js/main.js > frontend/js/bundle.js
+
+build-docker-tl-server:
+	DOCKER_BUILDKIT=1 docker build -f build/package/tl-server.Dockerfile -t tl-server .
