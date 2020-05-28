@@ -23,3 +23,6 @@ build-js:
 
 build-docker-tl-server:
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-server.Dockerfile -t tl-server .
+
+build-docker-tl-migrate:
+	DOCKER_BUILDKIT=1 docker build -f build/package/tl-migrate.Dockerfile -t tl-migrate ./db
