@@ -10,7 +10,14 @@ import (
 )
 
 type dbFlags struct {
-	URL string `env:"DB_URL,required"`
+	User     string `env:"POSTGRES_USER,required"`
+	Password string `env:"POSTGRES_PASSWORD,required"`
+	DBName   string `env:"POSTGRES_DB,required"`
+	Host     string `env:"POSTGRES_DB_HOST,required"`
+}
+
+func (d dbFlags) URL() string {
+	return "postgres://" + d.User + ":" + d.Password + "@" + d.Host + ":5432/" + d.DBName
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

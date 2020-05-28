@@ -32,7 +32,7 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 			}
 			zap.S().Infow("listen at", "addr", listener.Addr().String())
 
-			taskStore, err := pgstore.New(dbFlags.URL)
+			taskStore, err := pgstore.New(dbFlags.URL())
 			if err != nil {
 				zap.S().Fatalw("failed to connect to db", zap.Error(err))
 			}
