@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  db:
+    volumes:
+      - tl_pg_data:/var/lib/postgresql/data
+
+  tl_server:
+    ports:
+      - 8090:80/tcp
+
+volumes:
+  tl_pg_data:
+    driver: local

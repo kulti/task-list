@@ -26,3 +26,12 @@ build-docker-tl-server:
 
 build-docker-tl-migrate:
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-migrate.Dockerfile -t tl-migrate ./db
+
+build-docker-tl-integration-tests: build-docker-tl-server build-docker-tl-migrate
+	DOCKER_BUILDKIT=1 docker build -f build/package/tl-integration-tests.Dockerfile -t tl-integration-tests .
+
+run-tl-integration-tests: build-docker-tl-integration-tests
+	cd deployments && \
+	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run db_migrations up && \
+	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run tl-integration-tests; \
+	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml down

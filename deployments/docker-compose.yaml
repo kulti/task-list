@@ -5,12 +5,9 @@ services:
     image: postgres:12
     env_file:
       - database.env
-    volumes:
-      - tl_pg_data:/var/lib/postgresql/data
 
   db_migrations:
     image: tl-migrate
-    container_name: db_migrations
     depends_on:
       - db
     env_file:
@@ -21,7 +18,6 @@ services:
 
   tl_server:
     image: tl-server
-    container_name: tl_server
     depends_on:
       - db
     env_file:
@@ -29,9 +25,3 @@ services:
     environment:
       - POSTGRES_DB_HOST=db
       - PORT=80
-    ports:
-      - 8090:80/tcp
-
-volumes:
-  tl_pg_data:
-    driver: local
