@@ -1,12 +1,3 @@
-build: *.go
-	go build -o tl
-
-run-live-reload:
-	modd
-
-run: build
-	./tl server -p 8090
-
 gen-go:
 	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli generate --package-name=openapicli -Dapis,models,supportingFiles=client.go -i /local/api/task.yaml -g go -o /local/internal/generated/openapicli
 	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli generate --package-name=openapicli -DsupportingFiles=configuration.go -i /local/api/task.yaml -g go -o /local/internal/generated/openapicli
@@ -35,3 +26,16 @@ run-tl-integration-tests: build-docker-tl-integration-tests
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run db_migrations up && \
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run tl-integration-tests; \
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml down
+
+build-docker-modd:
+	DOCKER_BUILDKIT=1 docker build -f build/package/modd.Dockerfile -t tl-live-reload .
+
+run-tl-dev:
+	export SRC=${PWD}; \
+	cd deployments && \
+	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run db_migrations up && \
+	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run --service-ports tl_live_reload
+
+stop-tl-dev:
+	cd deployments && \
+	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml down

@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  tl_server:
+    restart: "no"
+    entrypoint: ["echo", "Service foo disabled"]
+
+  tl_live_reload:
+    image: tl-live-reload
+    env_file:
+      - database.env
+    environment:
+      - POSTGRES_DB_HOST=db
+      - PORT=80
+    volumes:
+      - ${SRC}:/app:ro
+    ports:
+      - 8097:80/tcp
