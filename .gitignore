@@ -1,3 +1,4 @@
 node_modules
 frontend/ts/openapi_cli
 frontend/js
+.vscode
