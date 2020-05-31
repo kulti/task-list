@@ -38,7 +38,7 @@ run-tl-dev:
 	export SRC=${PWD}; \
 	cd deployments && \
 	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run db_migrations up && \
-	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run --service-ports tl_live_reload
+	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run --service-ports tl_server
 
 stop-tl-dev:
 	cd deployments && \
