@@ -1,7 +1,7 @@
 import { DefaultApi } from "./openapi_cli/index"
 import * as models from "./openapi_cli/model/models"
 
-const api = new DefaultApi("http://127.0.0.1:8090/api/v1")
+const api = new DefaultApi(window.location.origin + "/api/v1")
 
 window.onload = () => {
     const input = $("#new_sprint_title")[0] as HTMLInputElement

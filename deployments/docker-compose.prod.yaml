@@ -5,9 +5,9 @@ services:
     volumes:
       - tl_pg_data:/var/lib/postgresql/data
 
-  tl_server:
+  tl_proxy:
     ports:
-      - 8090:80/tcp
+      - 80:80/tcp
 
 volumes:
   tl_pg_data:

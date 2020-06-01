@@ -3,17 +3,20 @@ gen-go:
 	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli generate --package-name=openapicli -DsupportingFiles=configuration.go -i /local/api/task.yaml -g go -o /local/internal/generated/openapicli
 
 gen-ts:
-	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/api/task.yaml -g typescript-jquery -o /local/frontend/ts/openapi_cli
-
-gen-css:
-	frontend/scss/task_menu.scss frontend/css/main.css
+	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/api/task.yaml -g typescript-jquery -o /local/frontend/src/openapi_cli
 
 build-js:
-	tsc --strict --outDir frontend/js frontend/ts/main.ts && \
-	browserify frontend/js/main.js > frontend/js/bundle.js
+	cd frontend && \
+	npx webpack
+
+build-docker-tl-proxy:
+	DOCKER_BUILDKIT=1 docker build -f build/package/proxy.Dockerfile -t tl-proxy ./proxy
 
 build-docker-tl-server:
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-server.Dockerfile -t tl-server .
+
+build-docker-tl-front:
+	DOCKER_BUILDKIT=1 docker build -f build/package/tl-front.Dockerfile -t tl-front ./frontend
 
 build-docker-tl-migrate:
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-migrate.Dockerfile -t tl-migrate ./db
@@ -38,8 +41,9 @@ run-tl-dev:
 	export SRC=${PWD}; \
 	cd deployments && \
 	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run db_migrations up && \
-	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run --service-ports tl_server
+	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml up
 
 stop-tl-dev:
+	export SRC=${PWD}; \
 	cd deployments && \
 	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml down

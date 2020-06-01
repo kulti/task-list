@@ -1,4 +1,4 @@
 node_modules
-frontend/ts/openapi_cli
-frontend/js
+frontend/src/openapi_cli
+frontend/dist
 .vscode

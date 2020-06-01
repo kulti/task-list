@@ -1,6 +1,10 @@
 version: '3'
 
 services:
+  db:
+    volumes:
+      - tl_pg_data_dev:/var/lib/postgresql/data
+
   tl_server:
     image: tl-live-reload
     env_file:
@@ -12,3 +16,18 @@ services:
       - ${SRC}:/app:ro
     ports:
       - 8097:80/tcp
+
+  tl_front:
+    volumes:
+      - ${SRC}/frontend:/web-dev:ro
+    environment:
+      - FOLDER=web-dev
+      - DEBUG=true
+
+  tl_proxy:
+    ports:
+      - 8080:80/tcp
+
+volumes:
+  tl_pg_data_dev:
+    driver: local

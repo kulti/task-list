@@ -18,6 +18,7 @@ services:
 
   tl_server:
     image: tl-server
+    restart: always
     depends_on:
       - db
     env_file:
@@ -25,3 +26,14 @@ services:
     environment:
       - POSTGRES_DB_HOST=db
       - PORT=80
+
+  tl_front:
+    image: tl-front
+    restart: always
+
+  tl_proxy:
+    image: tl-proxy
+    restart: always
+    depends_on:
+      - tl_front
+      - tl_server
