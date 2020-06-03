@@ -42,7 +42,9 @@ func (s *TaskStore) Close() {
 }
 
 func (s *TaskStore) NewSprint(ctx context.Context, title string) error {
-	_, err := s.conn.Exec(ctx, "INSERT INTO task_lists (type, title, created_at) VALUES ($1, $2, $3)", "sprint", title, time.Now())
+	_, err := s.conn.Exec(ctx,
+		"INSERT INTO task_lists (type, title, created_at) VALUES ($1, $2, $3)",
+		"sprint", title, time.Now())
 	if err != nil {
 		return err
 	}
@@ -51,8 +53,11 @@ func (s *TaskStore) NewSprint(ctx context.Context, title string) error {
 	return err
 }
 
-func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listIDs []string) (string, error) {
-	row := s.conn.QueryRow(ctx, "INSERT INTO tasks (text, points, burnt, state) VALUES($1, $2, $3, $4) RETURNING id", task.Text, task.Points, task.Burnt, task.State)
+func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listIDs []string,
+) (string, error) {
+	row := s.conn.QueryRow(ctx,
+		"INSERT INTO tasks (text, points, burnt, state) VALUES($1, $2, $3, $4) RETURNING id",
+		task.Text, task.Points, task.Burnt, task.State)
 	var taskID int64
 	err := row.Scan(&taskID)
 	if err != nil {
@@ -60,7 +65,9 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listIDs []
 	}
 
 	for _, listType := range listIDs {
-		row = s.conn.QueryRow(ctx, "SELECT id FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1", listType)
+		row = s.conn.QueryRow(ctx,
+			"SELECT id FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1",
+			listType)
 
 		var listID int
 		err = row.Scan(&listID)
@@ -68,7 +75,9 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listIDs []
 			return "", fmt.Errorf("failed to find list: %v", err)
 		}
 
-		_, err = s.conn.Exec(ctx, "INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)", taskID, listID)
+		_, err = s.conn.Exec(ctx,
+			"INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)",
+			taskID, listID)
 		if err != nil {
 			return "", fmt.Errorf("failed to add task to list: %v", err)
 		}
@@ -83,7 +92,9 @@ func (s *TaskStore) TakeTaskToList(ctx context.Context, taskID, listIDs string) 
 		return err
 	}
 
-	_, err = s.conn.Exec(ctx, "INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)", id, s.todoListID)
+	_, err = s.conn.Exec(ctx,
+		"INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)",
+		id, s.todoListID)
 	if err != nil {
 		return err
 	}
@@ -100,7 +111,9 @@ func (s *TaskStore) DeleteTaskFromList(ctx context.Context, taskID, listType str
 	case "sprint":
 		_, err = s.conn.Exec(ctx, "DELETE FROM tasks WHERE id = $1", id)
 	case "todo":
-		_, err = s.conn.Exec(ctx, "DELETE FROM task_list_map WHERE task_id = $1 AND list_id = $2", id, s.todoListID)
+		_, err = s.conn.Exec(ctx,
+			"DELETE FROM task_list_map WHERE task_id = $1 AND list_id = $2",
+			id, s.todoListID)
 	default:
 		err = errors.New("unknown list type")
 	}
@@ -116,7 +129,9 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 		listID = s.todoListID
 		taskList.Title = "Todo"
 	default:
-		row := s.conn.QueryRow(ctx, "SELECT id, title FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1", listType)
+		row := s.conn.QueryRow(ctx,
+			"SELECT id, title FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1",
+			listType)
 
 		err := row.Scan(&listID, &taskList.Title)
 		if err != nil {
@@ -124,7 +139,13 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 		}
 	}
 
-	rows, _ := s.conn.Query(ctx, "SELECT tasks.id, tasks.text, tasks.points, tasks.burnt, tasks.state FROM tasks, task_list_map WHERE task_list_map.list_id = $1 AND tasks.id = task_list_map.task_id ORDER BY tasks.id", listID)
+	rows, _ := s.conn.Query(ctx,
+		`SELECT tasks.id, tasks.text, tasks.points, tasks.burnt, tasks.state
+		FROM tasks, task_list_map
+		WHERE task_list_map.list_id = $1
+			AND tasks.id = task_list_map.task_id
+		ORDER BY tasks.id`,
+		listID)
 	defer rows.Close()
 
 	err := rows.Err()
@@ -150,7 +171,10 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 	if err != nil {
 		return err
 	}
-	_, err = s.conn.Exec(ctx, "UPDATE tasks SET text = $2, points = $3, burnt = $4 WHERE id = $1", id, opts.Text, opts.Points, opts.Burnt)
+
+	_, err = s.conn.Exec(ctx,
+		"UPDATE tasks SET text = $2, points = $3, burnt = $4 WHERE id = $1",
+		id, opts.Text, opts.Points, opts.Burnt)
 	return err
 }
 

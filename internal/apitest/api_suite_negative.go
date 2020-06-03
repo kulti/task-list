@@ -3,7 +3,9 @@ package apitest
 import "net/http"
 
 func (s *APISuite) TestNotFound() {
-	paths := []string{"/", "/unknown", "/api/v2", "/api/v1/unknown", "/api/v1/list/unknown", "/api/v1/list/sprint/unknown", "/api/v1/list/todo/new", "/api/v1/list/sprint/take", "/api/v1/list/sprint/delete", "/api/v1/task", "/api/v1/task/unknown"}
+	paths := []string{"/", "/unknown", "/api/v2", "/api/v1/unknown", "/api/v1/list/unknown",
+		"/api/v1/list/sprint/unknown", "/api/v1/list/todo/new", "/api/v1/list/sprint/take",
+		"/api/v1/list/sprint/delete", "/api/v1/task", "/api/v1/task/unknown"}
 
 	//nolint:scopelint
 	for _, p := range paths {

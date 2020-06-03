@@ -35,7 +35,7 @@ linters:
     - govet
     - ineffassign
     - interfacer
-    # - lll
+    - lll
     - maligned
     - misspell
     - nakedret
@@ -55,3 +55,7 @@ linters:
     - varcheck
     - whitespace
     # - wsl
+
+linters-settings:
+  lll:
+    line-length: 110
