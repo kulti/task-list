@@ -26,7 +26,11 @@ build-docker-tl-integration-tests: build-docker-tl-server build-docker-tl-migrat
 
 run-tl-prod:
 	cd deployments && \
-	docker-compose -p task-list -f docker-compose.yaml -f docker-compose.prod.yaml up
+	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml up
+
+stop-tl-prod:
+	cd deployments && \
+	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml down
 
 run-tl-integration-tests: build-docker-tl-integration-tests
 	cd deployments && \
@@ -47,3 +51,13 @@ stop-tl-dev:
 	export SRC=${PWD}; \
 	cd deployments && \
 	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml down
+
+db-dump:
+	cd deployments && \
+	source database.env && \
+	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec db pg_dumpall --username=$$POSTGRES_USER --database=$$POSTGRES_DB > db.dump
+
+db-restore:
+	cd deployments && \
+	source database.env && \
+	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec -T db psql --username=$$POSTGRES_USER --dbname=$$POSTGRES_DB < db.dump
