@@ -82,15 +82,19 @@ func (h listHandler) handleCreateTaskInList(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	listIDs := []string{listID}
-	if listID == todoListID {
-		listIDs = append(listIDs, sprintListID)
-		task.State = taskStateTodo
-	}
-	id, err := h.store.CreateTask(r.Context(), task, listIDs)
+	id, err := h.store.CreateTask(r.Context(), task, sprintListID)
 	if err != nil {
 		httpInternalServerError(w, "failed to create task", err)
 		return
+	}
+
+	if listID == todoListID {
+		task.State = "todo"
+		err = h.store.TakeTaskToList(r.Context(), id, listID)
+		if err != nil {
+			httpInternalServerError(w, "failed to create task", err)
+			return
+		}
 	}
 
 	task.ID = id

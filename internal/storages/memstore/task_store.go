@@ -52,15 +52,13 @@ func (s *TaskStore) NewSprint(_ context.Context, title string) error {
 	return nil
 }
 
-func (s *TaskStore) CreateTask(_ context.Context, task models.Task, listIDs []string) (string, error) {
+func (s *TaskStore) CreateTask(_ context.Context, task models.Task, listID string) (string, error) {
 	task.ID = s.nextID()
 	storeTask := &storeTask{
 		Task:    task,
-		listIDs: listIDs,
+		listIDs: []string{listID},
 	}
-	for _, listID := range listIDs {
-		s.tasks[listID].tasks = append(s.tasks[listID].tasks, storeTask)
-	}
+	s.tasks[listID].tasks = append(s.tasks[listID].tasks, storeTask)
 	return task.ID, nil
 }
 

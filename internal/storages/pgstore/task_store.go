@@ -53,8 +53,7 @@ func (s *TaskStore) NewSprint(ctx context.Context, title string) error {
 	return err
 }
 
-func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listIDs []string,
-) (string, error) {
+func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listType string) (string, error) {
 	row := s.conn.QueryRow(ctx,
 		"INSERT INTO tasks (text, points, burnt, state) VALUES($1, $2, $3, $4) RETURNING id",
 		task.Text, task.Points, task.Burnt, task.State)
@@ -64,23 +63,21 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listIDs []
 		return "", fmt.Errorf("failed to create task: %v", err)
 	}
 
-	for _, listType := range listIDs {
-		row = s.conn.QueryRow(ctx,
-			"SELECT id FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1",
-			listType)
+	row = s.conn.QueryRow(ctx,
+		"SELECT id FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1",
+		listType)
 
-		var listID int
-		err = row.Scan(&listID)
-		if err != nil {
-			return "", fmt.Errorf("failed to find list: %v", err)
-		}
+	var listID int
+	err = row.Scan(&listID)
+	if err != nil {
+		return "", fmt.Errorf("failed to find list: %v", err)
+	}
 
-		_, err = s.conn.Exec(ctx,
-			"INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)",
-			taskID, listID)
-		if err != nil {
-			return "", fmt.Errorf("failed to add task to list: %v", err)
-		}
+	_, err = s.conn.Exec(ctx,
+		"INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)",
+		taskID, listID)
+	if err != nil {
+		return "", fmt.Errorf("failed to add task to list: %v", err)
 	}
 
 	return strconv.FormatInt(taskID, 16), nil
