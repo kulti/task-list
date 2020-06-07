@@ -6,6 +6,9 @@ const api = new DefaultApi(window.location.origin + "/api/v1")
 window.onload = () => {
     const input = $("#new_sprint_title")[0] as HTMLInputElement
     input.placeholder = buildNewSprintTitle();
+    setInterval(() => {
+        input.placeholder = buildNewSprintTitle()
+    }, 24 * 60 * 60 * 1000)
 
     load_task_lists();
 }
