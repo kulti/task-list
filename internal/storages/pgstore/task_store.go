@@ -176,7 +176,17 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 }
 
 func (s *TaskStore) DoneTask(ctx context.Context, taskID string) error {
-	return s.updateTaskState(ctx, taskID, "done")
+	id, err := strconv.ParseInt(taskID, 16, 8)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.conn.Exec(ctx, "UPDATE tasks SET state = $2, burnt=points WHERE id = $1", id, "done")
+	return err
+}
+
+func (s *TaskStore) UndoneTask(ctx context.Context, taskID string) error {
+	return s.updateTaskState(ctx, taskID, "")
 }
 
 func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {

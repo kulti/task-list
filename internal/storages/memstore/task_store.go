@@ -107,6 +107,17 @@ func (s *TaskStore) DoneTask(_ context.Context, taskID string) error {
 	for i, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
 			s.tasks[sprintList].tasks[i].State = "done"
+			s.tasks[sprintList].tasks[i].Burnt = s.tasks[sprintList].tasks[i].Points
+			break
+		}
+	}
+	return nil
+}
+
+func (s *TaskStore) UndoneTask(_ context.Context, taskID string) error {
+	for i, t := range s.tasks[sprintList].tasks {
+		if t.ID == taskID {
+			s.tasks[sprintList].tasks[i].State = ""
 			break
 		}
 	}

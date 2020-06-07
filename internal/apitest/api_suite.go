@@ -105,6 +105,7 @@ func (s *APISuite) TestDoneTask() {
 	respTask := s.createSprintTask()
 	s.doneTask(respTask.Id)
 
+	respTask.Burnt = respTask.Points
 	respTask.State = "done"
 	s.checkSprintTaskList(respTask)
 }
@@ -125,5 +126,29 @@ func (s *APISuite) TestBurnPoints() {
 	respTask := s.createSprintTask()
 	respTask.Burnt = respTask.Points / 2 //nolint:gomnd
 	s.updateTask(respTask)
+	s.checkSprintTaskList(respTask)
+}
+
+func (s *APISuite) TestBurnAllPoints() {
+	s.newSprint()
+
+	respTask := s.createSprintTask()
+	respTask.Burnt = respTask.Points
+	s.updateTask(respTask)
+
+	respTask.State = "done"
+	s.checkSprintTaskList(respTask)
+}
+
+func (s *APISuite) TestUndoneTask() {
+	s.newSprint()
+
+	respTask := s.createSprintTask()
+	s.doneTask(respTask.Id)
+
+	respTask.Burnt = 0
+	s.updateTask(respTask)
+
+	respTask.State = ""
 	s.checkSprintTaskList(respTask)
 }

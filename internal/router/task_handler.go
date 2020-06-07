@@ -55,6 +55,18 @@ func (h taskHandler) handleUpdateTask(w http.ResponseWriter, r *http.Request, ta
 	if err != nil {
 		httpInternalServerError(w, "failed to update task in db", err)
 	}
+
+	if opts.Burnt == opts.Points {
+		err := h.store.DoneTask(r.Context(), taskID)
+		if err != nil {
+			httpInternalServerError(w, "failed to update task in db", err)
+		}
+	} else {
+		err := h.store.UndoneTask(r.Context(), taskID)
+		if err != nil {
+			httpInternalServerError(w, "failed to update task in db", err)
+		}
+	}
 }
 
 func (h taskHandler) handleDoneTask(w http.ResponseWriter, r *http.Request, taskID string) {

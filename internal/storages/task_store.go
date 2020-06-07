@@ -16,4 +16,5 @@ type TaskStore interface {
 	UpdateTask(ctx context.Context, taskID string, points models.UpdateOptions) error
 	DoneTask(ctx context.Context, taskID string) error
 	CancelTask(ctx context.Context, taskID string) error
+	UndoneTask(ctx context.Context, taskID string) error
 }
