@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"sort"
@@ -145,10 +144,10 @@ func (h listHandler) parseTask(r io.Reader) (models.Task, error) {
 		return models.Task{}, err
 	}
 	if task.Text == "" {
-		return models.Task{}, errors.New("missing required argument 'text'")
+		return models.Task{}, errMissingArgText
 	}
 	if task.Points == 0 {
-		return models.Task{}, errors.New("missing required argument 'points'")
+		return models.Task{}, errMissingArgPoints
 	}
 
 	return task, nil

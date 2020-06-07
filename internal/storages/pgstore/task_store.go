@@ -2,7 +2,6 @@ package pgstore
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -19,7 +18,7 @@ type TaskStore struct {
 func New(dbURL string) (*TaskStore, error) {
 	conn, err := pgxpool.Connect(context.Background(), dbURL)
 	if err != nil {
-		return nil, fmt.Errorf("unable to connect to database: %v", err)
+		return nil, fmt.Errorf("unable to connect to database: %w", err)
 	}
 
 	s := &TaskStore{
@@ -29,7 +28,7 @@ func New(dbURL string) (*TaskStore, error) {
 	row := conn.QueryRow(context.Background(), "SELECT id FROM task_lists WHERE type = $1", "todo")
 	err = row.Scan(&s.todoListID)
 	if err != nil {
-		return nil, fmt.Errorf("unable to find todo list: %v", err)
+		return nil, fmt.Errorf("unable to find todo list: %w", err)
 	}
 
 	return s, nil
@@ -60,7 +59,7 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listType s
 	var taskID int64
 	err := row.Scan(&taskID)
 	if err != nil {
-		return "", fmt.Errorf("failed to create task: %v", err)
+		return "", fmt.Errorf("failed to create task: %w", err)
 	}
 
 	row = s.conn.QueryRow(ctx,
@@ -70,14 +69,14 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listType s
 	var listID int
 	err = row.Scan(&listID)
 	if err != nil {
-		return "", fmt.Errorf("failed to find list: %v", err)
+		return "", fmt.Errorf("failed to find list: %w", err)
 	}
 
 	_, err = s.conn.Exec(ctx,
 		"INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)",
 		taskID, listID)
 	if err != nil {
-		return "", fmt.Errorf("failed to add task to list: %v", err)
+		return "", fmt.Errorf("failed to add task to list: %w", err)
 	}
 
 	return strconv.FormatInt(taskID, 16), nil
@@ -112,7 +111,7 @@ func (s *TaskStore) DeleteTaskFromList(ctx context.Context, taskID, listType str
 			"DELETE FROM task_list_map WHERE task_id = $1 AND list_id = $2",
 			id, s.todoListID)
 	default:
-		err = errors.New("unknown list type")
+		err = errUnknownListType
 	}
 	return err
 }
@@ -132,7 +131,7 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 
 		err := row.Scan(&listID, &taskList.Title)
 		if err != nil {
-			return models.TaskList{}, fmt.Errorf("failed to find list: %v", err)
+			return models.TaskList{}, fmt.Errorf("failed to find list: %w", err)
 		}
 	}
 
