@@ -30,9 +30,21 @@ const (
 	TaskStateCanceled  TaskState = "canceled"
 )
 
-// UpdateOptions represents a update options.
+// UpdateOptions represents an update options.
 type UpdateOptions struct {
 	Text   string `json:"text"`
 	Points int32  `json:"points"`
 	Burnt  int32  `json:"burnt"`
+}
+
+// SprintTemplate represents a sprint template.
+type SprintTemplate struct {
+	Tasks []TaskTemplate `json:"tasks"`
+}
+
+// TaskTemplate represents a task template.
+type TaskTemplate struct {
+	ID     string `json:"id"`
+	Text   string `json:"text"`
+	Points int32  `json:"points"`
 }

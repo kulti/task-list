@@ -200,3 +200,29 @@ func (s *TaskStore) updateTaskState(ctx context.Context, taskID, state string) e
 	_, err = s.conn.Exec(ctx, "UPDATE tasks SET state = $2 WHERE id = $1", id, state)
 	return err
 }
+
+func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplate, error) {
+	rows, _ := s.conn.Query(ctx,
+		`SELECT id, text, points
+		FROM new_sprint_task_tempate
+		ORDER BY id`)
+	defer rows.Close()
+
+	var tasks []models.TaskTemplate
+	err := rows.Err()
+	for err == nil && rows.Next() {
+		var task models.TaskTemplate
+		var taskID int64
+		err = rows.Scan(&taskID, &task.Text, &task.Points)
+		if err == nil {
+			task.ID = strconv.FormatInt(taskID, 16)
+			tasks = append(tasks, task)
+		}
+	}
+
+	if err != nil {
+		return models.SprintTemplate{}, err
+	}
+
+	return models.SprintTemplate{Tasks: tasks}, nil
+}

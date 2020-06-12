@@ -137,6 +137,15 @@ func (s *APISuite) takeTaskToList(taskID string, listID openapicli.ListId) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
+func (s *APISuite) getSprintTemplate() openapicli.SprintTemplate {
+	s.T().Helper()
+	tmpl, resp, err := s.cli.DefaultApi.GetSprintTemplate(s.ctx)
+	s.Require().NoError(err, s.errBody(err))
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusOK, resp.StatusCode)
+	return tmpl
+}
+
 func (s *APISuite) taskToRespTask(task openapicli.Task) openapicli.RespTask {
 	s.T().Helper()
 	data, err := json.Marshal(&task)

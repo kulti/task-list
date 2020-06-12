@@ -134,6 +134,10 @@ func (s *TaskStore) CancelTask(_ context.Context, taskID string) error {
 	return nil
 }
 
+func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplate, error) {
+	return models.SprintTemplate{}, nil
+}
+
 func (s *TaskStore) nextID() string {
 	s.lastID++
 	return strconv.FormatInt(s.lastID, 16)

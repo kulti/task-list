@@ -50,6 +50,12 @@ func (h listHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else {
 			http.NotFound(w, r)
 		}
+	case "template":
+		if listID == sprintListID {
+			h.handleGetSprintTemplate(w, r)
+		} else {
+			http.NotFound(w, r)
+		}
 	case "add":
 		h.handleCreateTaskInList(w, r, listID)
 	case "take":
@@ -72,6 +78,15 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 	}
 
 	h.store.NewSprint(r.Context(), opts.Title)
+}
+
+func (h listHandler) handleGetSprintTemplate(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := h.store.GetSprintTemplate(r.Context())
+	if err != nil {
+		httpInternalServerError(w, "failed to get sprint template", err)
+		return
+	}
+	httpJSON(w, &tmpl)
 }
 
 func (h listHandler) handleCreateTaskInList(w http.ResponseWriter, r *http.Request, listID string) {
