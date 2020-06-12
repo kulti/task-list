@@ -18,6 +18,17 @@ paths:
             schema:
               $ref: '#/components/schemas/SprintOpts'
 
+  /list/sprint/template:
+    get:
+      operationId: getSprintTemplate
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/SprintTemplate'
+
   /list/{listId}:
     get:
       operationId: getTaskList
@@ -213,6 +224,30 @@ components:
           type: string
         burnt:
           type: integer
+        points:
+          type: integer
+
+    SprintTemplate:
+      type: object
+      required:
+        - tasks
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskTemplate'
+
+    TaskTemplate:
+      type: object
+      required:
+        - id
+        - text
+        - points
+      properties:
+        id:
+          type: string
+        text:
+          type: string
         points:
           type: integer
 
