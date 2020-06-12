@@ -7,11 +7,6 @@ services:
 
   tl_server:
     image: tl-live-reload
-    env_file:
-      - database.env
-    environment:
-      - POSTGRES_DB_HOST=db
-      - PORT=80
     volumes:
       - ${SRC}:/app:ro
     ports:

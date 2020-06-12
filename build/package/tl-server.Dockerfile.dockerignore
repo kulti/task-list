@@ -4,3 +4,6 @@ frontend
 api
 .vscode
 tests
+db
+build
+deployments
