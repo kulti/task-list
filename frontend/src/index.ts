@@ -119,8 +119,24 @@ $("#new_sprint_btn")[0].addEventListener("click", () => {
         title: sprintTitle
     }
     api.createTaskList(sprintOpts).done(() => {
+        api.getSprintTemplate().done((sprintTemplate) => {
+            type createTaskPromise = JQuery.Promise<
+                { response: JQueryXHR; body: models.RespTask; },
+                { response: JQueryXHR; errorThrown: string; }
+                , any>;
+            const promises: createTaskPromise[] = [];
+            sprintTemplate.body.tasks.forEach((task) => {
+                const newTask: models.Task = {
+                    text: task.text,
+                    points: task.points,
+                }
+                promises.push(api.createTask(models.ListId.Sprint, newTask))
+            });
+            Promise.all(promises).then(() => { load_task_lists() });
+        }).fail(() => {
+            load_task_lists();
+        });
         showSuccessAlert("sprint created")
-        load_task_lists();
     }).fail((body) => {
         showErrorAlert("failed to create sprint")
     });
