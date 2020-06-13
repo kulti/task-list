@@ -1,3 +1,5 @@
+![CI](https://github.com/kulti/task-list/workflows/CI/badge.svg)
+
 ## Development
 
 ### Vscode configuration
