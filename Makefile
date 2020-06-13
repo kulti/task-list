@@ -55,9 +55,15 @@ stop-tl-dev:
 db-dump:
 	cd deployments && \
 	source database.env && \
-	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec db pg_dumpall --username=$$POSTGRES_USER --database=$$POSTGRES_DB > db.dump
+	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec db pg_dump --username=$$POSTGRES_USER --dbname=$$POSTGRES_DB --data-only > db.dump && \
+	sed -i '' -e 's/COPY public.task_lists /DELETE FROM public.task_lists;\'$$'\nCOPY public.task_lists /' \
+		-e '/COPY public.schema_migrations /{N;N;d;}' \
+	db.dump
 
 db-restore:
 	cd deployments && \
 	source database.env && \
-	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec -T db psql --username=$$POSTGRES_USER --dbname=$$POSTGRES_DB < db.dump
+	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml run db_migrations up && \
+	db_container=$(docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml ps -q db) && \
+	docker cp db.dump ${db_container}:/tmp/ && \
+	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec -T db psql --username=$$POSTGRES_USER --dbname=$$POSTGRES_DB -f /tmp/db.dump
