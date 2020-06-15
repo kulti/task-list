@@ -67,3 +67,7 @@ db-restore:
 	db_container=$(docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml ps -q db) && \
 	docker cp db.dump ${db_container}:/tmp/ && \
 	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec -T db psql --username=$$POSTGRES_USER --dbname=$$POSTGRES_DB -f /tmp/db.dump
+
+go-coverage:
+	./scripts/go_test.sh && \
+	go tool cover -html=coverage.txt
