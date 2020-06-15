@@ -2,3 +2,5 @@ node_modules
 frontend/src/openapi_cli
 frontend/dist
 .vscode
+empty_test.go
+coverage.txt
