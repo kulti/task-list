@@ -83,7 +83,7 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listType s
 }
 
 func (s *TaskStore) DeleteTaskFromList(ctx context.Context, taskID, listType string) error {
-	id, err := strconv.ParseInt(taskID, 16, 8)
+	id, err := strconv.ParseInt(taskID, 16, 64)
 	if err != nil {
 		return err
 	}
@@ -147,7 +147,7 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 }
 
 func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.UpdateOptions) error {
-	id, err := strconv.ParseInt(taskID, 16, 8)
+	id, err := strconv.ParseInt(taskID, 16, 64)
 	if err != nil {
 		return err
 	}
@@ -159,7 +159,7 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 }
 
 func (s *TaskStore) DoneTask(ctx context.Context, taskID string) error {
-	id, err := strconv.ParseInt(taskID, 16, 8)
+	id, err := strconv.ParseInt(taskID, 16, 64)
 	if err != nil {
 		return err
 	}
@@ -181,7 +181,7 @@ func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
 }
 
 func (s *TaskStore) updateTaskState(ctx context.Context, taskID, state string) error {
-	id, err := strconv.ParseInt(taskID, 16, 8)
+	id, err := strconv.ParseInt(taskID, 16, 64)
 	if err != nil {
 		return err
 	}
