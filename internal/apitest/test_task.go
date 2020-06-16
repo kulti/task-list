@@ -59,6 +59,16 @@ func (s *APISuite) TestTakeTask() {
 	s.checkTodoTaskList(respTask)
 }
 
+func (s *APISuite) TestTodoTask() {
+	s.newSprint()
+
+	respTask := s.createSprintTask()
+	s.todoTask(respTask.Id)
+
+	respTask.State = "todo"
+	s.checkSprintTaskList(respTask)
+}
+
 func (s *APISuite) TestDoneTask() {
 	s.newSprint()
 
