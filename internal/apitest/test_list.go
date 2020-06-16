@@ -1,7 +1,6 @@
 package apitest
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -36,7 +35,7 @@ func (s *APISuite) TestSortList() {
 	}
 
 	seed := time.Now().UnixNano()
-	fmt.Println("seed:", seed)
+	s.T().Log("seed:", seed)
 	rand.Seed(seed)
 	rand.Shuffle(len(createActions), func(i, j int) {
 		createActions[i], createActions[j] = createActions[j], createActions[i]
