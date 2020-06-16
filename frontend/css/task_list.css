@@ -41,9 +41,9 @@ div.points {
     flex: 3;
 }
 
-/* .task:last-child {
-    border-bottom: 0;
-} */
+.task.todo {
+    font-weight: bold;
+}
 
 .task.completed {
     color: #dddddd;
