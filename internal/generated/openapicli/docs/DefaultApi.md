@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**GetSprintTemplate**](DefaultApi.md#GetSprintTemplate) | **Get** /list/sprint/template | 
 [**GetTaskList**](DefaultApi.md#GetTaskList) | **Get** /list/{listId} | 
 [**TakeTask**](DefaultApi.md#TakeTask) | **Post** /list/{listId}/take/{taskId} | 
+[**TodoTask**](DefaultApi.md#TodoTask) | **Post** /task/{taskId}/todo | 
 [**UpdateTask**](DefaultApi.md#UpdateTask) | **Post** /task/{taskId}/update | 
 
 
@@ -251,6 +252,38 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **listId** | [**ListId**](.md)|  | 
+**taskId** | **string**|  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## TodoTask
+
+> TodoTask(ctx, taskId)
+
+
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **taskId** | **string**|  | 
 
 ### Return type
