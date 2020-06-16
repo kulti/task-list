@@ -12,7 +12,6 @@ import (
 
 const (
 	sprintListID  = "sprint"
-	todoListID    = "todo"
 	backlogListID = "backlog"
 )
 
@@ -58,8 +57,6 @@ func (h listHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	case "add":
 		h.handleCreateTaskInList(w, r, listID)
-	case "take":
-		h.handleTakeTaskToList(w, r, listID)
 	case "delete":
 		h.handleDeleteTask(w, r, listID)
 	default:
@@ -96,36 +93,14 @@ func (h listHandler) handleCreateTaskInList(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	id, err := h.store.CreateTask(r.Context(), task, sprintListID)
+	id, err := h.store.CreateTask(r.Context(), task, listID)
 	if err != nil {
 		httpInternalServerError(w, "failed to create task", err)
 		return
 	}
 
-	if listID == todoListID {
-		task.State = "todo"
-		err = h.store.TakeTaskToList(r.Context(), id, listID)
-		if err != nil {
-			httpInternalServerError(w, "failed to create task", err)
-			return
-		}
-	}
-
 	task.ID = id
 	httpJSON(w, &task)
-}
-
-func (h listHandler) handleTakeTaskToList(w http.ResponseWriter, r *http.Request, listID string) {
-	taskID, _ := shiftPath(r.URL.Path)
-	if taskID == "" {
-		http.NotFound(w, r)
-		return
-	}
-
-	err := h.store.TakeTaskToList(r.Context(), taskID, listID)
-	if err != nil {
-		httpInternalServerError(w, "failed to store changes in db", err)
-	}
 }
 
 func (h listHandler) handleDeleteTask(w http.ResponseWriter, r *http.Request, listID string) {
@@ -139,14 +114,6 @@ func (h listHandler) handleDeleteTask(w http.ResponseWriter, r *http.Request, li
 	if err != nil {
 		httpInternalServerError(w, "failed to delete task from db", err)
 		return
-	}
-
-	if listID == sprintListID {
-		err = h.store.DeleteTaskFromList(r.Context(), taskID, todoListID)
-		if err != nil {
-			httpInternalServerError(w, "failed to delete task from db", err)
-			return
-		}
 	}
 }
 
@@ -201,7 +168,7 @@ func (h listHandler) handleGetTaskList(w http.ResponseWriter, r *http.Request, l
 
 func (h listHandler) supportedListID(listID string) bool {
 	switch listID {
-	case sprintListID, todoListID, backlogListID:
+	case sprintListID, backlogListID:
 		return true
 	default:
 		return false

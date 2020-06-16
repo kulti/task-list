@@ -62,17 +62,6 @@ func (s *TaskStore) CreateTask(_ context.Context, task models.Task, listID strin
 	return task.ID, nil
 }
 
-func (s *TaskStore) TakeTaskToList(_ context.Context, taskID, listIDs string) error {
-	for _, t := range s.tasks[sprintList].tasks {
-		if t.ID == taskID {
-			t.State = "todo"
-			s.tasks[listIDs].tasks = append(s.tasks[listIDs].tasks, t)
-			break
-		}
-	}
-	return nil
-}
-
 func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.UpdateOptions) error {
 	for _, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
