@@ -185,7 +185,9 @@ func (h listHandler) handleGetTaskList(w http.ResponseWriter, r *http.Request, l
 	} else {
 		sort.Slice(taskList.Tasks, func(i, j int) bool {
 			switch taskList.Tasks[i].State {
-			case "", taskStateTodo:
+			case taskStateTodo:
+				return taskList.Tasks[j].State != taskStateTodo
+			case "":
 				return taskList.Tasks[j].State != "" && taskList.Tasks[j].State != taskStateTodo
 			case "done":
 				return taskList.Tasks[j].State == "canceled"
