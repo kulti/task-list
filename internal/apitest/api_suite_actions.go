@@ -94,6 +94,14 @@ func (s *APISuite) deleteTaskFromList(taskID string, listID openapicli.ListId) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
+func (s *APISuite) todoTask(taskID string) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.TodoTask(s.ctx, taskID)
+	s.Require().NoError(err, s.errBody(err))
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusOK, resp.StatusCode)
+}
+
 func (s *APISuite) doneTask(taskID string) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.DoneTask(s.ctx, taskID)

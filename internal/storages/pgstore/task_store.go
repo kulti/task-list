@@ -188,6 +188,10 @@ func (s *TaskStore) UndoneTask(ctx context.Context, taskID string) error {
 	return s.updateTaskState(ctx, taskID, "")
 }
 
+func (s *TaskStore) TodoTask(ctx context.Context, taskID string) error {
+	return s.updateTaskState(ctx, taskID, "todo")
+}
+
 func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
 	return s.updateTaskState(ctx, taskID, "canceled")
 }

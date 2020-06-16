@@ -14,6 +14,7 @@ type TaskStore interface {
 	DeleteTaskFromList(ctx context.Context, taskID, listID string) error
 	ListTasks(ctx context.Context, listID string) (models.TaskList, error)
 	UpdateTask(ctx context.Context, taskID string, points models.UpdateOptions) error
+	TodoTask(ctx context.Context, taskID string) error
 	DoneTask(ctx context.Context, taskID string) error
 	CancelTask(ctx context.Context, taskID string) error
 	UndoneTask(ctx context.Context, taskID string) error

@@ -32,6 +32,8 @@ func (h taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch action {
 	case "update":
 		h.handleUpdateTask(w, r, taskID)
+	case "todo":
+		h.handleTodoTask(w, r, taskID)
 	case "done":
 		h.handleDoneTask(w, r, taskID)
 	case "cancel":
@@ -66,6 +68,13 @@ func (h taskHandler) handleUpdateTask(w http.ResponseWriter, r *http.Request, ta
 		if err != nil {
 			httpInternalServerError(w, "failed to update task in db", err)
 		}
+	}
+}
+
+func (h taskHandler) handleTodoTask(w http.ResponseWriter, r *http.Request, taskID string) {
+	err := h.store.TodoTask(r.Context(), taskID)
+	if err != nil {
+		httpInternalServerError(w, "failed to update task in db", err)
 	}
 }
 

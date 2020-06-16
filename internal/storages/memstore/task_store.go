@@ -124,6 +124,16 @@ func (s *TaskStore) UndoneTask(_ context.Context, taskID string) error {
 	return nil
 }
 
+func (s *TaskStore) TodoTask(_ context.Context, taskID string) error {
+	for i, t := range s.tasks[sprintList].tasks {
+		if t.ID == taskID {
+			s.tasks[sprintList].tasks[i].State = "todo"
+			break
+		}
+	}
+	return nil
+}
+
 func (s *TaskStore) CancelTask(_ context.Context, taskID string) error {
 	for i, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
