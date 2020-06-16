@@ -6,6 +6,12 @@ import (
 	"github.com/kulti/task-list/internal/generated/openapicli"
 )
 
+const (
+	taskStateDone     = "done"
+	taskStateTodo     = "todo"
+	taskStateCanceled = "canceled"
+)
+
 func (s *APISuite) taskToRespTask(task openapicli.Task) openapicli.RespTask {
 	s.T().Helper()
 	data, err := json.Marshal(&task)
