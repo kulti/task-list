@@ -23,7 +23,7 @@ func (s *APISuite) TestTodoTask() {
 	respTask := s.createSprintTask()
 	s.todoTask(respTask.Id)
 
-	respTask.State = "todo"
+	respTask.State = taskStateTodo
 	s.checkSprintTaskList(respTask)
 }
 
@@ -34,7 +34,7 @@ func (s *APISuite) TestDoneTask() {
 	s.doneTask(respTask.Id)
 
 	respTask.Burnt = respTask.Points
-	respTask.State = "done"
+	respTask.State = taskStateDone
 	s.checkSprintTaskList(respTask)
 }
 
@@ -44,7 +44,7 @@ func (s *APISuite) TestCancelTask() {
 	respTask := s.createSprintTask()
 	s.cancelTask(respTask.Id)
 
-	respTask.State = "canceled"
+	respTask.State = taskStateCanceled
 	s.checkSprintTaskList(respTask)
 }
 
@@ -64,7 +64,7 @@ func (s *APISuite) TestBurnAllPoints() {
 	respTask.Burnt = respTask.Points
 	s.updateTask(respTask)
 
-	respTask.State = "done"
+	respTask.State = taskStateDone
 	s.checkSprintTaskList(respTask)
 }
 
