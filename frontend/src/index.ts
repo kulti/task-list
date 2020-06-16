@@ -173,30 +173,22 @@ function showAlert(type: string, text: string) {
 function load_task_lists() {
     api.getTaskList(models.ListId.Sprint).fail((body) => {
         showErrorAlert("failed to load sprint tasks")
-    }).done((sprintListData) => {
-        const sprintTaskList = sprintListData.body
-        api.getTaskList(models.ListId.Todo).fail((body) => {
-            showErrorAlert("failed to load todo tasks")
-        }).done((todoListData) => {
-            const todoTaskList = todoListData.body
-            draw_task_lists(todoTaskList, sprintTaskList);
-        });
+    }).done((data) => {
+        draw_task_lists(data.body);
     });
 }
 
 enum TaskProperty {
     Completed = 'completed',
     Canceled = 'canceled',
+    Todo = 'todo',
 }
 
-function draw_task_lists(todoTaskList: models.TaskList, sprintTaskList: models.TaskList) {
-    prepare_task_list(todoTaskList)
+function draw_task_lists(sprintTaskList: models.TaskList) {
     prepare_task_list(sprintTaskList)
 
-    update_task_list_header(todoTaskList, models.ListId.Todo)
     update_task_list_header(sprintTaskList, models.ListId.Sprint)
 
-    fill_task_list(models.ListId.Todo, todoTaskList.tasks)
     fill_task_list(models.ListId.Sprint, sprintTaskList.tasks)
 }
 
@@ -233,6 +225,8 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
         taskProperties = TaskProperty.Completed
     } else if (task.state === models.RespTask.StateEnum.Canceled) {
         taskProperties = TaskProperty.Canceled
+    } else if (task.state === models.RespTask.StateEnum.Todo) {
+        taskProperties = TaskProperty.Todo
     }
 
     const taskIdDiv = document.createElement('div') as HTMLDivElement;

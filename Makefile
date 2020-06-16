@@ -41,7 +41,7 @@ run-tl-integration-tests: build-docker-tl-integration-tests
 build-docker-modd:
 	DOCKER_BUILDKIT=1 docker build -f build/package/modd.Dockerfile -t tl-live-reload .
 
-run-tl-dev:
+run-tl-dev: build-docker-tl-proxy build-docker-tl-front build-docker-modd build-docker-tl-migrate
 	export SRC=${PWD}; \
 	cd deployments && \
 	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run db_migrations up && \
