@@ -79,7 +79,7 @@ class DropdownMenu {
     }
 
     todoTask() {
-        api.takeTask(models.ListId.Todo, this.taskId).done(() => {
+        api.todoTask(this.taskId).done(() => {
             load_task_lists();
         }).fail(() => {
             showErrorAlert("failed to todo task")
