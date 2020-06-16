@@ -10,7 +10,7 @@ IGNORE_PACKAGES="\
 
 PACKAGES_FILTER=$(echo ${IGNORE_PACKAGES} | sed -e 's/ /|/g')
 
-PACKAGES=$(go list -f '{{.Name}} {{.Dir}} {{.ImportPath}}' ./... | grep -v -E "${PACKAGES_FILTER}")
+PACKAGES=$(go list -f '{{.Name}} {{.Dir}} {{.TestGoFiles}}{{.XTestGoFiles}} {{.ImportPath}}' ./... | grep -v -E "${PACKAGES_FILTER}")
 
 ALL_PACKAGES=""
 IFS_BACKUP=${IFS}
@@ -18,10 +18,13 @@ IFS=$'\n'
 for p in ${PACKAGES}; do
     name=$(echo $p | cut -f1 -d ' ')
     dir=$(echo $p | cut -f2 -d ' ')
-    pkg=$(echo $p | cut -f3 -d ' ')
+    tests=$(echo $p| cut -f3 -d ' ')
+    pkg=$(echo $p | cut -f4 -d ' ')
 
     ALL_PACKAGES="${ALL_PACKAGES} ${pkg}"
-    echo "package ${name}_test" > ${dir}/empty_test.go
+    if [[ ${tests} == '[][]' ]]; then
+        echo "package ${name}_test" > ${dir}/empty_test.go
+    fi
 done
 
 IFS=${IFS_BACKUP}
