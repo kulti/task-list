@@ -11,8 +11,7 @@ import (
 )
 
 type TaskStore struct {
-	conn       *pgxpool.Pool
-	todoListID int64
+	conn *pgxpool.Pool
 }
 
 func New(dbURL string) (*TaskStore, error) {
@@ -23,12 +22,6 @@ func New(dbURL string) (*TaskStore, error) {
 
 	s := &TaskStore{
 		conn: conn,
-	}
-
-	row := conn.QueryRow(context.Background(), "SELECT id FROM task_lists WHERE type = $1", "todo")
-	err = row.Scan(&s.todoListID)
-	if err != nil {
-		return nil, fmt.Errorf("unable to find todo list: %w", err)
 	}
 
 	return s, nil
@@ -44,11 +37,6 @@ func (s *TaskStore) NewSprint(ctx context.Context, title string) error {
 	_, err := s.conn.Exec(ctx,
 		"INSERT INTO task_lists (type, title, created_at) VALUES ($1, $2, $3)",
 		"sprint", title, time.Now())
-	if err != nil {
-		return err
-	}
-
-	_, err = s.conn.Exec(ctx, "DELETE FROM task_list_map WHERE list_id = $1", s.todoListID)
 	return err
 }
 
@@ -90,10 +78,6 @@ func (s *TaskStore) DeleteTaskFromList(ctx context.Context, taskID, listType str
 	switch listType {
 	case "sprint":
 		_, err = s.conn.Exec(ctx, "DELETE FROM tasks WHERE id = $1", id)
-	case "todo":
-		_, err = s.conn.Exec(ctx,
-			"DELETE FROM task_list_map WHERE task_id = $1 AND list_id = $2",
-			id, s.todoListID)
 	default:
 		err = errUnknownListType
 	}
@@ -104,19 +88,13 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 	var taskList models.TaskList
 	var listID int64
 
-	switch listType {
-	case "todo":
-		listID = s.todoListID
-		taskList.Title = "Todo"
-	default:
-		row := s.conn.QueryRow(ctx,
-			"SELECT id, title FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1",
-			listType)
+	row := s.conn.QueryRow(ctx,
+		"SELECT id, title FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1",
+		listType)
 
-		err := row.Scan(&listID, &taskList.Title)
-		if err != nil {
-			return models.TaskList{}, fmt.Errorf("failed to find list: %w", err)
-		}
+	err := row.Scan(&listID, &taskList.Title)
+	if err != nil {
+		return models.TaskList{}, fmt.Errorf("failed to find list: %w", err)
 	}
 
 	rows, _ := s.conn.Query(ctx,
@@ -128,7 +106,7 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 		listID)
 	defer rows.Close()
 
-	err := rows.Err()
+	err = rows.Err()
 	for err == nil && rows.Next() {
 		var task models.Task
 		var taskID int64
