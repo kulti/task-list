@@ -8,7 +8,7 @@ window.onload = () => {
     input.placeholder = buildNewSprintTitle();
     setInterval(() => {
         input.placeholder = buildNewSprintTitle()
-    }, 24 * 60 * 60 * 1000)
+    }, 60 * 60 * 1000)
 
     load_task_lists();
 }
