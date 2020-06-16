@@ -14,6 +14,5 @@ type ListId string
 // List of ListId
 const (
 	SPRINT ListId = "sprint"
-	TODO ListId = "todo"
 	BACKLOG ListId = "backlog"
 )

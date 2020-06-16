@@ -82,22 +82,6 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listType s
 	return strconv.FormatInt(taskID, 16), nil
 }
 
-func (s *TaskStore) TakeTaskToList(ctx context.Context, taskID, listIDs string) error {
-	id, err := strconv.ParseInt(taskID, 16, 8)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.conn.Exec(ctx,
-		"INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)",
-		id, s.todoListID)
-	if err != nil {
-		return err
-	}
-
-	return s.updateTaskState(ctx, taskID, "todo")
-}
-
 func (s *TaskStore) DeleteTaskFromList(ctx context.Context, taskID, listType string) error {
 	id, err := strconv.ParseInt(taskID, 16, 8)
 	if err != nil {

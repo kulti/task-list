@@ -6,16 +6,6 @@ func (s *APISuite) TestCreateSprintTask() {
 	respTask := s.createSprintTask()
 
 	s.checkSprintTaskList(respTask)
-	s.checkTodoTaskList()
-}
-
-func (s *APISuite) TestCreateTodoTask() {
-	s.newSprint()
-
-	respTask := s.createTodoTask()
-
-	s.checkSprintTaskList(respTask)
-	s.checkTodoTaskList(respTask)
 }
 
 func (s *APISuite) TestDeleteTask() {
@@ -25,38 +15,6 @@ func (s *APISuite) TestDeleteTask() {
 	s.deleteSprintTask(respTask.Id)
 
 	s.checkSprintTaskList()
-	s.checkTodoTaskList()
-}
-
-func (s *APISuite) TestDeleteTodoTaskFromSprintList() {
-	s.newSprint()
-
-	respTask := s.createTodoTask()
-	s.deleteSprintTask(respTask.Id)
-
-	s.checkSprintTaskList()
-	s.checkTodoTaskList()
-}
-
-func (s *APISuite) TestDeleteTodoTaskFromTodoList() {
-	s.newSprint()
-
-	respTask := s.createTodoTask()
-	s.deleteTodoTask(respTask.Id)
-
-	s.checkSprintTaskList(respTask)
-	s.checkTodoTaskList()
-}
-
-func (s *APISuite) TestTakeTask() {
-	s.newSprint()
-
-	respTask := s.createSprintTask()
-
-	s.takeTaskToTodoList(respTask.Id)
-	respTask.State = "todo"
-	s.checkSprintTaskList(respTask)
-	s.checkTodoTaskList(respTask)
 }
 
 func (s *APISuite) TestTodoTask() {

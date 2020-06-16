@@ -22,11 +22,6 @@ func (s *APISuite) checkSprintTaskList(tasks ...openapicli.RespTask) {
 	s.checkTaskList(openapicli.SPRINT, s.sprintTitle, tasks...)
 }
 
-func (s *APISuite) checkTodoTaskList(tasks ...openapicli.RespTask) {
-	s.T().Helper()
-	s.checkTaskList(openapicli.TODO, "Todo", tasks...)
-}
-
 func (s *APISuite) checkTaskList(listID openapicli.ListId, listTitle string, tasks ...openapicli.RespTask) {
 	s.T().Helper()
 	taskList, resp, err := s.cli.DefaultApi.GetTaskList(s.ctx, listID)
@@ -47,11 +42,6 @@ func (s *APISuite) createSprintTask() openapicli.RespTask {
 	return s.createTask(openapicli.SPRINT, s.testTask())
 }
 
-func (s *APISuite) createTodoTask() openapicli.RespTask {
-	s.T().Helper()
-	return s.createTask(openapicli.TODO, s.testTask())
-}
-
 func (s *APISuite) createTask(listID openapicli.ListId, task openapicli.Task) openapicli.RespTask {
 	s.T().Helper()
 	respTask, resp, err := s.cli.DefaultApi.CreateTask(s.ctx, listID, task)
@@ -63,8 +53,8 @@ func (s *APISuite) createTask(listID openapicli.ListId, task openapicli.Task) op
 	switch listID {
 	case openapicli.SPRINT:
 		s.Require().Empty(respTask.State)
-	case openapicli.TODO:
-		s.Require().Equal("todo", respTask.State)
+	default:
+		s.Fail("unsupported list id")
 	}
 	s.Require().NotEmpty(respTask.Id)
 
@@ -79,11 +69,6 @@ func (s *APISuite) createTask(listID openapicli.ListId, task openapicli.Task) op
 func (s *APISuite) deleteSprintTask(taskID string) {
 	s.T().Helper()
 	s.deleteTaskFromList(taskID, openapicli.SPRINT)
-}
-
-func (s *APISuite) deleteTodoTask(taskID string) {
-	s.T().Helper()
-	s.deleteTaskFromList(taskID, openapicli.TODO)
 }
 
 func (s *APISuite) deleteTaskFromList(taskID string, listID openapicli.ListId) {
@@ -126,19 +111,6 @@ func (s *APISuite) updateTask(task openapicli.RespTask) {
 		Points: task.Points,
 	}
 	resp, err := s.cli.DefaultApi.UpdateTask(s.ctx, task.Id, opts)
-	s.Require().NoError(err, s.errBody(err))
-	defer resp.Body.Close()
-	s.Require().Equal(http.StatusOK, resp.StatusCode)
-}
-
-func (s *APISuite) takeTaskToTodoList(taskID string) {
-	s.T().Helper()
-	s.takeTaskToList(taskID, openapicli.TODO)
-}
-
-func (s *APISuite) takeTaskToList(taskID string, listID openapicli.ListId) {
-	s.T().Helper()
-	resp, err := s.cli.DefaultApi.TakeTask(s.ctx, listID, taskID)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
