@@ -16,20 +16,15 @@ front/dist/bundle.js: front/src/index.ts
 	cd front && \
 	npx webpack
 
-build-docker-tl-proxy:
-	DOCKER_BUILDKIT=1 docker build -f build/package/proxy.Dockerfile -t tl-proxy ./proxy
+SERVICES=proxy server front migrate live-reload
 
-build-docker-tl-server:
-	DOCKER_BUILDKIT=1 docker build -f build/package/tl-server.Dockerfile -t tl-server ./server
+front: build-js
 
-build-docker-tl-front: build-js
-	DOCKER_BUILDKIT=1 docker build -f build/package/tl-front.Dockerfile -t tl-front ./front
+$(addprefix build-docker-tl-, $(SERVICES)): build-docker-tl-%: %
+	DOCKER_BUILDKIT=1 docker build -t tl-$< ./$<
 
-build-docker-tl-migrate:
-	DOCKER_BUILDKIT=1 docker build -f build/package/tl-migrate.Dockerfile -t tl-migrate ./migrate
-
-build-docker-tl-integration-tests: build-docker-tl-server build-docker-tl-migrate
-	DOCKER_BUILDKIT=1 docker build -f build/package/tl-integration-tests.Dockerfile -t tl-integration-tests ./server
+build-docker-tl-integration-tests:
+	DOCKER_BUILDKIT=1 docker build -f server/tl-integration-tests.Dockerfile -t tl-integration-tests ./server
 
 run-tl-prod: build-docker-tl-proxy build-docker-tl-front build-docker-server build-docker-tl-migrate
 	cd deployments && \
@@ -44,9 +39,6 @@ run-tl-integration-tests: build-docker-tl-integration-tests
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run db_migrations up && \
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run tl-integration-tests; \
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml down
-
-build-docker-tl-live-reload:
-	DOCKER_BUILDKIT=1 docker build -t tl-live-reload live-reload
 
 run-tl-dev: build-docker-tl-proxy build-docker-tl-front build-docker-tl-live-reload build-docker-tl-migrate
 	export SRC=${PWD}; \
