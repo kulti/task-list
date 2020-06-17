@@ -8,7 +8,7 @@ services:
   tl_server:
     image: tl-live-reload
     volumes:
-      - ${SRC}:/app:ro
+      - ${SRC}/server:/app:ro
     ports:
       - 8097:80/tcp
 
