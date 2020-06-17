@@ -1,9 +1,6 @@
 package apitest
 
 import (
-	"math/rand"
-	"time"
-
 	"github.com/kulti/task-list/server/internal/generated/openapicli"
 )
 
@@ -14,8 +11,6 @@ func (s *APISuite) TestEmptyList() {
 }
 
 func (s *APISuite) TestSortList() {
-	s.newSprint()
-
 	var (
 		todoTask   openapicli.RespTask
 		simpleTask openapicli.RespTask
@@ -34,20 +29,30 @@ func (s *APISuite) TestSortList() {
 		},
 	}
 
-	seed := time.Now().UnixNano()
-	s.T().Log("seed:", seed)
-	rand.Seed(seed)
-	rand.Shuffle(len(createActions), func(i, j int) {
-		createActions[i], createActions[j] = createActions[j], createActions[i]
-	})
+	permutate(createActions, func(actions []func()) {
+		s.newSprint()
 
-	for _, a := range createActions {
-		a()
+		for _, a := range createActions {
+			a()
+		}
+
+		s.todoTask(todoTask.Id)
+		s.doneTask(doneTask.Id)
+		s.cancelTask(cancelTask.Id)
+
+		s.checkSprintTaskList(todoTask, simpleTask, doneTask, cancelTask)
+	}, 0)
+}
+
+func permutate(a []func(), f func([]func()), i int) {
+	if i > len(a) {
+		f(a)
+		return
 	}
-
-	s.todoTask(todoTask.Id)
-	s.doneTask(doneTask.Id)
-	s.cancelTask(cancelTask.Id)
-
-	s.checkSprintTaskList(todoTask, simpleTask, doneTask, cancelTask)
+	permutate(a, f, i+1)
+	for j := i + 1; j < len(a); j++ {
+		a[i], a[j] = a[j], a[i]
+		permutate(a, f, i+1)
+		a[i], a[j] = a[j], a[i]
+	}
 }
