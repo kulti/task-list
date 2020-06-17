@@ -26,7 +26,7 @@ build-docker-tl-front: build-js
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-front.Dockerfile -t tl-front ./front
 
 build-docker-tl-migrate:
-	DOCKER_BUILDKIT=1 docker build -f build/package/tl-migrate.Dockerfile -t tl-migrate ./db
+	DOCKER_BUILDKIT=1 docker build -f build/package/tl-migrate.Dockerfile -t tl-migrate ./migrate
 
 build-docker-tl-integration-tests: build-docker-tl-server build-docker-tl-migrate
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-integration-tests.Dockerfile -t tl-integration-tests ./server
