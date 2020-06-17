@@ -14,7 +14,7 @@ services:
 
   tl_front:
     volumes:
-      - ${SRC}/frontend:/web-dev:ro
+      - ${SRC}/front:/web-dev:ro
     environment:
       - FOLDER=web-dev
       - DEBUG=true
