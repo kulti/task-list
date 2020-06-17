@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/kulti/task-list/internal/models"
+	"github.com/kulti/task-list/server/internal/models"
 )
 
 const (

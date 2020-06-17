@@ -3,7 +3,7 @@ package apitest
 import (
 	"net/http"
 
-	"github.com/kulti/task-list/internal/generated/openapicli"
+	"github.com/kulti/task-list/server/internal/generated/openapicli"
 )
 
 func (s *APISuite) newSprint() {

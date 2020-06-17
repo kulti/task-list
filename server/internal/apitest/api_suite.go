@@ -3,7 +3,7 @@ package apitest
 import (
 	"context"
 
-	"github.com/kulti/task-list/internal/generated/openapicli"
+	"github.com/kulti/task-list/server/internal/generated/openapicli"
 	"github.com/stretchr/testify/suite"
 )
 

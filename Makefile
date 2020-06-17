@@ -1,6 +1,6 @@
-gen-go: internal/generated/openapicli/api_default.go
+gen-go: server/internal/generated/openapicli/api_default.go
 
-internal/generated/openapicli/api_default.go: api/task.yaml
+server/internal/generated/openapicli/api_default.go: api/task.yaml
 	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate --package-name=openapicli -Dapis,models,supportingFiles=client.go -i /local/api/task.yaml -g go -o /local/internal/generated/openapicli
 	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate --package-name=openapicli -DsupportingFiles=configuration.go -i /local/api/task.yaml -g go -o /local/internal/generated/openapicli
 
@@ -20,7 +20,7 @@ build-docker-tl-proxy:
 	DOCKER_BUILDKIT=1 docker build -f build/package/proxy.Dockerfile -t tl-proxy ./proxy
 
 build-docker-tl-server:
-	DOCKER_BUILDKIT=1 docker build -f build/package/tl-server.Dockerfile -t tl-server .
+	DOCKER_BUILDKIT=1 docker build -f build/package/tl-server.Dockerfile -t tl-server ./server
 
 build-docker-tl-front: build-js
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-front.Dockerfile -t tl-front ./frontend
@@ -29,7 +29,7 @@ build-docker-tl-migrate:
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-migrate.Dockerfile -t tl-migrate ./db
 
 build-docker-tl-integration-tests: build-docker-tl-server build-docker-tl-migrate
-	DOCKER_BUILDKIT=1 docker build -f build/package/tl-integration-tests.Dockerfile -t tl-integration-tests .
+	DOCKER_BUILDKIT=1 docker build -f build/package/tl-integration-tests.Dockerfile -t tl-integration-tests ./server
 
 run-tl-prod: build-docker-tl-proxy build-docker-tl-front build-docker-server build-docker-tl-migrate
 	cd deployments && \
@@ -76,5 +76,6 @@ db-restore:
 	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec -T db psql --username=$$POSTGRES_USER --dbname=$$POSTGRES_DB -f /tmp/db.dump
 
 go-coverage:
+	cd server && \
 	./scripts/go_test.sh && \
 	go tool cover -html=coverage.txt

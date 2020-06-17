@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/kulti/task-list/internal/models"
-	"github.com/kulti/task-list/internal/storages"
+	"github.com/kulti/task-list/server/internal/models"
+	"github.com/kulti/task-list/server/internal/storages"
 )
 
 type taskHandler struct {

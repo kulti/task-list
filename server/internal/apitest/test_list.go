@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/kulti/task-list/internal/generated/openapicli"
+	"github.com/kulti/task-list/server/internal/generated/openapicli"
 )
 
 func (s *APISuite) TestEmptyList() {

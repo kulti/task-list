@@ -1,4 +1,4 @@
-module github.com/kulti/task-list
+module github.com/kulti/task-list/server
 
 go 1.14
 

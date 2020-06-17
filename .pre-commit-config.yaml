@@ -9,6 +9,7 @@ repos:
     rev: v1.27.0
     hooks:
     -   id: golangci-lint
+        entry: bash -c 'cd server && golangci-lint run --fix'
 -   repo: https://github.com/awebdeveloper/pre-commit-tslint/
     rev: master
     hooks:

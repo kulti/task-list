@@ -20,9 +20,11 @@ jobs:
         uses: actions/checkout@v2
       - name: Test
         run: ./scripts/go_test.sh
+        working-directory: server
       - name: Send coverage
         uses: shogo82148/actions-goveralls@v1
         with:
+          working-directory: server
           path-to-profile: coverage.txt
           ignore: generated,apitest
 
