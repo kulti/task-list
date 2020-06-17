@@ -7,7 +7,7 @@ services:
 
   tl_proxy:
     ports:
-      - 80:80/tcp
+      - ${PROXY_PORT}:80/tcp
 
 volumes:
   tl_pg_data:

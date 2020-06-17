@@ -7,7 +7,7 @@ services:
       - database.env
 
   db_migrations:
-    image: tl-migrate
+    image: tl-migrate:${IMAGE_TAG}
     depends_on:
       - db
     env_file:
@@ -17,7 +17,7 @@ services:
     command: version
 
   tl_server:
-    image: tl-server
+    image: tl-server:${IMAGE_TAG}
     restart: always
     depends_on:
       - db
@@ -28,11 +28,11 @@ services:
       - PORT=80
 
   tl_front:
-    image: tl-front
+    image: tl-front:${IMAGE_TAG}
     restart: always
 
   tl_proxy:
-    image: tl-proxy
+    image: tl-proxy:${IMAGE_TAG}
     restart: always
     depends_on:
       - tl_front

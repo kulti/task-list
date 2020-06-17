@@ -6,15 +6,15 @@ services:
       - tl_pg_data_dev:/var/lib/postgresql/data
 
   tl_server:
-    image: tl-live-reload
+    image: tl-live-reload:${IMAGE_TAG}
     volumes:
-      - ${SRC}/server:/app:ro
+      - ${PWD}/server:/app:ro
     ports:
       - 8097:80/tcp
 
   tl_front:
     volumes:
-      - ${SRC}/front:/web-dev:ro
+      - ${PWD}/front:/web-dev:ro
     environment:
       - FOLDER=web-dev
       - DEBUG=true

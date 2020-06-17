@@ -26,30 +26,11 @@ $(addprefix build-docker-tl-, $(SERVICES)): build-docker-tl-%: %
 build-docker-tl-integration-tests:
 	DOCKER_BUILDKIT=1 docker build -f server/tl-integration-tests.Dockerfile -t tl-integration-tests ./server
 
-run-tl-prod: build-docker-tl-proxy build-docker-tl-front build-docker-server build-docker-tl-migrate
-	cd deployments && \
-	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml up
-
-stop-tl-prod:
-	cd deployments && \
-	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml down
-
 run-tl-integration-tests: build-docker-tl-integration-tests
 	cd deployments && \
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run db_migrations up && \
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run tl-integration-tests; \
 	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml down
-
-run-tl-dev: build-docker-tl-proxy build-docker-tl-front build-docker-tl-live-reload build-docker-tl-migrate
-	export SRC=${PWD}; \
-	cd deployments && \
-	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml run db_migrations up && \
-	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml up
-
-stop-tl-dev:
-	export SRC=${PWD}; \
-	cd deployments && \
-	docker-compose -p dev -f docker-compose.yaml -f docker-compose.dev.yaml down
 
 db-dump:
 	cd deployments && \
@@ -71,3 +52,5 @@ go-coverage:
 	cd server && \
 	./scripts/go_test.sh && \
 	go tool cover -html=coverage.txt
+
+include environments.mk
