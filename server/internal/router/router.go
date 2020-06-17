@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/kulti/task-list/internal/storages"
+	"github.com/kulti/task-list/server/internal/storages"
 	"github.com/rs/cors"
 )
 

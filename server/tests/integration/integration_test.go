@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kulti/task-list/internal/apitest"
+	"github.com/kulti/task-list/server/internal/apitest"
 	"github.com/stretchr/testify/suite"
 )
 

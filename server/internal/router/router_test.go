@@ -4,9 +4,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/kulti/task-list/internal/apitest"
-	"github.com/kulti/task-list/internal/router"
-	"github.com/kulti/task-list/internal/storages/memstore"
+	"github.com/kulti/task-list/server/internal/apitest"
+	"github.com/kulti/task-list/server/internal/router"
+	"github.com/kulti/task-list/server/internal/storages/memstore"
 	"github.com/stretchr/testify/suite"
 )
 

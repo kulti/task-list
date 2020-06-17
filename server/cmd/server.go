@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/caarlos0/env/v6"
-	"github.com/kulti/task-list/internal/router"
-	"github.com/kulti/task-list/internal/storages/pgstore"
+	"github.com/kulti/task-list/server/internal/router"
+	"github.com/kulti/task-list/server/internal/storages/pgstore"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )

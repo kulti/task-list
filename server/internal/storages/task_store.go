@@ -3,7 +3,7 @@ package storages
 import (
 	"context"
 
-	"github.com/kulti/task-list/internal/models"
+	"github.com/kulti/task-list/server/internal/models"
 )
 
 // TaskStore is an interface to task storage.

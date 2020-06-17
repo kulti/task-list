@@ -2,11 +2,11 @@
 set -o pipefail
 
 IGNORE_PACKAGES="\
-    github.com/kulti/task-list$
-    github.com/kulti/task-list/cmd$
-    github.com/kulti/task-list/internal/apitest$
-    github.com/kulti/task-list/internal/generated
-    github.com/kulti/task-list/internal/storages
+    github.com/kulti/task-list/server$
+    github.com/kulti/task-list/server/cmd$
+    github.com/kulti/task-list/server/internal/apitest$
+    github.com/kulti/task-list/server/internal/generated
+    github.com/kulti/task-list/server/internal/storages
 "
 
 PACKAGES_FILTER=$(echo ${IGNORE_PACKAGES} | sed -e 's/ /|/g')
