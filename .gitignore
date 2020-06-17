@@ -1,6 +1,6 @@
 node_modules
-frontend/src/openapi_cli
-frontend/dist
+front/src/openapi_cli
+front/dist
 .vscode
 empty_test.go
 coverage.txt

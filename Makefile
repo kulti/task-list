@@ -5,15 +5,15 @@ server/internal/generated/openapicli/api_default.go: api/task.yaml
 	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate --package-name=openapicli -DsupportingFiles=configuration.go -i /local/api/task.yaml -g go -o /local/internal/generated/openapicli
 
 
-gen-ts: frontend/src/openapi_cli/index.ts
+gen-ts: front/src/openapi_cli/index.ts
 
-frontend/src/openapi_cli/index.ts: api/task.yaml
-	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate -i /local/api/task.yaml -g typescript-jquery -o /local/frontend/src/openapi_cli
+front/src/openapi_cli/index.ts: api/task.yaml
+	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate -i /local/api/task.yaml -g typescript-jquery -o /local/front/src/openapi_cli
 
-build-js: gen-ts frontend/dist/bundle.js
+build-js: gen-ts front/dist/bundle.js
 
-frontend/dist/bundle.js: frontend/src/index.ts
-	cd frontend && \
+front/dist/bundle.js: front/src/index.ts
+	cd front && \
 	npx webpack
 
 build-docker-tl-proxy:
@@ -23,7 +23,7 @@ build-docker-tl-server:
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-server.Dockerfile -t tl-server ./server
 
 build-docker-tl-front: build-js
-	DOCKER_BUILDKIT=1 docker build -f build/package/tl-front.Dockerfile -t tl-front ./frontend
+	DOCKER_BUILDKIT=1 docker build -f build/package/tl-front.Dockerfile -t tl-front ./front
 
 build-docker-tl-migrate:
 	DOCKER_BUILDKIT=1 docker build -f build/package/tl-migrate.Dockerfile -t tl-migrate ./db
