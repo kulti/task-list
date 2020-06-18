@@ -26,11 +26,8 @@ $(addprefix build-docker-tl-, $(SERVICES)): build-docker-tl-%: %
 build-docker-tl-integration-tests:
 	DOCKER_BUILDKIT=1 docker build -f server/tl-integration-tests.Dockerfile -t tl-integration-tests ./server
 
-run-tl-integration-tests: build-docker-tl-integration-tests
-	cd deployments && \
-	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run db_migrations up && \
-	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml run tl-integration-tests; \
-	docker-compose -p integration-tests -f docker-compose.yaml -f docker-compose.tests.yaml down
+run-tl-integration-tests: build-docker-tl-integration-tests build-docker-tl-server build-docker-tl-migrate
+	./scripts/run-tl-integration-tests.sh
 
 db-dump:
 	cd deployments && \
