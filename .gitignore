@@ -4,3 +4,4 @@ front/dist
 .vscode
 empty_test.go
 coverage.txt
+*.code-workspace
