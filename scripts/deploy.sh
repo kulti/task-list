@@ -6,7 +6,7 @@ env=$1
 action=$2
 
 cd deployments
-[ -f ~/.tl/${env}.env ] && source ${env}.env
+[ -f ${env}.env ] && source ${env}.env
 [ -f ~/.tl/${env}.env ] && source ~/.tl/${env}.env
 
 case $action in
