@@ -1,14 +1,14 @@
 gen-go: server/internal/generated/openapicli/api_default.go
 
 server/internal/generated/openapicli/api_default.go: api/task.yaml
-	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate --package-name=openapicli -Dapis,models,supportingFiles=client.go -i /local/api/task.yaml -g go -o /local/server/internal/generated/openapicli
-	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate --package-name=openapicli -DsupportingFiles=configuration.go -i /local/api/task.yaml -g go -o /local/server/internal/generated/openapicli
+	docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate --package-name=openapicli -Dapis,models,supportingFiles=client.go -i /local/api/task.yaml -g go -o /local/server/internal/generated/openapicli
+	docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate --package-name=openapicli -DsupportingFiles=configuration.go -i /local/api/task.yaml -g go -o /local/server/internal/generated/openapicli
 
 
 gen-ts: front/src/openapi_cli/index.ts
 
 front/src/openapi_cli/index.ts: api/task.yaml
-	docker run --rm -it -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate -i /local/api/task.yaml -g typescript-jquery -o /local/front/src/openapi_cli
+	docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 generate -i /local/api/task.yaml -g typescript-jquery -o /local/front/src/openapi_cli
 
 build-js: gen-ts front/dist/bundle.js
 
