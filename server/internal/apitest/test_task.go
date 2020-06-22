@@ -1,5 +1,7 @@
 package apitest
 
+import "net/http"
+
 func (s *APISuite) TestCreateSprintTask() {
 	s.newSprint()
 
@@ -79,4 +81,22 @@ func (s *APISuite) TestUndoneTask() {
 
 	respTask.State = ""
 	s.checkSprintTaskList(respTask)
+}
+
+func (s *APISuite) TestCancelTaskThatAlreadyDone() {
+	s.newSprint()
+
+	respTask := s.createSprintTask()
+	s.doneTask(respTask.Id)
+
+	s.cancelTaskWithError(respTask.Id, http.StatusBadRequest)
+}
+
+func (s *APISuite) TestDoneTaskThatAlreadyCanceled() {
+	s.newSprint()
+
+	respTask := s.createSprintTask()
+	s.cancelTask(respTask.Id)
+
+	s.doneTaskWithError(respTask.Id, http.StatusBadRequest)
 }

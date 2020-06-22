@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/kulti/task-list/server/internal/models"
+	"github.com/kulti/task-list/server/internal/storages"
 )
 
 const (
@@ -95,6 +96,9 @@ func (s *TaskStore) ListTasks(_ context.Context, listID string) (models.TaskList
 func (s *TaskStore) DoneTask(_ context.Context, taskID string) error {
 	for i, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
+			if s.tasks[sprintList].tasks[i].State == "canceled" {
+				return storages.NewStateInconsistencyErr("canceled", "done")
+			}
 			s.tasks[sprintList].tasks[i].State = "done"
 			s.tasks[sprintList].tasks[i].Burnt = s.tasks[sprintList].tasks[i].Points
 			break
@@ -126,6 +130,9 @@ func (s *TaskStore) TodoTask(_ context.Context, taskID string) error {
 func (s *TaskStore) CancelTask(_ context.Context, taskID string) error {
 	for i, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
+			if s.tasks[sprintList].tasks[i].State == "done" {
+				return storages.NewStateInconsistencyErr("done", "canceled")
+			}
 			s.tasks[sprintList].tasks[i].State = "canceled"
 			break
 		}

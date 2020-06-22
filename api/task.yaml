@@ -113,6 +113,9 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: Bad reqest can be returned in cases when done is not possible for task.
+            E.g. cannot done task that already canceled.
 
   /task/{taskId}/cancel:
     post:
@@ -126,6 +129,9 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: Bad reqest can be returned in cases when cancel is not possible for task.
+            E.g. cannot cancel task that already done.
 
   /task/{taskId}/update:
     post:

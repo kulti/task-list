@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/kulti/task-list/server/internal/models"
@@ -80,6 +81,10 @@ func (h taskHandler) handleTodoTask(w http.ResponseWriter, r *http.Request, task
 
 func (h taskHandler) handleDoneTask(w http.ResponseWriter, r *http.Request, taskID string) {
 	err := h.store.DoneTask(r.Context(), taskID)
+	if errors.As(err, &storages.StateInconsistencyErr{}) {
+		httpBadRequest(w, "failed to update task in db", err)
+		return
+	}
 	if err != nil {
 		httpInternalServerError(w, "failed to update task in db", err)
 	}
@@ -87,6 +92,10 @@ func (h taskHandler) handleDoneTask(w http.ResponseWriter, r *http.Request, task
 
 func (h taskHandler) handleCancelTask(w http.ResponseWriter, r *http.Request, taskID string) {
 	err := h.store.CancelTask(r.Context(), taskID)
+	if errors.As(err, &storages.StateInconsistencyErr{}) {
+		httpBadRequest(w, "failed to update task in db", err)
+		return
+	}
 	if err != nil {
 		httpInternalServerError(w, "failed to update task in db", err)
 	}

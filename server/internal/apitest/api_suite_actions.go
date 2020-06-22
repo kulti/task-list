@@ -95,12 +95,28 @@ func (s *APISuite) doneTask(taskID string) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
+func (s *APISuite) doneTaskWithError(taskID string, httpStatus int) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.DoneTask(s.ctx, taskID)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(httpStatus, resp.StatusCode)
+}
+
 func (s *APISuite) cancelTask(taskID string) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.CancelTask(s.ctx, taskID)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
+}
+
+func (s *APISuite) cancelTaskWithError(taskID string, httpStatus int) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.CancelTask(s.ctx, taskID)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(httpStatus, resp.StatusCode)
 }
 
 func (s *APISuite) updateTask(task openapicli.RespTask) {
