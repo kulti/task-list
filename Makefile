@@ -21,13 +21,16 @@ SERVICES=proxy server front migrate live-reload
 front: build-js
 
 $(addprefix build-docker-tl-, $(SERVICES)): build-docker-tl-%: %
-	DOCKER_BUILDKIT=1 docker build -t tl-$< ./$<
+	DOCKER_BUILDKIT=1 docker build -t kulti/tl-$< ./$<
 
 build-docker-tl-integration-tests:
-	DOCKER_BUILDKIT=1 docker build -f server/tl-integration-tests.Dockerfile -t tl-integration-tests ./server
+	DOCKER_BUILDKIT=1 docker build -f server/tl-integration-tests.Dockerfile -t kulti/tl-integration-tests ./server
 
 run-tl-integration-tests: build-docker-tl-integration-tests build-docker-tl-server build-docker-tl-migrate
 	./scripts/run-tl-integration-tests.sh
+
+push-docker-images: build-docker-tl-integration-tests build-docker-tl-server build-docker-tl-migrate build-docker-tl-front build-docker-tl-proxy
+	./scripts/push-docker-images.sh
 
 db-dump:
 	cd deployments && \

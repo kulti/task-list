@@ -2,7 +2,7 @@ version: '3'
 
 services:
   tl-integration-tests:
-    image: tl-integration-tests
+    image: kulti/tl-integration-tests
     depends_on:
       - tl_server
     environment:
