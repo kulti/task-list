@@ -18,7 +18,7 @@ front/dist/bundle.js: front/src/index.ts
 
 SERVICES=proxy server front migrate live-reload
 
-front: build-js
+front: gen-ts
 
 $(addprefix build-docker-tl-, $(SERVICES)): build-docker-tl-%: %
 	DOCKER_BUILDKIT=1 docker build -t kulti/tl-$< ./$<
