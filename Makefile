@@ -29,7 +29,7 @@ build-docker-tl-integration-tests:
 run-tl-integration-tests: build-docker-tl-integration-tests build-docker-tl-server build-docker-tl-migrate
 	./scripts/run-tl-integration-tests.sh
 
-push-docker-images: build-docker-tl-integration-tests build-docker-tl-server build-docker-tl-migrate build-docker-tl-front build-docker-tl-proxy
+push-docker-images: build-docker-tl-server build-docker-tl-migrate build-docker-tl-front build-docker-tl-proxy
 	./scripts/push-docker-images.sh
 
 db-dump:
