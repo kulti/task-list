@@ -55,16 +55,22 @@ class DropdownMenu {
         this.dropdownMenu = document.createElement('div') as HTMLDivElement;
         this.dropdownMenu.className = "dropdown-menu";
 
-        this.appendItem("Done", this.doneTask)
-
-        if (this.listId === models.ListId.Sprint) {
-            const action = this.appendItem("Todo", this.todoTask)
-            if (taskState === models.RespTask.StateEnum.Todo) {
-                action.className += " disabled"
-            }
+        switch (taskState) {
+            case models.RespTask.StateEnum.Todo:
+                this.appendItem("Done", this.doneTask)
+                this.appendItem("Cancel", this.cancelTask)
+                break;
+            case models.RespTask.StateEnum.Done:
+                break;
+            case models.RespTask.StateEnum.Canceled:
+                break;
+            default:
+                this.appendItem("Done", this.doneTask)
+                this.appendItem("Todo", this.todoTask)
+                this.appendItem("Cancel", this.cancelTask)
+                break;
         }
 
-        this.appendItem("Cancel", this.cancelTask)
         this.appendItem("Delete", this.deleteTask)
 
         parent.appendChild(this.dropdownMenu)
