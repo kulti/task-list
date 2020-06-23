@@ -13,6 +13,7 @@ RUN npm install
 
 ADD . /build
 
+RUN npm run test
 RUN npx webpack
 
 FROM halverneus/static-file-server
