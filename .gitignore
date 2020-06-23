@@ -1,6 +1,7 @@
 node_modules
 front/src/openapi_cli
 front/dist
+front/coverage
 .vscode
 empty_test.go
 coverage.txt
