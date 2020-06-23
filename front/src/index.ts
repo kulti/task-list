@@ -1,5 +1,6 @@
 import { DefaultApi } from "./openapi_cli/index"
 import * as models from "./openapi_cli/model/models"
+import { DropdownMenu } from "./DropdownMenu"
 
 const api = new DefaultApi(window.location.origin + "/api/v1")
 
@@ -36,86 +37,6 @@ function buildNewSprintTitle(): string {
     const endDate = dateToString(date);
 
     return beginDate + " - " + endDate;
-}
-
-class DropdownMenu {
-    dropdownMenu: HTMLDivElement;
-    listId: models.ListId;
-    taskId: string;
-
-    constructor(parent: Node, listId: models.ListId, taskId: string, taskState: models.RespTask.StateEnum) {
-        this.listId = listId;
-        this.taskId = taskId;
-
-        this.doneTask = this.doneTask.bind(this)
-        this.todoTask = this.todoTask.bind(this)
-        this.cancelTask = this.cancelTask.bind(this)
-        this.deleteTask = this.deleteTask.bind(this)
-
-        this.dropdownMenu = document.createElement('div') as HTMLDivElement;
-        this.dropdownMenu.className = "dropdown-menu";
-
-        switch (taskState) {
-            case models.RespTask.StateEnum.Todo:
-                this.appendItem("Done", this.doneTask)
-                this.appendItem("Cancel", this.cancelTask)
-                break;
-            case models.RespTask.StateEnum.Done:
-                break;
-            case models.RespTask.StateEnum.Canceled:
-                break;
-            default:
-                this.appendItem("Done", this.doneTask)
-                this.appendItem("Todo", this.todoTask)
-                this.appendItem("Cancel", this.cancelTask)
-                break;
-        }
-
-        this.appendItem("Delete", this.deleteTask)
-
-        parent.appendChild(this.dropdownMenu)
-    }
-
-    doneTask() {
-        api.doneTask(this.taskId).done(() => {
-            load_task_lists();
-        }).fail(() => {
-            showErrorAlert("failed to done task")
-        })
-    }
-
-    todoTask() {
-        api.todoTask(this.taskId).done(() => {
-            load_task_lists();
-        }).fail(() => {
-            showErrorAlert("failed to todo task")
-        })
-    }
-
-    cancelTask() {
-        api.cancelTask(this.taskId).done(() => {
-            load_task_lists();
-        }).fail(() => {
-            showErrorAlert("failed to cancel task")
-        })
-    }
-
-    deleteTask() {
-        api.deleteTask(this.listId, this.taskId).done(() => {
-            load_task_lists();
-        }).fail(() => {
-            showErrorAlert("failed to delete task")
-        })
-    }
-
-    appendItem(text: string, handler: EventListener): HTMLElement {
-        const action = document.createElement('div') as HTMLDivElement;
-        action.className = "dropdown-item"
-        action.innerText = text
-        action.addEventListener("click", handler)
-        this.dropdownMenu.appendChild(action)
-        return action
-    }
 }
 
 $("#new_sprint_btn")[0].addEventListener("click", () => {
@@ -261,8 +182,7 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     dropdown.append(taskDiv);
 
     taskDiv.onclick = () => {
-        // tslint:disable-next-line: no-unused-expression
-        new DropdownMenu(dropdown, listId, task.id, task.state)
+        build_dropdown_menul(dropdown, listId, task)
     };
 
     dropdown.ondblclick = (): any => {
@@ -273,6 +193,40 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     return dropdown;
 }
 
+function build_dropdown_menul(dropdown: HTMLDivElement, listId: models.ListId, task: models.RespTask) {
+    // tslint:disable-next-line: no-unused-expression
+    new DropdownMenu(dropdown, task.state,
+        () => {
+            api.todoTask(task.id).done(() => {
+                load_task_lists();
+            }).fail(() => {
+                showErrorAlert("failed to todo task")
+            })
+        },
+        () => {
+            api.doneTask(task.id).done(() => {
+                load_task_lists();
+            }).fail(() => {
+                showErrorAlert("failed to done task")
+            })
+        },
+        () => {
+            api.cancelTask(task.id).done(() => {
+                load_task_lists();
+            }).fail(() => {
+                showErrorAlert("failed to cancel task")
+            })
+        },
+        () => {
+            api.deleteTask(listId, task.id).done(() => {
+                load_task_lists();
+            }).fail(() => {
+                showErrorAlert("failed to delete task")
+            })
+        }
+    )
+
+}
 
 function build_task_input_html(listId: models.ListId, task: models.RespTask): HTMLElement {
     const taskTextInput = document.createElement('input') as HTMLInputElement;
