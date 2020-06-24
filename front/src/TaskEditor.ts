@@ -1,26 +1,38 @@
 import * as models from "./openapi_cli/model/models"
 
-export function BuildTaskEditor(applyFn: (text: string, points: string) => void, resetDiv?: HTMLElement, task?: models.RespTask): HTMLElement {
+export enum TaskEditoFocus {
+    Text = 'text',
+    Points = 'points',
+    None = 'none'
+}
+
+export function BuildTaskEditor(
+    applyFn: (text: string, points: string) => void,
+    resetDiv?: HTMLElement,
+    task?: models.RespTask,
+    focus = TaskEditoFocus.None
+): HTMLElement {
     const taskTextInput = document.createElement('input') as HTMLInputElement;
     taskTextInput.className = "text form-control";
     taskTextInput.type = "text";
+    taskTextInput.placeholder = "Do new task";
 
     const taskPointsInput = document.createElement('input') as HTMLInputElement;
     taskPointsInput.className = "points form-control";
     taskPointsInput.type = "text";
+    taskPointsInput.placeholder = "0";
 
     if (task) {
         taskTextInput.value = task.text;
         taskPointsInput.value = task.burnt + "/" + task.points;
+    }
 
-        const autofocusPoints = ($(".text:hover").length === 0)
+    if (focus !== TaskEditoFocus.None) {
+        const autofocusPoints = (focus === TaskEditoFocus.Points)
         const autofocusInput = autofocusPoints ? taskPointsInput : taskTextInput;
         setTimeout(() => {
             autofocusInput.focus()
         }, 0);
-    } else {
-        taskTextInput.placeholder = "Do new task";
-        taskPointsInput.placeholder = "0";
     }
 
     const taskDiv = document.createElement('div') as HTMLDivElement;
@@ -28,8 +40,8 @@ export function BuildTaskEditor(applyFn: (text: string, points: string) => void,
     taskDiv.append(taskTextInput, taskPointsInput);
 
     const handleKeyPress = (ev: KeyboardEvent) => {
-        switch (ev.keyCode) {
-            case 27:
+        switch (ev.key) {
+            case 'Escape':
                 if (resetDiv) {
                     taskDiv.replaceWith(resetDiv)
                 } else {
@@ -37,7 +49,7 @@ export function BuildTaskEditor(applyFn: (text: string, points: string) => void,
                     taskPointsInput.value = ""
                 }
                 break;
-            case 13:
+            case 'Enter':
                 applyFn(taskTextInput.value, taskPointsInput.value)
         }
     }

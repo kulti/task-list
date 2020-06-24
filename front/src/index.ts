@@ -1,7 +1,7 @@
 import { DefaultApi } from "./openapi_cli/index"
 import * as models from "./openapi_cli/model/models"
 import { BuildDropdownMenu } from "./DropdownMenu"
-import { BuildTaskEditor } from "./TaskEditor"
+import { BuildTaskEditor, TaskEditoFocus } from "./TaskEditor"
 
 const api = new DefaultApi(window.location.origin + "/api/v1")
 
@@ -229,6 +229,8 @@ function build_dropdown_menu(listId: models.ListId, task: models.RespTask): HTML
 }
 
 function build_task_input_html(listId: models.ListId, task: models.RespTask, resetDiv: HTMLElement): HTMLElement {
+    const autofocusPoints = ($(".text:hover").length === 0)
+    const focus = autofocusPoints ? TaskEditoFocus.Points : TaskEditoFocus.Text;
     return BuildTaskEditor((text: string, points: string) => {
         const pointsArr = points.split("/")
         const opts: models.UpdateOptions = {
@@ -242,7 +244,7 @@ function build_task_input_html(listId: models.ListId, task: models.RespTask, res
             showErrorAlert("failed to update task")
         });
         load_task_lists();
-    }, resetDiv, task);
+    }, resetDiv, task, focus);
 }
 
 function build_new_task_input_html(listId: models.ListId): HTMLElement {
