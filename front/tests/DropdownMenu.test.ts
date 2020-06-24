@@ -10,17 +10,13 @@ describe('list elements', () => {
     `(
         'list "$type" should contains: $items',
         ({ type, items }) => {
-            const DropdownMenu = require('../src/DropdownMenu').DropdownMenu
+            const BuildDropdownMenu = require('../src/DropdownMenu').BuildDropdownMenu
 
-            const parent = document.createElement('div') as HTMLDivElement;
-            // tslint:disable-next-line: no-unused-expression
-            new DropdownMenu(parent, type, {}, {}, {}, {})
+            const menuDiv = BuildDropdownMenu(type, {}, {}, {}, {})
 
-            expect(parent.childNodes).toHaveLength(1)
-            expect(parent.firstElementChild.className).toEqual('dropdown-menu')
-
-            const menuDiv = parent.firstElementChild
+            expect(menuDiv.className).toEqual('dropdown-menu')
             expect(menuDiv.childNodes).toHaveLength(items.length)
+
             items.forEach((item: string, i: number) => {
                 const menuItem = menuDiv.children[i] as HTMLDivElement
                 expect(menuItem.innerText).toEqual(item)
@@ -36,12 +32,9 @@ describe('list item actions', () => {
     fnMap.set('Cancel', jest.fn())
     fnMap.set('Delete', jest.fn())
 
-    const DropdownMenu = require('../src/DropdownMenu').DropdownMenu
-    const parent = document.createElement('div') as HTMLDivElement;
-    // tslint:disable-next-line: no-unused-expression
-    new DropdownMenu(parent, '', fnMap.get('Todo'), fnMap.get('Done'), fnMap.get('Cancel'), fnMap.get('Delete'))
+    const BuildDropdownMenu = require('../src/DropdownMenu').BuildDropdownMenu
+    const menuDiv = BuildDropdownMenu('', fnMap.get('Todo'), fnMap.get('Done'), fnMap.get('Cancel'), fnMap.get('Delete'))
 
-    const menuDiv = parent.firstElementChild
     expect(menuDiv.childNodes).toHaveLength(4)
 
     menuDiv.childNodes.forEach((menuItem: HTMLDivElement) => {

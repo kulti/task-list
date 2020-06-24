@@ -1,6 +1,6 @@
 import { DefaultApi } from "./openapi_cli/index"
 import * as models from "./openapi_cli/model/models"
-import { DropdownMenu } from "./DropdownMenu"
+import { BuildDropdownMenu } from "./DropdownMenu"
 
 const api = new DefaultApi(window.location.origin + "/api/v1")
 
@@ -182,7 +182,7 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     dropdown.append(taskDiv);
 
     taskDiv.onclick = () => {
-        build_dropdown_menul(dropdown, listId, task)
+        dropdown.append(build_dropdown_menu(listId, task))
     };
 
     dropdown.ondblclick = (): any => {
@@ -193,9 +193,8 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     return dropdown;
 }
 
-function build_dropdown_menul(dropdown: HTMLDivElement, listId: models.ListId, task: models.RespTask) {
-    // tslint:disable-next-line: no-unused-expression
-    new DropdownMenu(dropdown, task.state,
+function build_dropdown_menu(listId: models.ListId, task: models.RespTask): HTMLDivElement {
+    return BuildDropdownMenu(task.state,
         () => {
             api.todoTask(task.id).done(() => {
                 load_task_lists();

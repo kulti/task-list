@@ -1,40 +1,34 @@
 import * as models from "./openapi_cli/model/models"
 
-export class DropdownMenu {
-    dropdownMenu: HTMLDivElement;
+export function BuildDropdownMenu(taskState: models.RespTask.StateEnum, todoEL: EventListener,
+    doneEl: EventListener, cancelEL: EventListener, deleteEL: EventListener): HTMLDivElement {
+    const dropdownMenu = document.createElement('div') as HTMLDivElement;
+    dropdownMenu.className = "dropdown-menu";
 
-    constructor(parent: Node, taskState: models.RespTask.StateEnum, todoEL: EventListener,
-        doneEl: EventListener, cancelEL: EventListener, deleteEL: EventListener) {
-        this.dropdownMenu = document.createElement('div') as HTMLDivElement;
-        this.dropdownMenu.className = "dropdown-menu";
-
-        switch (taskState) {
-            case models.RespTask.StateEnum.Todo:
-                this.appendItem("Done", doneEl)
-                this.appendItem("Cancel", cancelEL)
-                break;
-            case models.RespTask.StateEnum.Done:
-                break;
-            case models.RespTask.StateEnum.Canceled:
-                break;
-            default:
-                this.appendItem("Done", doneEl)
-                this.appendItem("Todo", todoEL)
-                this.appendItem("Cancel", cancelEL)
-                break;
-        }
-
-        this.appendItem("Delete", deleteEL)
-
-        parent.appendChild(this.dropdownMenu)
+    switch (taskState) {
+        case models.RespTask.StateEnum.Todo:
+            appendItem(dropdownMenu, "Done", doneEl)
+            appendItem(dropdownMenu, "Cancel", cancelEL)
+            break;
+        case models.RespTask.StateEnum.Done:
+            break;
+        case models.RespTask.StateEnum.Canceled:
+            break;
+        default:
+            appendItem(dropdownMenu, "Done", doneEl)
+            appendItem(dropdownMenu, "Todo", todoEL)
+            appendItem(dropdownMenu, "Cancel", cancelEL)
+            break;
     }
 
-    appendItem(text: string, handler: EventListener): HTMLElement {
-        const action = document.createElement('div') as HTMLDivElement;
-        action.className = "dropdown-item"
-        action.innerText = text
-        action.addEventListener("click", handler)
-        this.dropdownMenu.appendChild(action)
-        return action
-    }
+    appendItem(dropdownMenu, "Delete", deleteEL)
+    return dropdownMenu
+}
+
+function appendItem(dropdownMenu: HTMLDivElement, text: string, handler: EventListener) {
+    const action = document.createElement('div') as HTMLDivElement;
+    action.className = "dropdown-item"
+    action.innerText = text
+    action.addEventListener("click", handler)
+    dropdownMenu.appendChild(action)
 }
