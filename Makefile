@@ -26,7 +26,7 @@ $(addprefix build-docker-tl-, $(SERVICES)): build-docker-tl-%: %
 build-docker-tl-integration-tests:
 	DOCKER_BUILDKIT=1 docker build -f server/tl-integration-tests.Dockerfile -t kulti/tl-integration-tests ./server
 
-run-tl-integration-tests: build-docker-tl-integration-tests build-docker-tl-server build-docker-tl-migrate
+run-tl-integration-tests: build-docker-tl-integration-tests build-docker-tl-server build-docker-tl-migrate build-docker-tl-front build-docker-tl-proxy
 	./scripts/run-tl-integration-tests.sh
 
 push-docker-images: build-docker-tl-server build-docker-tl-migrate build-docker-tl-front build-docker-tl-proxy
