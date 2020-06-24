@@ -1,6 +1,7 @@
 package router_test
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -24,6 +25,13 @@ func (s *RouterTestSuite) SetupTest() {
 
 func (s *RouterTestSuite) TearDownTest() {
 	s.srv.Close()
+}
+
+func (s *RouterTestSuite) TestApiRootNotFound() {
+	resp, err := http.Get(s.srv.URL)
+	s.Require().NoError(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusNotFound, resp.StatusCode)
 }
 
 func TestRouter(t *testing.T) {
