@@ -1,5 +1,3 @@
-import * as models from "../src/openapi_cli/model/models"
-
 describe('list elements', () => {
     test.each`
         type          | items
