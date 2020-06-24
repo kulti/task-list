@@ -1,18 +1,14 @@
-import * as models from "../src/openapi_cli/model/models"
+import { BuildTaskEditor, TaskEditorTask } from "../src/TaskEditor"
 
 describe('build task editor', () => {
-    const BuildTaskEditor = require('../src/TaskEditor').BuildTaskEditor
-
-    const task: models.RespTask = {
-        id: 'any id',
+    const task: TaskEditorTask = {
         text: "test task",
         points: 3,
         burnt: 1,
-        state: models.RespTask.StateEnum.Todo,
     }
 
     it('has specific html for new task', () => {
-        const taskDiv = BuildTaskEditor({},) as HTMLDivElement
+        const taskDiv = BuildTaskEditor(jest.fn())
 
         expect(taskDiv.childNodes).toHaveLength(2)
 
@@ -28,7 +24,7 @@ describe('build task editor', () => {
     });
 
     it('has specific html for edit task', () => {
-        const taskDiv = BuildTaskEditor({}, {}, task) as HTMLDivElement
+        const taskDiv = BuildTaskEditor(jest.fn(), undefined, undefined, task)
 
         expect(taskDiv.childNodes).toHaveLength(2)
 
@@ -39,6 +35,21 @@ describe('build task editor', () => {
         const pointsInput = taskDiv.childNodes[1] as HTMLInputElement
         expect(pointsInput.className).toContain('points')
         expect(pointsInput.value).toEqual(task.burnt + "/" + task.points)
+    });
+
+    it('has specific html for edit task without burnt points', () => {
+        task.burnt = undefined
+        const taskDiv = BuildTaskEditor(jest.fn(), undefined, undefined, task)
+
+        expect(taskDiv.childNodes).toHaveLength(2)
+
+        const textInput = taskDiv.childNodes[0] as HTMLInputElement
+        expect(textInput.className).toContain('text')
+        expect(textInput.value).toEqual(task.text)
+
+        const pointsInput = taskDiv.childNodes[1] as HTMLInputElement
+        expect(pointsInput.className).toContain('points')
+        expect(pointsInput.value).toEqual(task.points.toString())
     });
 
     it('handles enter key as apply', () => {
@@ -60,7 +71,8 @@ describe('build task editor', () => {
 
     it('handles escape key to cleanup inputs', () => {
         const applyFn = jest.fn()
-        const taskDiv = BuildTaskEditor(applyFn) as HTMLDivElement
+        const cancelFn = jest.fn()
+        const taskDiv = BuildTaskEditor(applyFn, cancelFn) as HTMLDivElement
         const textInput = taskDiv.childNodes[0] as HTMLInputElement
         const pointsInput = taskDiv.childNodes[1] as HTMLInputElement
 
@@ -73,6 +85,7 @@ describe('build task editor', () => {
         textInput.dispatchEvent(ev)
 
         expect(applyFn).not.toBeCalled()
+        expect(cancelFn).toBeCalled()
         expect(textInput.value).toEqual('')
         expect(pointsInput.value).toEqual('')
     });
@@ -83,7 +96,7 @@ describe('build task editor', () => {
         const resetDiv = document.createElement('div') as HTMLDivElement
         resetDiv.className = 'reset'
 
-        const taskDiv = BuildTaskEditor(applyFn, resetDiv) as HTMLDivElement
+        const taskDiv = BuildTaskEditor(applyFn, undefined, resetDiv) as HTMLDivElement
         const textInput = taskDiv.childNodes[0] as HTMLInputElement
         const pointsInput = taskDiv.childNodes[1] as HTMLInputElement
 
