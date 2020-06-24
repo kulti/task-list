@@ -1,16 +1,21 @@
-import * as models from "./openapi_cli/model/models"
-
-export enum TaskEditoFocus {
+export enum TaskEditorFocus {
     Text = 'text',
     Points = 'points',
     None = 'none'
 }
 
+export interface TaskEditorTask {
+    text: string;
+    points: number;
+    burnt?: number;
+}
+
 export function BuildTaskEditor(
     applyFn: (text: string, points: string) => void,
+    cancelFn?: () => void,
     resetDiv?: HTMLElement,
-    task?: models.RespTask,
-    focus = TaskEditoFocus.None
+    task?: TaskEditorTask,
+    focus = TaskEditorFocus.None
 ): HTMLElement {
     const taskTextInput = document.createElement('input') as HTMLInputElement;
     taskTextInput.className = "text form-control";
@@ -24,11 +29,14 @@ export function BuildTaskEditor(
 
     if (task) {
         taskTextInput.value = task.text;
-        taskPointsInput.value = task.burnt + "/" + task.points;
+        if (task.burnt) {
+            taskPointsInput.value = task.burnt + "/"
+        }
+        taskPointsInput.value += task.points;
     }
 
-    if (focus !== TaskEditoFocus.None) {
-        const autofocusPoints = (focus === TaskEditoFocus.Points)
+    if (focus !== TaskEditorFocus.None) {
+        const autofocusPoints = (focus === TaskEditorFocus.Points)
         const autofocusInput = autofocusPoints ? taskPointsInput : taskTextInput;
         setTimeout(() => {
             autofocusInput.focus()
@@ -47,6 +55,10 @@ export function BuildTaskEditor(
                 } else {
                     taskTextInput.value = ""
                     taskPointsInput.value = ""
+                }
+
+                if (cancelFn) {
+                    cancelFn()
                 }
                 break;
             case 'Enter':

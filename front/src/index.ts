@@ -1,9 +1,11 @@
 import { DefaultApi } from "./openapi_cli/index"
 import * as models from "./openapi_cli/model/models"
 import { BuildDropdownMenu } from "./DropdownMenu"
-import { BuildTaskEditor, TaskEditoFocus } from "./TaskEditor"
+import { BuildTaskEditor, TaskEditorFocus, TaskEditorTask } from "./TaskEditor"
 
 const api = new DefaultApi(window.location.origin + "/api/v1")
+
+let sprintTemplate: models.SprintTemplate;
 
 window.onload = () => {
     const input = $("#new_sprint_title")[0] as HTMLInputElement
@@ -47,20 +49,9 @@ $("#new_sprint_btn")[0].addEventListener("click", () => {
         title: sprintTitle
     }
     api.createTaskList(sprintOpts).done(() => {
-        api.getSprintTemplate().done((sprintTemplate) => {
-            type createTaskPromise = JQuery.Promise<
-                { response: JQueryXHR; body: models.RespTask; },
-                { response: JQueryXHR; errorThrown: string; }
-                , any>;
-            const promises: createTaskPromise[] = [];
-            sprintTemplate.body.tasks.forEach((task) => {
-                const newTask: models.Task = {
-                    text: task.text,
-                    points: task.points,
-                }
-                promises.push(api.createTask(models.ListId.Sprint, newTask))
-            });
-            Promise.all(promises).then(() => { load_task_lists() });
+        api.getSprintTemplate().done((data) => {
+            sprintTemplate = data.body
+            load_task_lists();
         }).fail(() => {
             load_task_lists();
         });
@@ -137,7 +128,17 @@ function fill_task_list(listId: models.ListId, tasks: models.RespTask[]) {
         taskListHtml.append(build_task_html(listId, task))
     })
 
-    taskListHtml.append(build_new_task_input_html(listId))
+    if (sprintTemplate && sprintTemplate.tasks && sprintTemplate.tasks.length > 0) {
+        const task: TaskEditorTask = {
+            text: sprintTemplate.tasks[0].text,
+            points: sprintTemplate.tasks[0].points,
+        }
+        sprintTemplate.tasks.splice(0, 1)
+        taskListHtml.append(build_template_task_input_html(models.ListId.Sprint, task))
+        focus_new_task_input(listId);
+    } else {
+        taskListHtml.append(build_new_task_input_html(listId))
+    }
 }
 
 function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElement {
@@ -187,7 +188,7 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     };
 
     dropdown.ondblclick = (): any => {
-        dropdown.replaceWith(build_task_input_html(listId, task, dropdown))
+        dropdown.replaceWith(build_task_input_html(task, dropdown))
         return false
     }
 
@@ -228,9 +229,16 @@ function build_dropdown_menu(listId: models.ListId, task: models.RespTask): HTML
 
 }
 
-function build_task_input_html(listId: models.ListId, task: models.RespTask, resetDiv: HTMLElement): HTMLElement {
+function build_task_input_html(task: models.RespTask, resetDiv: HTMLElement): HTMLElement {
+    const editorTask: TaskEditorTask = {
+        text: task.text,
+        points: task.points,
+        burnt: task.burnt,
+    }
+
     const autofocusPoints = ($(".text:hover").length === 0)
-    const focus = autofocusPoints ? TaskEditoFocus.Points : TaskEditoFocus.Text;
+    const focus = autofocusPoints ? TaskEditorFocus.Points : TaskEditorFocus.Text;
+
     return BuildTaskEditor((text: string, points: string) => {
         const pointsArr = points.split("/")
         const opts: models.UpdateOptions = {
@@ -244,7 +252,7 @@ function build_task_input_html(listId: models.ListId, task: models.RespTask, res
             showErrorAlert("failed to update task")
         });
         load_task_lists();
-    }, resetDiv, task, focus);
+    }, undefined, resetDiv, editorTask, focus);
 }
 
 function build_new_task_input_html(listId: models.ListId): HTMLElement {
@@ -255,13 +263,35 @@ function build_new_task_input_html(listId: models.ListId): HTMLElement {
         }
         api.createTask(listId, newTask).done(() => {
             load_task_lists();
-            setTimeout(() => {
-                $(listHtmlId(listId) + " .text.form-control")[0].focus()
-            }, 100);
+            focus_new_task_input(listId);
         }).fail((body) => {
             showErrorAlert("failed to create task")
         });
-    })
+    });
+}
+
+function build_template_task_input_html(listId: models.ListId, task: TaskEditorTask): HTMLElement {
+    return BuildTaskEditor((text: string, points: string) => {
+        const newTask: models.Task = {
+            text,
+            points: parseInt(points, 10),
+        }
+        api.createTask(listId, newTask).done(() => {
+            load_task_lists();
+            focus_new_task_input(listId);
+        }).fail((body) => {
+            showErrorAlert("failed to create task")
+        });
+    }, () => {
+        load_task_lists();
+        focus_new_task_input(listId);
+    }, undefined, task);
+}
+
+function focus_new_task_input(listId: models.ListId) {
+    setTimeout(() => {
+        $(listHtmlId(listId) + " .text.form-control")[0].focus()
+    }, 100);
 }
 
 function sum_points(tasks: models.RespTask[]): number {
