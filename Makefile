@@ -12,7 +12,7 @@ front/src/openapi_cli/index.ts: api/task.yaml
 
 build-js: gen-ts front/dist/bundle.js
 
-front/dist/bundle.js: front/src/index.ts
+front/dist/bundle.js: front/src/*.ts
 	cd front && \
 	npx webpack
 

@@ -1,6 +1,7 @@
 import { DefaultApi } from "./openapi_cli/index"
 import * as models from "./openapi_cli/model/models"
 import { BuildDropdownMenu } from "./DropdownMenu"
+import { BuildTaskEditor } from "./TaskEditor"
 
 const api = new DefaultApi(window.location.origin + "/api/v1")
 
@@ -186,7 +187,7 @@ function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElem
     };
 
     dropdown.ondblclick = (): any => {
-        dropdown.replaceWith(build_task_input_html(listId, task))
+        dropdown.replaceWith(build_task_input_html(listId, task, dropdown))
         return false
     }
 
@@ -227,93 +228,38 @@ function build_dropdown_menu(listId: models.ListId, task: models.RespTask): HTML
 
 }
 
-function build_task_input_html(listId: models.ListId, task: models.RespTask): HTMLElement {
-    const taskTextInput = document.createElement('input') as HTMLInputElement;
-    taskTextInput.className = "text form-control";
-    taskTextInput.type = "text";
-    taskTextInput.value = task.text;
-
-    const taskPointsInput = document.createElement('input') as HTMLInputElement;
-    taskPointsInput.className = "points form-control";
-    taskPointsInput.type = "text";
-    taskPointsInput.value = task.burnt + "/" + task.points;
-
-    const autofocusPoints = ($(".text:hover").length === 0)
-    const autofocusInput = autofocusPoints ? taskPointsInput : taskTextInput;
-    setTimeout(() => {
-        autofocusInput.focus()
-    }, 0);
-
-    const taskDiv = document.createElement('div') as HTMLDivElement;
-    taskDiv.className = "form-group task";
-    taskDiv.append(taskTextInput, taskPointsInput);
-
-    const handleKeyPress = (ev: KeyboardEvent) => {
-        switch (ev.keyCode) {
-            case 27:
-                taskDiv.replaceWith(build_task_html(listId, task));
-                break;
-            case 13:
-                const points = taskPointsInput.value.split("/")
-                const opts: models.UpdateOptions = {
-                    text: taskTextInput.value,
-                    points: parseInt(points[1], 10),
-                    burnt: parseInt(points[0], 10),
-                }
-                api.updateTask(task.id, opts).done(() => {
-                    load_task_lists();
-                }).fail((body) => {
-                    showErrorAlert("failed to update task")
-                });
-                load_task_lists();
+function build_task_input_html(listId: models.ListId, task: models.RespTask, resetDiv: HTMLElement): HTMLElement {
+    return BuildTaskEditor((text: string, points: string) => {
+        const pointsArr = points.split("/")
+        const opts: models.UpdateOptions = {
+            text,
+            points: parseInt(pointsArr[1], 10),
+            burnt: parseInt(pointsArr[0], 10),
         }
-    }
-
-    taskTextInput.onkeyup = handleKeyPress;
-    taskPointsInput.onkeyup = handleKeyPress;
-
-    return taskDiv;
+        api.updateTask(task.id, opts).done(() => {
+            load_task_lists();
+        }).fail((body) => {
+            showErrorAlert("failed to update task")
+        });
+        load_task_lists();
+    }, resetDiv, task);
 }
 
 function build_new_task_input_html(listId: models.ListId): HTMLElement {
-    const taskTextInput = document.createElement('input') as HTMLInputElement;
-    taskTextInput.className = "text form-control";
-    taskTextInput.type = "text";
-    taskTextInput.placeholder = "Do new task";
-
-    const taskPointsInput = document.createElement('input') as HTMLInputElement;
-    taskPointsInput.className = "points form-control";
-    taskPointsInput.type = "text";
-    taskPointsInput.placeholder = "0";
-
-    const taskDiv = document.createElement('div') as HTMLDivElement;
-    taskDiv.className = "form-group task";
-    taskDiv.append(taskTextInput, taskPointsInput);
-
-    const handleKeyPress = (ev: KeyboardEvent) => {
-        switch (ev.keyCode) {
-            case 27:
-                taskDiv.replaceWith(build_new_task_input_html(listId));
-                break;
-            case 13:
-                const task: models.Task = {
-                    text: taskTextInput.value,
-                    points: parseInt(taskPointsInput.value, 10),
-                }
-                api.createTask(listId, task).done(() => {
-                    load_task_lists();
-                    setTimeout(() => {
-                        $(listHtmlId(listId) + " .text.form-control")[0].focus()
-                    }, 100);
-                }).fail((body) => {
-                    showErrorAlert("failed to create task")
-                });
+    return BuildTaskEditor((text: string, points: string) => {
+        const newTask: models.Task = {
+            text,
+            points: parseInt(points, 10),
         }
-    }
-    taskTextInput.onkeyup = handleKeyPress;
-    taskPointsInput.onkeyup = handleKeyPress;
-
-    return taskDiv;
+        api.createTask(listId, newTask).done(() => {
+            load_task_lists();
+            setTimeout(() => {
+                $(listHtmlId(listId) + " .text.form-control")[0].focus()
+            }, 100);
+        }).fail((body) => {
+            showErrorAlert("failed to create task")
+        });
+    })
 }
 
 function sum_points(tasks: models.RespTask[]): number {
