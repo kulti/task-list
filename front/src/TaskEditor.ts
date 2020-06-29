@@ -29,7 +29,7 @@ export function BuildTaskEditor(
 
     if (task) {
         taskTextInput.value = task.text;
-        if (task.burnt) {
+        if (task.burnt !== undefined) {
             taskPointsInput.value = task.burnt + "/"
         }
         taskPointsInput.value += task.points;

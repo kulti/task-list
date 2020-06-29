@@ -37,15 +37,24 @@ describe('build task editor', () => {
         expect(pointsInput.value).toEqual(task.burnt + "/" + task.points)
     });
 
-    it('has specific html for edit task without burnt points', () => {
-        task.burnt = undefined
-        const taskDiv = BuildTaskEditor(jest.fn(), undefined, undefined, task)
+    it('has specific html for edit task with zero-burnt', () => {
+        const zeroBurntTask = { ...task }
+        zeroBurntTask.burnt = 0
+        const taskDiv = BuildTaskEditor(jest.fn(), undefined, undefined, zeroBurntTask)
 
         expect(taskDiv.childNodes).toHaveLength(2)
 
-        const textInput = taskDiv.childNodes[0] as HTMLInputElement
-        expect(textInput.className).toContain('text')
-        expect(textInput.value).toEqual(task.text)
+        const pointsInput = taskDiv.childNodes[1] as HTMLInputElement
+        expect(pointsInput.className).toContain('points')
+        expect(pointsInput.value).toEqual("0/" + task.points)
+    });
+
+    it('has specific html for edit task without burnt points', () => {
+        const noBurntTask = task
+        noBurntTask.burnt = undefined
+        const taskDiv = BuildTaskEditor(jest.fn(), undefined, undefined, noBurntTask)
+
+        expect(taskDiv.childNodes).toHaveLength(2)
 
         const pointsInput = taskDiv.childNodes[1] as HTMLInputElement
         expect(pointsInput.className).toContain('points')
