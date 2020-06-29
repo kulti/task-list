@@ -8,6 +8,11 @@ const api = new DefaultApi(window.location.origin + "/api/v1")
 let sprintTemplate: models.SprintTemplate;
 
 window.onload = () => {
+    const socket = new WebSocket("ws://" + window.location.host + "/ws");
+    socket.onclose = () => {
+        showErrorAlertWithRefresh("lost connection to server")
+    };
+
     const input = $("#new_sprint_title")[0] as HTMLInputElement
     input.placeholder = buildNewSprintTitle();
     setInterval(() => {
@@ -69,7 +74,11 @@ function showErrorAlert(text: string) {
     showAlert("danger", text)
 }
 
-function showAlert(type: string, text: string) {
+function showErrorAlertWithRefresh(text: string) {
+    showAlert("danger", text, 5)
+}
+
+function showAlert(type: string, text: string, refreshSec?: number) {
     const alertCloseBtn = document.createElement('button') as HTMLButtonElement
     alertCloseBtn.type = "button"
     alertCloseBtn.className = "close"
@@ -84,14 +93,27 @@ function showAlert(type: string, text: string) {
     alertDiv.appendChild(alertCloseBtn)
 
     $('#alerts').append(alertDiv)
-    setTimeout(() => {
-        alertDiv.remove()
-    }, 2000);
+
+    if (refreshSec) {
+        alertDiv.innerText = text + " - refresh in " + refreshSec + "seconds";
+        let i = refreshSec - 1;
+        setInterval(() => {
+            alertDiv.innerText = text + " - refresh in " + i + " seconds";
+            i--;
+            if (i === 0) {
+                window.location.reload();
+            }
+        }, 1000);
+    } else {
+        setTimeout(() => {
+            alertDiv.remove()
+        }, 2000);
+    }
 }
 
 function load_task_lists() {
     api.getTaskList(models.ListId.Sprint).fail((body) => {
-        showErrorAlert("failed to load sprint tasks")
+        showErrorAlertWithRefresh("failed to load sprint tasks")
     }).done((data) => {
         draw_task_lists(data.body);
     });

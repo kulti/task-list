@@ -16,7 +16,7 @@ ADD . /build
 RUN npm run test
 RUN npx webpack
 
-FROM halverneus/static-file-server
+FROM kulti/static-file-server:v1.9.0
 
 COPY --from=builder /build/index.html /web/
 COPY --from=builder /build/dist/bundle.js /web/dist/
