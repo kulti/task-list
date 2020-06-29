@@ -140,7 +140,7 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 }
 
 func (s *TaskStore) DoneTask(ctx context.Context, taskID string) error {
-	allowedStates := map[string]struct{}{"": {}, "todo": {}}
+	allowedStates := map[string]struct{}{"": {}, "todo": {}, "done": {}}
 	return s.updateTaskStateWithStmt(ctx, taskID, "done",
 		"UPDATE tasks SET state = $2, burnt=points WHERE id = $1", allowedStates)
 }
