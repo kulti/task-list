@@ -100,3 +100,14 @@ func (s *APISuite) TestDoneTaskThatAlreadyCanceled() {
 
 	s.doneTaskWithError(respTask.Id, http.StatusBadRequest)
 }
+
+func (s *APISuite) TestUpdateDoneTask() {
+	s.newSprint()
+
+	respTask := s.createSprintTask()
+	s.doneTask(respTask.Id)
+
+	respTask.Points++
+	respTask.Burnt = respTask.Points
+	s.updateTask(respTask)
+}
