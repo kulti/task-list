@@ -172,7 +172,7 @@ components:
         text:
           type: string
         points:
-          type: integer
+          $ref: '#/components/schemas/Points'
 
     RespTask:
       type: object
@@ -188,9 +188,9 @@ components:
         text:
           type: string
         points:
-          type: integer
+          $ref: '#/components/schemas/Points'
         burnt:
-          type: integer
+          $ref: '#/components/schemas/Points'
         state:
           type: string
           enum: [todo, done, canceled]
@@ -222,9 +222,9 @@ components:
         text:
           type: string
         burnt:
-          type: integer
+          $ref: '#/components/schemas/Points'
         points:
-          type: integer
+          $ref: '#/components/schemas/Points'
 
     SprintTemplate:
       type: object
@@ -248,7 +248,11 @@ components:
         text:
           type: string
         points:
-          type: integer
+          $ref: '#/components/schemas/Points'
+
+    Points:
+      type: integer
+      maximum: 32767
 
 # /cal/{year}/{month} - get
 # /cal/{year}/{month}/add - post (добавить проект)
