@@ -16,7 +16,7 @@ front/dist/bundle.js: front/src/*.ts
 	cd front && \
 	npx webpack
 
-SERVICES=proxy server front migrate live-reload
+SERVICES=proxy server front migrate live-reload db-backup
 
 front: gen-ts
 
@@ -31,14 +31,6 @@ run-tl-integration-tests: build-docker-tl-integration-tests build-docker-tl-serv
 
 push-docker-images: build-docker-tl-server build-docker-tl-migrate build-docker-tl-front build-docker-tl-proxy
 	./scripts/push-docker-images.sh
-
-db-dump:
-	cd deployments && \
-	source database.env && \
-	docker-compose -p prod -f docker-compose.yaml -f docker-compose.prod.yaml exec db pg_dump --username=$$POSTGRES_USER --dbname=$$POSTGRES_DB --data-only > db.dump && \
-	sed -i '' -e 's/COPY public.task_lists /DELETE FROM public.task_lists;\'$$'\nCOPY public.task_lists /' \
-		-e '/COPY public.schema_migrations /{N;N;d;}' \
-	db.dump
 
 db-restore:
 	cd deployments && \

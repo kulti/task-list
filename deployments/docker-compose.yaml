@@ -6,6 +6,13 @@ services:
     env_file:
       - database.env
 
+  db_backup:
+    image: kulti/tl-db-backup:${IMAGE_TAG}
+    env_file:
+      - database.env
+    environment:
+      - POSTGRES_HOST=db
+
   db_migrations:
     image: kulti/tl-migrate:${IMAGE_TAG}
     depends_on:

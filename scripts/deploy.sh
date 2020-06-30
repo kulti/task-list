@@ -35,6 +35,9 @@ restart)
 logs)
     cmd ${env} "logs -f"
     ;;
+dbdump)
+    cmd ${env} "run db_backup /dump.sh"
+    ;;
 *)
 cat << EOF
 Usage ./scripts/deploy.sh environemnt command
@@ -44,6 +47,7 @@ Commands:
     down
     ps
     logs
+    dbdump
 
 Environments:
     dev
