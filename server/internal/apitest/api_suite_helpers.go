@@ -2,6 +2,10 @@ package apitest
 
 import (
 	"encoding/json"
+	"math"
+	"math/rand"
+
+	"github.com/bxcodec/faker/v3"
 
 	"github.com/kulti/task-list/server/internal/generated/openapicli"
 )
@@ -32,8 +36,10 @@ func (s *APISuite) errBody(err error) string {
 }
 
 func (s *APISuite) testTask() openapicli.Task {
-	return openapicli.Task{
-		Text:   "test task",
-		Points: 7, //nolint:gomnd
+	t := openapicli.Task{
+		Text:   faker.Sentence(),
+		Points: 1 + rand.Int31n(math.MaxInt16-1),
 	}
+	s.T().Logf("test task: %+v", t)
+	return t
 }
