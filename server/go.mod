@@ -3,6 +3,7 @@ module github.com/kulti/task-list/server
 go 1.14
 
 require (
+	github.com/bxcodec/faker/v3 v3.5.0
 	github.com/caarlos0/env/v6 v6.2.2
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/kr/text v0.2.0 // indirect

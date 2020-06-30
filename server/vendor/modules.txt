@@ -1,3 +1,7 @@
+# github.com/bxcodec/faker/v3 v3.5.0
+## explicit
+github.com/bxcodec/faker/v3
+github.com/bxcodec/faker/v3/support/slice
 # github.com/caarlos0/env/v6 v6.2.2
 ## explicit
 github.com/caarlos0/env/v6
