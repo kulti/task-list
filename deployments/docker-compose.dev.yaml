@@ -5,6 +5,15 @@ services:
     volumes:
       - tl_pg_data_dev:/var/lib/postgresql/data
 
+  db_backup:
+    command:
+      - /bin/true
+    environment:
+      - LOGOUTPUT=/dev/stdout
+      - FILENAME=/backups/db.dump
+    volumes:
+      - /tmp/backups:/backups
+
   tl_server:
     image: kulti/tl-live-reload:${IMAGE_TAG}
     volumes:

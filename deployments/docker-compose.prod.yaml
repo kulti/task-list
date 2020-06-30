@@ -5,10 +5,17 @@ services:
     volumes:
       - tl_pg_data:/var/lib/postgresql/data
 
+  db_backup:
+    volumes:
+      - tl_pg_backup:/backups
+
   tl_proxy:
     ports:
       - ${PROXY_PORT}:80/tcp
 
 volumes:
   tl_pg_data:
+    driver: local
+
+  tl_pg_backup:
     driver: local
