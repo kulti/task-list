@@ -165,16 +165,14 @@ components:
 
     Task:
       type: object
+      required:
+        - text
+        - points
       properties:
         text:
           type: string
         points:
           type: integer
-        burnt:
-          type: integer
-        state:
-          type: string
-          enum: [todo, done, canceled]
 
     RespTask:
       type: object

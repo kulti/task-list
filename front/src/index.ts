@@ -166,7 +166,7 @@ function fill_task_list(listId: models.ListId, tasks: models.RespTask[]) {
 function build_task_html(listId: models.ListId, task: models.RespTask): HTMLElement {
     let points = ''
     let percent = 0
-    if (task.state !== models.Task.StateEnum.Canceled) {
+    if (task.state !== models.RespTask.StateEnum.Canceled) {
         points = task.burnt + "/" + task.points
         percent = 100 * task.burnt / task.points
     }
