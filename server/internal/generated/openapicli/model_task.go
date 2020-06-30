@@ -10,8 +10,6 @@
 package openapicli
 // Task struct for Task
 type Task struct {
-	Text string `json:"text,omitempty"`
-	Points int32 `json:"points,omitempty"`
-	Burnt int32 `json:"burnt,omitempty"`
-	State string `json:"state,omitempty"`
+	Text string `json:"text"`
+	Points int32 `json:"points"`
 }
