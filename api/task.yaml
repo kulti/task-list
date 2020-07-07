@@ -8,19 +8,12 @@ paths:
   /list/sprint/new:
     post:
       operationId: createTaskList
-      responses:
-        '200':
-          description: OK
       requestBody:
         required: true
         content:
           'application/json':
             schema:
               $ref: '#/components/schemas/SprintOpts'
-
-  /list/sprint/template:
-    get:
-      operationId: getSprintTemplate
       responses:
         '200':
           description: OK

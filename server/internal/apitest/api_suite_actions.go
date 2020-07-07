@@ -11,10 +11,11 @@ func (s *APISuite) newSprint() {
 	opts := openapicli.SprintOpts{
 		Title: s.sprintTitle,
 	}
-	resp, err := s.cli.DefaultApi.CreateTaskList(s.ctx, opts)
+	tmpl, resp, err := s.cli.DefaultApi.CreateTaskList(s.ctx, opts)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
+	s.Require().Empty(tmpl.Tasks)
 }
 
 func (s *APISuite) checkSprintTaskList(tasks ...openapicli.RespTask) {
@@ -130,13 +131,4 @@ func (s *APISuite) updateTask(task openapicli.RespTask) {
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
-}
-
-func (s *APISuite) getSprintTemplate() openapicli.SprintTemplate {
-	s.T().Helper()
-	tmpl, resp, err := s.cli.DefaultApi.GetSprintTemplate(s.ctx)
-	s.Require().NoError(err, s.errBody(err))
-	defer resp.Body.Close()
-	s.Require().Equal(http.StatusOK, resp.StatusCode)
-	return tmpl
 }

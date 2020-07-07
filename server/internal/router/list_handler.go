@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"sort"
 
+	"go.uber.org/zap"
+
 	"github.com/kulti/task-list/server/internal/models"
 	"github.com/kulti/task-list/server/internal/storages"
 )
@@ -49,12 +51,6 @@ func (h listHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else {
 			http.NotFound(w, r)
 		}
-	case "template":
-		if listID == sprintListID {
-			h.handleGetSprintTemplate(w, r)
-		} else {
-			http.NotFound(w, r)
-		}
 	case "add":
 		h.handleCreateTaskInList(w, r, listID)
 	case "delete":
@@ -74,15 +70,17 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	h.store.NewSprint(r.Context(), opts.Title)
-}
-
-func (h listHandler) handleGetSprintTemplate(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := h.store.GetSprintTemplate(r.Context())
+	err = h.store.NewSprint(r.Context(), opts.Title)
 	if err != nil {
-		httpInternalServerError(w, "failed to get sprint template", err)
+		httpInternalServerError(w, "failed to create new sprint", err)
 		return
 	}
+
+	tmpl, err := h.store.GetSprintTemplate(r.Context())
+	if err != nil {
+		zap.L().Warn("failed to get sprint template - skip it", zap.Error(err))
+	}
+
 	httpJSON(w, &tmpl)
 }
 
