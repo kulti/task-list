@@ -9,7 +9,6 @@ Method | HTTP request | Description
 [**CreateTaskList**](DefaultApi.md#CreateTaskList) | **Post** /list/sprint/new | 
 [**DeleteTask**](DefaultApi.md#DeleteTask) | **Post** /list/{listId}/delete/{taskId} | 
 [**DoneTask**](DefaultApi.md#DoneTask) | **Post** /task/{taskId}/done | 
-[**GetSprintTemplate**](DefaultApi.md#GetSprintTemplate) | **Get** /list/sprint/template | 
 [**GetTaskList**](DefaultApi.md#GetTaskList) | **Get** /list/{listId} | 
 [**TodoTask**](DefaultApi.md#TodoTask) | **Post** /task/{taskId}/todo | 
 [**UpdateTask**](DefaultApi.md#UpdateTask) | **Post** /task/{taskId}/update | 
@@ -83,7 +82,7 @@ No authorization required
 
 ## CreateTaskList
 
-> CreateTaskList(ctx, sprintOpts)
+> SprintTemplate CreateTaskList(ctx, sprintOpts)
 
 
 
@@ -97,7 +96,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
- (empty response body)
+[**SprintTemplate**](SprintTemplate.md)
 
 ### Authorization
 
@@ -106,7 +105,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
-- **Accept**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
@@ -172,34 +171,6 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## GetSprintTemplate
-
-> SprintTemplate GetSprintTemplate(ctx, )
-
-
-
-### Required Parameters
-
-This endpoint does not need any parameter.
-
-### Return type
-
-[**SprintTemplate**](SprintTemplate.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
