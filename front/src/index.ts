@@ -53,13 +53,9 @@ $("#new_sprint_btn")[0].addEventListener("click", () => {
     const sprintOpts: models.SprintOpts = {
         title: sprintTitle
     }
-    api.createTaskList(sprintOpts).done(() => {
-        api.getSprintTemplate().done((data) => {
-            sprintTemplate = data.body
-            load_task_lists();
-        }).fail(() => {
-            load_task_lists();
-        });
+    api.createTaskList(sprintOpts).done((data) => {
+        sprintTemplate = data.body
+        load_task_lists();
         showSuccessAlert("sprint created")
     }).fail((body) => {
         showErrorAlert("failed to create sprint")
