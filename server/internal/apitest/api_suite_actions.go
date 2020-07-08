@@ -10,6 +10,8 @@ func (s *APISuite) newSprint() {
 	s.T().Helper()
 	opts := openapicli.SprintOpts{
 		Title: s.sprintTitle,
+		Begin: s.sprintDate.Format("2006-01-02"),
+		End:   s.sprintDate.Format("2006-01-02"),
 	}
 	tmpl, resp, err := s.cli.DefaultApi.CreateTaskList(s.ctx, opts)
 	s.Require().NoError(err, s.errBody(err))

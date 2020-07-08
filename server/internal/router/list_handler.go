@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"sort"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -67,6 +68,18 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 	err := jsDecoder.Decode(&opts)
 	if err != nil {
 		httpBadRequest(w, "failed to parse new sprint body", err)
+		return
+	}
+
+	_, err = time.Parse("2006-01-02", opts.Begin)
+	if err != nil {
+		httpBadRequest(w, "failed to parse begin time", err)
+		return
+	}
+
+	_, err = time.Parse("2006-01-02", opts.End)
+	if err != nil {
+		httpBadRequest(w, "failed to parse end time", err)
 		return
 	}
 
