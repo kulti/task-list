@@ -3,6 +3,8 @@ package models
 // SprintOpts represents new sprint options.
 type SprintOpts struct {
 	Title string `json:"title"`
+	Begin string `json:"begin"`
+	End   string `json:"end"`
 }
 
 // TaskList represents a task list.

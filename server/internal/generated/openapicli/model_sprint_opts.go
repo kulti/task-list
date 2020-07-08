@@ -11,4 +11,6 @@ package openapicli
 // SprintOpts struct for SprintOpts
 type SprintOpts struct {
 	Title string `json:"title"`
+	Begin string `json:"begin"`
+	End string `json:"end"`
 }

@@ -152,9 +152,17 @@ components:
       type: object
       required:
         - title
+        - begin
+        - end
       properties:
         title:
           type: string
+        begin:
+          type: string
+          format: date
+        end:
+          type: string
+          format: date
 
     Task:
       type: object

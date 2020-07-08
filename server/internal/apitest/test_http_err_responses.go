@@ -1,6 +1,10 @@
 package apitest
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/kulti/task-list/server/internal/generated/openapicli"
+)
 
 func (s *APISuite) TestNotFound() {
 	paths := []string{"/unknown", "/api/v2", "/api/v1/unknown", "/api/v1/list/unknown",
@@ -16,4 +20,22 @@ func (s *APISuite) TestNotFound() {
 			s.Require().Equal(http.StatusNotFound, resp.StatusCode)
 		})
 	}
+}
+
+func (s *APISuite) TestNewSprintInvalidDates() {
+	opts := openapicli.SprintOpts{
+		Title: s.sprintTitle,
+		Begin: s.sprintDate.Format("invalid date"),
+		End:   s.sprintDate.Format("2006-01-02"),
+	}
+	_, resp, err := s.cli.DefaultApi.CreateTaskList(s.ctx, opts)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
+
+	opts.Begin, opts.End = opts.End, opts.Begin
+	_, resp, err = s.cli.DefaultApi.CreateTaskList(s.ctx, opts)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
 }

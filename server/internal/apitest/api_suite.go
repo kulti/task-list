@@ -2,6 +2,7 @@ package apitest
 
 import (
 	"context"
+	"time"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/stretchr/testify/suite"
@@ -15,6 +16,7 @@ type APISuite struct {
 	ctx         context.Context
 	apiURL      string
 	sprintTitle string
+	sprintDate  time.Time
 }
 
 func (s *APISuite) Init(apiURL string) {
@@ -24,4 +26,5 @@ func (s *APISuite) Init(apiURL string) {
 	s.ctx = context.Background()
 	s.apiURL = apiURL
 	s.sprintTitle = faker.Sentence()
+	s.sprintDate = time.Now()
 }
