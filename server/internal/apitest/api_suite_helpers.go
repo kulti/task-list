@@ -16,7 +16,7 @@ const (
 	taskStateCanceled = "canceled"
 )
 
-func (s *APISuite) taskToRespTask(task openapicli.Task) openapicli.RespTask {
+func (s *APISuiteActions) taskToRespTask(task openapicli.Task) openapicli.RespTask {
 	s.T().Helper()
 	data, err := json.Marshal(&task)
 	s.Require().NoError(err)
@@ -28,14 +28,14 @@ func (s *APISuite) taskToRespTask(task openapicli.Task) openapicli.RespTask {
 	return respTask
 }
 
-func (s *APISuite) errBody(err error) string {
+func (s *APISuiteActions) errBody(err error) string {
 	if apiErr, ok := err.(openapicli.GenericOpenAPIError); ok {
 		return string(apiErr.Body())
 	}
 	return ""
 }
 
-func (s *APISuite) testTask() openapicli.Task {
+func (s *APISuiteActions) testTask() openapicli.Task {
 	t := openapicli.Task{
 		Text:   faker.Sentence(),
 		Points: 1 + rand.Int31n(math.MaxInt16-1),
