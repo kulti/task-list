@@ -11,9 +11,9 @@ type rootHandler struct {
 	taskHandler taskHandler
 }
 
-func newRootHandler(store storages.TaskStore) rootHandler {
+func newRootHandler(store storages.TaskStore, calService CalService) rootHandler {
 	return rootHandler{
-		listHandler: newListHandler(store),
+		listHandler: newListHandler(store, calService),
 		taskHandler: newTaskHandler(store),
 	}
 }

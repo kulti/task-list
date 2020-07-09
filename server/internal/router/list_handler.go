@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -23,12 +24,14 @@ const (
 )
 
 type listHandler struct {
-	store storages.TaskStore
+	store      storages.TaskStore
+	calService CalService
 }
 
-func newListHandler(store storages.TaskStore) listHandler {
+func newListHandler(store storages.TaskStore, calService CalService) listHandler {
 	return listHandler{
-		store: store,
+		store:      store,
+		calService: calService,
 	}
 }
 
@@ -71,13 +74,13 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, err = time.Parse("2006-01-02", opts.Begin)
+	begin, err := time.Parse("2006-01-02", opts.Begin)
 	if err != nil {
 		httpBadRequest(w, "failed to parse begin time", err)
 		return
 	}
 
-	_, err = time.Parse("2006-01-02", opts.End)
+	end, err := time.Parse("2006-01-02", opts.End)
 	if err != nil {
 		httpBadRequest(w, "failed to parse end time", err)
 		return
@@ -94,6 +97,17 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 		zap.L().Warn("failed to get sprint template - skip it", zap.Error(err))
 	}
 
+	if h.calService != nil {
+		events, err := h.calService.GetEvents(r.Context(), begin, end)
+		if err != nil {
+			zap.L().Warn("failed to get calendar events - skip it", zap.Error(err))
+		} else {
+			for _, e := range events {
+				taskName := fmt.Sprintf("%02d.%02d - %s", e.Date.Day(), e.Date.Month(), e.Name)
+				tmpl.Tasks = append(tmpl.Tasks, models.TaskTemplate{Text: taskName})
+			}
+		}
+	}
 	httpJSON(w, &tmpl)
 }
 
