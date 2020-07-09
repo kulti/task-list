@@ -30,7 +30,11 @@ func (s *APISuiteActions) Init(apiURL string) {
 	s.sprintDate = time.Now()
 }
 
-func (s *APISuiteActions) newSprint() {
+func (s *APISuiteActions) Client() *openapicli.DefaultApiService {
+	return s.cli.DefaultApi
+}
+
+func (s *APISuiteActions) NewSprint() {
 	s.T().Helper()
 	opts := openapicli.SprintOpts{
 		Title: s.sprintTitle,

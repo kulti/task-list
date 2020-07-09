@@ -7,7 +7,7 @@ import (
 )
 
 func (s *APISuite) TestEmptyList() {
-	s.newSprint()
+	s.NewSprint()
 
 	s.checkSprintTaskList()
 }
@@ -36,7 +36,7 @@ func (s *APISuite) TestSortList() {
 
 	permutate(createActions, func(actions []permutateAction) {
 		s.Run(permutateName(actions), func() {
-			s.newSprint()
+			s.NewSprint()
 
 			for _, a := range createActions {
 				a.fn()
