@@ -3,7 +3,7 @@ package apitest
 import "net/http"
 
 func (s *APISuite) TestCreateSprintTask() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 
@@ -11,7 +11,7 @@ func (s *APISuite) TestCreateSprintTask() {
 }
 
 func (s *APISuite) TestDeleteTask() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	s.deleteSprintTask(respTask.Id)
@@ -20,7 +20,7 @@ func (s *APISuite) TestDeleteTask() {
 }
 
 func (s *APISuite) TestTodoTask() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	s.todoTask(respTask.Id)
@@ -30,7 +30,7 @@ func (s *APISuite) TestTodoTask() {
 }
 
 func (s *APISuite) TestDoneTask() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	s.doneTask(respTask.Id)
@@ -41,7 +41,7 @@ func (s *APISuite) TestDoneTask() {
 }
 
 func (s *APISuite) TestCancelTask() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	s.cancelTask(respTask.Id)
@@ -51,7 +51,7 @@ func (s *APISuite) TestCancelTask() {
 }
 
 func (s *APISuite) TestBurnPoints() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	respTask.Burnt = respTask.Points / 2 //nolint:gomnd
@@ -60,7 +60,7 @@ func (s *APISuite) TestBurnPoints() {
 }
 
 func (s *APISuite) TestBurnAllPoints() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	respTask.Burnt = respTask.Points
@@ -71,7 +71,7 @@ func (s *APISuite) TestBurnAllPoints() {
 }
 
 func (s *APISuite) TestUndoneTask() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	s.doneTask(respTask.Id)
@@ -84,7 +84,7 @@ func (s *APISuite) TestUndoneTask() {
 }
 
 func (s *APISuite) TestCancelTaskThatAlreadyDone() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	s.doneTask(respTask.Id)
@@ -93,7 +93,7 @@ func (s *APISuite) TestCancelTaskThatAlreadyDone() {
 }
 
 func (s *APISuite) TestDoneTaskThatAlreadyCanceled() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	s.cancelTask(respTask.Id)
@@ -102,7 +102,7 @@ func (s *APISuite) TestDoneTaskThatAlreadyCanceled() {
 }
 
 func (s *APISuite) TestUpdateDoneTask() {
-	s.newSprint()
+	s.NewSprint()
 
 	respTask := s.createSprintTask()
 	s.doneTask(respTask.Id)
