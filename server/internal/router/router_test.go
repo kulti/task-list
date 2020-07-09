@@ -17,7 +17,7 @@ type RouterTestSuite struct {
 }
 
 func (s *RouterTestSuite) SetupTest() {
-	r := router.New(memstore.NewTaskStore())
+	r := router.New(memstore.NewTaskStore(), nil)
 	s.srv = httptest.NewServer(r.RootHandler())
 
 	s.Init(s.srv.URL)

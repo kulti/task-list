@@ -36,7 +36,7 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 			if err != nil {
 				zap.S().Fatalw("failed to connect to db", zap.Error(err))
 			}
-			router := router.New(taskStore)
+			router := router.New(taskStore, nil)
 
 			err = http.Serve(listener, router.RootHandler())
 			if err != nil {
