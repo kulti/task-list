@@ -9,6 +9,10 @@ services:
     volumes:
       - tl_pg_backup:/backups
 
+  tl_server:
+    volumes:
+      - /etc/tl:/etc/tl:ro
+
   tl_proxy:
     ports:
       - ${PROXY_PORT}:80/tcp
