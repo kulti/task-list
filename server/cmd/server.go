@@ -7,6 +7,7 @@ import (
 
 	"github.com/caarlos0/env/v6"
 	"github.com/kulti/task-list/server/internal/router"
+	"github.com/kulti/task-list/server/internal/services/calservice"
 	"github.com/kulti/task-list/server/internal/storages/pgstore"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -15,6 +16,11 @@ import (
 type serverCmdFlags struct {
 	Port uint16 `env:"PORT" envDefault:"0"`
 }
+
+const (
+	calendarCredentialPath = "/etc/tl/calendar/credentials.json"
+	calendarIDsPath        = "/etc/tl/calendar/calendars.json"
+)
 
 func newServerCmd(dbFlags dbFlags) *cobra.Command {
 	var serverCmdFlags serverCmdFlags
@@ -36,7 +42,8 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 			if err != nil {
 				zap.S().Fatalw("failed to connect to db", zap.Error(err))
 			}
-			router := router.New(taskStore, nil)
+
+			router := router.New(taskStore, newCalendarService())
 
 			err = http.Serve(listener, router.RootHandler())
 			if err != nil {
@@ -46,4 +53,19 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 	}
 
 	return serverCmd
+}
+
+func newCalendarService() router.CalService {
+	cs, err := calservice.New(calservice.Options{
+		CredentialPath:  calendarCredentialPath,
+		CalendarIDsPath: calendarIDsPath,
+	})
+
+	if err != nil {
+		zap.L().Warn("failed to create calendar service", zap.Error(err))
+		return nil
+	}
+
+	zap.L().Info("calendar service created")
+	return cs
 }
