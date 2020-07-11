@@ -18,6 +18,7 @@ services:
     image: kulti/tl-live-reload:${IMAGE_TAG}
     volumes:
       - ${PWD}/server:/app:ro
+      - ${PWD}/server/files/etc:/etc/tl:ro
     ports:
       - 8097:80/tcp
 

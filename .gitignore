@@ -6,3 +6,4 @@ front/coverage
 empty_test.go
 coverage.txt
 *.code-workspace
+server/files
