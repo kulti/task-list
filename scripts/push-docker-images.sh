@@ -4,7 +4,7 @@ set -e
 
 git_tag=$(git describe --tags 2> /dev/null)
 if [[ ${git_tag} != "" ]]; then
-    services="tl-proxy tl-front tl-server tl-migrate"
+    services="tl-proxy tl-front tl-server tl-migrate tl-db-backup"
     for s in ${services}; do
         image_s="kulti/${s}"
         image="${image_s}:${git_tag}"
