@@ -38,8 +38,8 @@ func (s *TaskStore) Close() {
 
 func (s *TaskStore) NewSprint(ctx context.Context, opts models.SprintOpts) error {
 	_, err := s.conn.Exec(ctx,
-		"INSERT INTO task_lists (type, title, created_at) VALUES ($1, $2, $3)",
-		"sprint", opts.Title, time.Now())
+		"INSERT INTO task_lists (type, title, created_at, begin, \"end\") VALUES ($1, $2, $3, $4, $5)",
+		"sprint", opts.Title, time.Now(), opts.Begin, opts.End)
 	return err
 }
 
