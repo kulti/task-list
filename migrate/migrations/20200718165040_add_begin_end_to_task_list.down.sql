@@ -1,0 +1,2 @@
+ALTER TABLE task_lists DROP COLUMN IF EXISTS "begin";
+ALTER TABLE task_lists DROP COLUMN IF EXISTS "end";
