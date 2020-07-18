@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -97,18 +98,33 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 		zap.L().Warn("failed to get sprint template - skip it", zap.Error(err))
 	}
 
-	if h.calService != nil {
-		events, err := h.calService.GetEvents(r.Context(), begin, end)
-		if err != nil {
-			zap.L().Warn("failed to get calendar events - skip it", zap.Error(err))
-		} else {
-			for _, e := range events {
-				taskName := fmt.Sprintf("%02d.%02d - %s", e.Date.Day(), e.Date.Month(), e.Name)
-				tmpl.Tasks = append(tmpl.Tasks, models.TaskTemplate{Text: taskName})
-			}
-		}
-	}
+	h.extendSprintTemplateWithCalendarEvents(r.Context(), &tmpl, begin, end)
+
 	httpJSON(w, &tmpl)
+}
+
+func (h listHandler) extendSprintTemplateWithCalendarEvents(ctx context.Context,
+	tmpl *models.SprintTemplate, begin, end time.Time,
+) {
+	if h.calService == nil {
+		return
+	}
+
+	events, err := h.calService.GetEvents(ctx, begin, end)
+	if err != nil {
+		zap.L().Warn("failed to get calendar events - skip it", zap.Error(err))
+		return
+	}
+
+	for _, e := range events {
+		var taskName string
+		if !e.Date.IsZero() {
+			taskName = fmt.Sprintf("%02d.%02d - %s", e.Date.Day(), e.Date.Month(), e.Name)
+		} else {
+			taskName = fmt.Sprintf("%02d.%02d - %s", e.StartDate.Day(), e.StartDate.Month(), e.Name)
+		}
+		tmpl.Tasks = append(tmpl.Tasks, models.TaskTemplate{Text: taskName})
+	}
 }
 
 func (h listHandler) handleCreateTaskInList(w http.ResponseWriter, r *http.Request, listID string) {
