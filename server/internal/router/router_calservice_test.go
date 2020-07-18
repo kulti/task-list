@@ -40,7 +40,6 @@ func (s *RouterCalServiceTestSuite) TearDownTest() {
 	s.mockCtrl.Finish()
 }
 
-//nolint:dupl
 func (s *RouterCalServiceTestSuite) TestAllDayEvents() {
 	begin := time.Date(2020, 7, 6, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2020, 7, 12, 0, 0, 0, 0, time.UTC)
@@ -59,14 +58,13 @@ func (s *RouterCalServiceTestSuite) TestAllDayEvents() {
 	s.Require().Equal("11.07 - "+events[1].Name, tmpl.Tasks[1].Text)
 }
 
-//nolint:dupl
 func (s *RouterCalServiceTestSuite) TestAtTimeEvents() {
 	begin := time.Date(2020, 11, 13, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2020, 11, 19, 0, 0, 0, 0, time.UTC)
 
 	events := []calservice.Event{
-		{Name: "test event 1", StartDate: begin.Add(1 * time.Hour * 24)},
-		{Name: "test event 2", StartDate: begin.Add(3 * time.Hour * 24)},
+		{Name: "test event 1", StartDate: begin.Add(1 * time.Hour * 24).Add(18*time.Hour + 10*time.Minute)},
+		{Name: "test event 2", StartDate: begin.Add(3 * time.Hour * 24).Add(7 * time.Hour)},
 	}
 
 	s.calService.EXPECT().GetEvents(gomock.Any(), begin, end).Return(events, nil)
@@ -74,8 +72,8 @@ func (s *RouterCalServiceTestSuite) TestAtTimeEvents() {
 	tmpl := s.createTaskList(begin, end)
 
 	s.Require().Len(tmpl.Tasks, 2)
-	s.Require().Equal("14.11 - "+events[0].Name, tmpl.Tasks[0].Text)
-	s.Require().Equal("16.11 - "+events[1].Name, tmpl.Tasks[1].Text)
+	s.Require().Equal("14.11 - "+events[0].Name+" (18:10)", tmpl.Tasks[0].Text)
+	s.Require().Equal("16.11 - "+events[1].Name+" (07:00)", tmpl.Tasks[1].Text)
 }
 
 var errCalService = errors.New("calendar service error")

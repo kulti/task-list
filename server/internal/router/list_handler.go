@@ -121,7 +121,10 @@ func (h listHandler) extendSprintTemplateWithCalendarEvents(ctx context.Context,
 		if !e.Date.IsZero() {
 			taskName = fmt.Sprintf("%02d.%02d - %s", e.Date.Day(), e.Date.Month(), e.Name)
 		} else {
-			taskName = fmt.Sprintf("%02d.%02d - %s", e.StartDate.Day(), e.StartDate.Month(), e.Name)
+			taskName = fmt.Sprintf("%02d.%02d - %s (%02d:%02d)",
+				e.StartDate.Day(), e.StartDate.Month(),
+				e.Name,
+				e.StartDate.Hour(), e.StartDate.Minute())
 		}
 		tmpl.Tasks = append(tmpl.Tasks, models.TaskTemplate{Text: taskName})
 	}
