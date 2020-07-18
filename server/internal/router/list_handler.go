@@ -87,7 +87,7 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.store.NewSprint(r.Context(), opts.Title)
+	err = h.store.NewSprint(r.Context(), opts)
 	if err != nil {
 		httpInternalServerError(w, "failed to create new sprint", err)
 		return
