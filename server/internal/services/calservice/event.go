@@ -4,6 +4,7 @@ import "time"
 
 // Event reprents a calendar event.
 type Event struct {
-	Date time.Time
-	Name string
+	Date      time.Time
+	StartDate time.Time
+	Name      string
 }

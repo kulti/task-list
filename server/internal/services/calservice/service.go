@@ -84,11 +84,20 @@ func (s *Service) getCalendarEvents(ctx context.Context, begin, end time.Time, i
 
 	evs := make([]Event, len(events.Items))
 	for i, item := range events.Items {
-		date, err := time.Parse(time.RFC3339, item.Start.DateTime)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse event time: %w", err)
+		ev := Event{Name: item.Summary}
+
+		if item.Start.DateTime != "" {
+			ev.StartDate, err = time.Parse(time.RFC3339, item.Start.DateTime)
+		} else {
+			ev.Date, err = time.Parse("2006-01-02", item.Start.Date)
 		}
-		evs[i] = Event{Name: item.Summary, Date: date}
+
+		if err != nil {
+			zap.L().Warn("failed to parse event time - skip it", zap.Error(err))
+			continue
+		}
+
+		evs[i] = ev
 	}
 
 	return evs, nil

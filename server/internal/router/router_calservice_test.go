@@ -40,18 +40,10 @@ func (s *RouterCalServiceTestSuite) TearDownTest() {
 	s.mockCtrl.Finish()
 }
 
-func (s *RouterCalServiceTestSuite) TestCalendarService() {
-	opts := openapicli.SprintOpts{
-		Title: "cal service sprint",
-		Begin: "2020-07-06",
-		End:   "2020-07-12",
-	}
-
-	begin, err := time.Parse("2006-01-02", opts.Begin)
-	s.Require().NoError(err)
-
-	end, err := time.Parse("2006-01-02", opts.End)
-	s.Require().NoError(err)
+//nolint:dupl
+func (s *RouterCalServiceTestSuite) TestAllDayEvents() {
+	begin := time.Date(2020, 7, 6, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2020, 7, 12, 0, 0, 0, 0, time.UTC)
 
 	events := []calservice.Event{
 		{Name: "test event 1", Date: begin.Add(2 * time.Hour * 24)},
@@ -60,14 +52,30 @@ func (s *RouterCalServiceTestSuite) TestCalendarService() {
 
 	s.calService.EXPECT().GetEvents(gomock.Any(), begin, end).Return(events, nil)
 
-	tmpl, resp, err := s.Client().CreateTaskList(context.Background(), opts)
-	s.Require().NoError(err)
-	defer resp.Body.Close()
-	s.Require().Equal(http.StatusOK, resp.StatusCode)
+	tmpl := s.createTaskList(begin, end)
 
 	s.Require().Len(tmpl.Tasks, 2)
 	s.Require().Equal("08.07 - "+events[0].Name, tmpl.Tasks[0].Text)
 	s.Require().Equal("11.07 - "+events[1].Name, tmpl.Tasks[1].Text)
+}
+
+//nolint:dupl
+func (s *RouterCalServiceTestSuite) TestAtTimeEvents() {
+	begin := time.Date(2020, 11, 13, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2020, 11, 19, 0, 0, 0, 0, time.UTC)
+
+	events := []calservice.Event{
+		{Name: "test event 1", StartDate: begin.Add(1 * time.Hour * 24)},
+		{Name: "test event 2", StartDate: begin.Add(3 * time.Hour * 24)},
+	}
+
+	s.calService.EXPECT().GetEvents(gomock.Any(), begin, end).Return(events, nil)
+
+	tmpl := s.createTaskList(begin, end)
+
+	s.Require().Len(tmpl.Tasks, 2)
+	s.Require().Equal("14.11 - "+events[0].Name, tmpl.Tasks[0].Text)
+	s.Require().Equal("16.11 - "+events[1].Name, tmpl.Tasks[1].Text)
 }
 
 var errCalService = errors.New("calendar service error")
@@ -76,6 +84,20 @@ func (s *RouterCalServiceTestSuite) TestCalendarServiceErrorAffectsNothing() {
 	s.calService.EXPECT().GetEvents(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errCalService)
 
 	s.NewSprint()
+}
+
+func (s *RouterCalServiceTestSuite) createTaskList(begin, end time.Time) openapicli.SprintTemplate {
+	opts := openapicli.SprintOpts{
+		Title: "cal service sprint",
+		Begin: begin.Format("2006-01-02"),
+		End:   end.Format("2006-01-02"),
+	}
+
+	tmpl, resp, err := s.Client().CreateTaskList(context.Background(), opts)
+	s.Require().NoError(err)
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusOK, resp.StatusCode)
+	return tmpl
 }
 
 func TestRouterWithCalendarService(t *testing.T) {
