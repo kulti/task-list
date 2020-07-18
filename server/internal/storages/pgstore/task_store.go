@@ -36,10 +36,10 @@ func (s *TaskStore) Close() {
 	}
 }
 
-func (s *TaskStore) NewSprint(ctx context.Context, title string) error {
+func (s *TaskStore) NewSprint(ctx context.Context, opts models.SprintOpts) error {
 	_, err := s.conn.Exec(ctx,
 		"INSERT INTO task_lists (type, title, created_at) VALUES ($1, $2, $3)",
-		"sprint", title, time.Now())
+		"sprint", opts.Title, time.Now())
 	return err
 }
 

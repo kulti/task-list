@@ -47,8 +47,8 @@ func NewTaskStore() *TaskStore {
 	return ts
 }
 
-func (s *TaskStore) NewSprint(_ context.Context, title string) error {
-	s.tasks[sprintList] = &taskList{title: title}
+func (s *TaskStore) NewSprint(_ context.Context, opts models.SprintOpts) error {
+	s.tasks[sprintList] = &taskList{title: opts.Title}
 	s.tasks[todoList] = &taskList{title: "Todo"}
 	return nil
 }
