@@ -10,7 +10,6 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/kulti/task-list/server/internal/models"
-	"github.com/kulti/task-list/server/internal/storages"
 )
 
 type TaskStore struct {
@@ -140,35 +139,30 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 }
 
 func (s *TaskStore) DoneTask(ctx context.Context, taskID string) error {
-	allowedStates := map[string]struct{}{"": {}, "todo": {}, "done": {}}
-	return s.updateTaskStateWithStmt(ctx, taskID, "done",
-		"UPDATE tasks SET state = $2, burnt=points WHERE id = $1", allowedStates)
+	return s.updateTaskStateWithStmt(ctx, taskID, models.DoneTaskEvent,
+		"UPDATE tasks SET state = $2, burnt=points WHERE id = $1")
 }
 
 func (s *TaskStore) UndoneTask(ctx context.Context, taskID string) error {
-	allowedStates := map[string]struct{}{"": {}, "done": {}}
-	return s.updateTaskState(ctx, taskID, "", allowedStates)
+	return s.updateTaskState(ctx, taskID, models.UndoneTaskEvent)
 }
 
 func (s *TaskStore) TodoTask(ctx context.Context, taskID string) error {
-	allowedStates := map[string]struct{}{"": {}}
-	return s.updateTaskState(ctx, taskID, "todo", allowedStates)
+	return s.updateTaskState(ctx, taskID, models.TodoTaskEvent)
 }
 
 func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
-	allowedStates := map[string]struct{}{"": {}, "todo": {}}
-	return s.updateTaskState(ctx, taskID, "canceled", allowedStates)
+	return s.updateTaskState(ctx, taskID, models.CancelTaskEvent)
 }
 
-func (s *TaskStore) updateTaskState(ctx context.Context, taskID, state string,
-	allowedStates map[string]struct{},
+func (s *TaskStore) updateTaskState(ctx context.Context, taskID string,
+	event models.SwitchTaskStateEvent,
 ) error {
-	return s.updateTaskStateWithStmt(ctx, taskID, state,
-		"UPDATE tasks SET state = $2 WHERE id = $1", allowedStates)
+	return s.updateTaskStateWithStmt(ctx, taskID, event, "UPDATE tasks SET state = $2 WHERE id = $1")
 }
 
-func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID, state, stmt string,
-	allowedStates map[string]struct{},
+func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID string,
+	event models.SwitchTaskStateEvent, stmt string,
 ) (resultErr error) {
 	id, err := strconv.ParseInt(taskID, 16, 64)
 	if err != nil {
@@ -188,11 +182,12 @@ func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID, state, 
 	}()
 
 	row := tx.QueryRow(ctx, "SELECT state FROM tasks WHERE id = $1 FOR NO KEY UPDATE", id)
-	var curState string
+	var curState models.TaskState
 	err = row.Scan(&curState)
 	if err == nil || errors.Is(err, pgx.ErrNoRows) {
-		if _, ok := allowedStates[curState]; !ok {
-			return storages.NewStateInconsistencyErr(curState, state)
+		state, err := curState.NextState(event)
+		if err != nil {
+			return err
 		}
 
 		if _, err := tx.Exec(ctx, stmt, id, state); err != nil {

@@ -81,7 +81,7 @@ func (h taskHandler) handleTodoTask(w http.ResponseWriter, r *http.Request, task
 
 func (h taskHandler) handleDoneTask(w http.ResponseWriter, r *http.Request, taskID string) {
 	err := h.store.DoneTask(r.Context(), taskID)
-	if errors.As(err, &storages.StateInconsistencyErr{}) {
+	if errors.As(err, &models.StateInconsistencyErr{}) {
 		httpBadRequest(w, "failed to update task in db", err)
 		return
 	}
@@ -92,7 +92,7 @@ func (h taskHandler) handleDoneTask(w http.ResponseWriter, r *http.Request, task
 
 func (h taskHandler) handleCancelTask(w http.ResponseWriter, r *http.Request, taskID string) {
 	err := h.store.CancelTask(r.Context(), taskID)
-	if errors.As(err, &storages.StateInconsistencyErr{}) {
+	if errors.As(err, &models.StateInconsistencyErr{}) {
 		httpBadRequest(w, "failed to update task in db", err)
 		return
 	}
