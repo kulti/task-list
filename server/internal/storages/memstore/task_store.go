@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/kulti/task-list/server/internal/models"
-	"github.com/kulti/task-list/server/internal/storages"
 )
 
 const (
@@ -96,10 +95,10 @@ func (s *TaskStore) ListTasks(_ context.Context, listID string) (models.TaskList
 func (s *TaskStore) DoneTask(_ context.Context, taskID string) error {
 	for i, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
-			if s.tasks[sprintList].tasks[i].State == "canceled" {
-				return storages.NewStateInconsistencyErr("canceled", "done")
+			err := s.changeTaskState(s.tasks[sprintList].tasks[i], models.DoneTaskEvent)
+			if err != nil {
+				return err
 			}
-			s.tasks[sprintList].tasks[i].State = "done"
 			s.tasks[sprintList].tasks[i].Burnt = s.tasks[sprintList].tasks[i].Points
 			break
 		}
@@ -110,8 +109,7 @@ func (s *TaskStore) DoneTask(_ context.Context, taskID string) error {
 func (s *TaskStore) UndoneTask(_ context.Context, taskID string) error {
 	for i, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
-			s.tasks[sprintList].tasks[i].State = ""
-			break
+			return s.changeTaskState(s.tasks[sprintList].tasks[i], models.UndoneTaskEvent)
 		}
 	}
 	return nil
@@ -120,8 +118,7 @@ func (s *TaskStore) UndoneTask(_ context.Context, taskID string) error {
 func (s *TaskStore) TodoTask(_ context.Context, taskID string) error {
 	for i, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
-			s.tasks[sprintList].tasks[i].State = "todo"
-			break
+			return s.changeTaskState(s.tasks[sprintList].tasks[i], models.TodoTaskEvent)
 		}
 	}
 	return nil
@@ -130,11 +127,7 @@ func (s *TaskStore) TodoTask(_ context.Context, taskID string) error {
 func (s *TaskStore) CancelTask(_ context.Context, taskID string) error {
 	for i, t := range s.tasks[sprintList].tasks {
 		if t.ID == taskID {
-			if s.tasks[sprintList].tasks[i].State == "done" {
-				return storages.NewStateInconsistencyErr("done", "canceled")
-			}
-			s.tasks[sprintList].tasks[i].State = "canceled"
-			break
+			return s.changeTaskState(s.tasks[sprintList].tasks[i], models.CancelTaskEvent)
 		}
 	}
 	return nil
@@ -147,4 +140,13 @@ func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplat
 func (s *TaskStore) nextID() string {
 	s.lastID++
 	return strconv.FormatInt(s.lastID, 16)
+}
+
+func (s *TaskStore) changeTaskState(task *storeTask, event models.SwitchTaskStateEvent) error {
+	state, err := task.State.NextState(event)
+	if err != nil {
+		return err
+	}
+	task.State = state
+	return nil
 }

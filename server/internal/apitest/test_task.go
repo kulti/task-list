@@ -110,4 +110,21 @@ func (s *APISuite) TestUpdateDoneTask() {
 	respTask.Points++
 	respTask.Burnt = respTask.Points
 	s.updateTask(respTask)
+
+	respTask.State = taskStateDone
+	s.checkSprintTaskList(respTask)
+}
+
+func (s *APISuite) TestUpdateTodoTask() {
+	s.NewSprint()
+
+	respTask := s.createSprintTask()
+	s.todoTask(respTask.Id)
+
+	respTask.Points++
+	respTask.Burnt = respTask.Points - 1
+	s.updateTask(respTask)
+
+	respTask.State = taskStateTodo
+	s.checkSprintTaskList(respTask)
 }
