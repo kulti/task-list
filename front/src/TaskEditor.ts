@@ -17,12 +17,12 @@ export function BuildTaskEditor(
   task?: TaskEditorTask,
   focus = TaskEditorFocus.None
 ): HTMLElement {
-  const taskTextInput = document.createElement("input") as HTMLInputElement;
+  const taskTextInput = document.createElement("input");
   taskTextInput.className = "text form-control";
   taskTextInput.type = "text";
   taskTextInput.placeholder = "Do new task";
 
-  const taskPointsInput = document.createElement("input") as HTMLInputElement;
+  const taskPointsInput = document.createElement("input");
   taskPointsInput.className = "points form-control";
   taskPointsInput.type = "text";
   taskPointsInput.placeholder = "0";
@@ -30,7 +30,7 @@ export function BuildTaskEditor(
   if (task) {
     taskTextInput.value = task.text;
     if (task.burnt !== undefined) {
-      taskPointsInput.value = task.burnt + "/";
+      taskPointsInput.value = task.burnt.toString() + "/";
     }
     taskPointsInput.value += task.points;
   }
@@ -43,7 +43,7 @@ export function BuildTaskEditor(
     }, 0);
   }
 
-  const taskDiv = document.createElement("div") as HTMLDivElement;
+  const taskDiv = document.createElement("div");
   taskDiv.className = "form-group task";
   taskDiv.append(taskTextInput, taskPointsInput);
 

@@ -196,7 +196,7 @@ components:
           $ref: "#/components/schemas/Points"
         state:
           type: string
-          enum: [todo, done, canceled]
+          enum: ["", todo, done, canceled]
 
     TaskList:
       type: object

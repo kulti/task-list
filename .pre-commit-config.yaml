@@ -10,11 +10,12 @@ repos:
     hooks:
       - id: golangci-lint
         entry: bash -c 'cd server && golangci-lint run --fix'
-  - repo: https://github.com/awebdeveloper/pre-commit-tslint/
-    rev: master
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v7.5.0
     hooks:
-      - id: tslint
-        additional_dependencies: ["tslint@6.1.2", "typescript"]
+      - id: eslint
+        files: \.[jt]sx?$
+        types: [file]
   - repo: https://github.com/prettier/prettier/
     rev: master
     hooks:

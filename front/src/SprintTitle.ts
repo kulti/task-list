@@ -11,7 +11,7 @@ export function getNewSprintOpts(): models.SprintOpts {
 
 function formatSrpintDate(d: Date): string {
   return (
-    d.getUTCFullYear() +
+    d.getUTCFullYear().toString() +
     "-" +
     numToString(d.getMonth() + 1) +
     "-" +

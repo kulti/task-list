@@ -10,6 +10,7 @@ const monday = 1;
 const RealDate = Date;
 
 function mockDate(d: Date) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
   (global as any).Date = class extends RealDate {
     constructor(fromDate?: Date) {
       super();
