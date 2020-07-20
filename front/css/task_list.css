@@ -1,69 +1,69 @@
 .list_header {
-    overflow: hidden;
-    border-bottom: 1px solid rgb(229, 229, 229);
-    display: flex;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(229, 229, 229);
+  display: flex;
 }
 
 .list_header .title {
-    font-weight: bold;
-    font-family: Helvetica, sans-serif;
-    font-size: 15px;
-    float: left;
-    flex: 3;
+  font-weight: bold;
+  font-family: Helvetica, sans-serif;
+  font-size: 15px;
+  float: left;
+  flex: 3;
 }
 
 .task__id {
-    display: none;
+  display: none;
 }
 
 .points {
-    font-family: Helvetica, sans-serif;
-    font-size: 15px;
-    text-align: center;
-    float: left;
-    flex: 1;
+  font-family: Helvetica, sans-serif;
+  font-size: 15px;
+  text-align: center;
+  float: left;
+  flex: 1;
 }
 
 div.points {
-    color: rgb(229, 229, 229);
+  color: rgb(229, 229, 229);
 }
 
 .task {
-    overflow: hidden;
-    border-bottom: 1px solid rgb(242, 242, 242);
-    display: flex;
-    align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(242, 242, 242);
+  display: flex;
+  align-items: center;
 }
 
 .task .text {
-    font-family: 'Times New Roman', Times, serif;
-    float: left;
-    flex: 3;
+  font-family: "Times New Roman", Times, serif;
+  float: left;
+  flex: 3;
 }
 
 .task.todo {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .task.completed {
-    color: #dddddd;
+  color: #dddddd;
 }
 
 .task.canceled {
-    color: #dddddd;
-    text-decoration-line: line-through;
+  color: #dddddd;
+  text-decoration-line: line-through;
 }
 
 .dropdown-item {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 ::placeholder {
-    color: #dddddd !important;
+  color: #dddddd !important;
 }
 
 #alerts {
-    position: absolute;
-    width: 100%;
-    z-index: 20;
+  position: absolute;
+  width: 100%;
+  z-index: 20;
 }
