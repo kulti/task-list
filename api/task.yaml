@@ -11,16 +11,16 @@ paths:
       requestBody:
         required: true
         content:
-          'application/json':
+          "application/json":
             schema:
-              $ref: '#/components/schemas/SprintOpts'
+              $ref: "#/components/schemas/SprintOpts"
       responses:
-        '200':
+        "200":
           description: OK
           content:
-            'application/json':
+            "application/json":
               schema:
-                $ref: '#/components/schemas/SprintTemplate'
+                $ref: "#/components/schemas/SprintTemplate"
 
   /list/{listId}:
     get:
@@ -30,10 +30,10 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/ListId'
+            $ref: "#/components/schemas/ListId"
       responses:
-        '200':
-          description: 'all tasks in list'
+        "200":
+          description: "all tasks in list"
           content:
             application/json:
               schema:
@@ -47,21 +47,21 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/ListId'
+            $ref: "#/components/schemas/ListId"
       requestBody:
         description: task to add
         required: true
         content:
-          'application/json':
+          "application/json":
             schema:
-              $ref: '#/components/schemas/Task'
+              $ref: "#/components/schemas/Task"
       responses:
-        '200':
-          description: 'created task'
+        "200":
+          description: "created task"
           content:
-            'application/json':
+            "application/json":
               schema:
-                $ref: '#/components/schemas/RespTask'
+                $ref: "#/components/schemas/RespTask"
 
   /list/{listId}/delete/{taskId}:
     post:
@@ -71,14 +71,14 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/ListId'
+            $ref: "#/components/schemas/ListId"
         - name: taskId
           in: path
           required: true
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: OK
 
   /task/{taskId}/todo:
@@ -91,7 +91,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: OK
 
   /task/{taskId}/done:
@@ -104,10 +104,11 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
-          description: Bad reqest can be returned in cases when done is not possible for task.
+        "400":
+          description:
+            Bad reqest can be returned in cases when done is not possible for task.
             E.g. cannot done task that already canceled.
 
   /task/{taskId}/cancel:
@@ -120,10 +121,11 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
-          description: Bad reqest can be returned in cases when cancel is not possible for task.
+        "400":
+          description:
+            Bad reqest can be returned in cases when cancel is not possible for task.
             E.g. cannot cancel task that already done.
 
   /task/{taskId}/update:
@@ -136,15 +138,15 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: OK
       requestBody:
         description: task updates
         required: true
         content:
-          'application/json':
+          "application/json":
             schema:
-              $ref: '#/components/schemas/UpdateOptions'
+              $ref: "#/components/schemas/UpdateOptions"
 
 components:
   schemas:
@@ -173,7 +175,7 @@ components:
         text:
           type: string
         points:
-          $ref: '#/components/schemas/Points'
+          $ref: "#/components/schemas/Points"
 
     RespTask:
       type: object
@@ -189,9 +191,9 @@ components:
         text:
           type: string
         points:
-          $ref: '#/components/schemas/Points'
+          $ref: "#/components/schemas/Points"
         burnt:
-          $ref: '#/components/schemas/Points'
+          $ref: "#/components/schemas/Points"
         state:
           type: string
           enum: [todo, done, canceled]
@@ -207,7 +209,7 @@ components:
         tasks:
           type: array
           items:
-            $ref: '#/components/schemas/RespTask'
+            $ref: "#/components/schemas/RespTask"
 
     ListId:
       type: string
@@ -223,9 +225,9 @@ components:
         text:
           type: string
         burnt:
-          $ref: '#/components/schemas/Points'
+          $ref: "#/components/schemas/Points"
         points:
-          $ref: '#/components/schemas/Points'
+          $ref: "#/components/schemas/Points"
 
     SprintTemplate:
       type: object
@@ -235,7 +237,7 @@ components:
         tasks:
           type: array
           items:
-            $ref: '#/components/schemas/TaskTemplate'
+            $ref: "#/components/schemas/TaskTemplate"
 
     TaskTemplate:
       type: object
@@ -249,12 +251,8 @@ components:
         text:
           type: string
         points:
-          $ref: '#/components/schemas/Points'
+          $ref: "#/components/schemas/Points"
 
     Points:
       type: integer
       maximum: 32767
-
-# /cal/{year}/{month} - get
-# /cal/{year}/{month}/add - post (добавить проект)
-# /cal/{year}/{month}/{date}/add - post

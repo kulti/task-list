@@ -1,17 +1,21 @@
-exclude: 'generated|vendor'
+exclude: "generated|vendor"
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0
     hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
--   repo: https://github.com/golangci/golangci-lint
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+  - repo: https://github.com/golangci/golangci-lint
     rev: v1.27.0
     hooks:
-    -   id: golangci-lint
+      - id: golangci-lint
         entry: bash -c 'cd server && golangci-lint run --fix'
--   repo: https://github.com/awebdeveloper/pre-commit-tslint/
+  - repo: https://github.com/awebdeveloper/pre-commit-tslint/
     rev: master
     hooks:
-    -   id: tslint
-        additional_dependencies: ['tslint@6.1.2', 'typescript']
+      - id: tslint
+        additional_dependencies: ["tslint@6.1.2", "typescript"]
+  - repo: https://github.com/prettier/prettier/
+    rev: master
+    hooks:
+      - id: prettier
