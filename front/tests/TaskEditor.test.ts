@@ -34,7 +34,9 @@ describe("build task editor", () => {
 
     const pointsInput = taskDiv.childNodes[1] as HTMLInputElement;
     expect(pointsInput.className).toContain("points");
-    expect(pointsInput.value).toEqual(task.burnt + "/" + task.points);
+    expect(pointsInput.value).toEqual(
+      task.burnt.toString() + "/" + task.points.toString()
+    );
   });
 
   it("has specific html for edit task with zero-burnt", () => {
@@ -51,7 +53,7 @@ describe("build task editor", () => {
 
     const pointsInput = taskDiv.childNodes[1] as HTMLInputElement;
     expect(pointsInput.className).toContain("points");
-    expect(pointsInput.value).toEqual("0/" + task.points);
+    expect(pointsInput.value).toEqual("0/" + task.points.toString());
   });
 
   it("has specific html for edit task without burnt points", () => {
@@ -111,8 +113,8 @@ describe("build task editor", () => {
 
   it("handles escape key to apply reset div", () => {
     const applyFn = jest.fn();
-    const mainDiv = document.createElement("div") as HTMLDivElement;
-    const resetDiv = document.createElement("div") as HTMLDivElement;
+    const mainDiv = document.createElement("div");
+    const resetDiv = document.createElement("div");
     resetDiv.className = "reset";
 
     const taskDiv = BuildTaskEditor(

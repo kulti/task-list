@@ -2,11 +2,7 @@ import { DefaultApi } from "./openapi_cli/index";
 import * as models from "./openapi_cli/model/models";
 import { BuildDropdownMenu } from "./DropdownMenu";
 import { BuildTaskEditor, TaskEditorFocus, TaskEditorTask } from "./TaskEditor";
-import {
-  getNewSprintDates,
-  buildNewSprintTitle,
-  getNewSprintOpts,
-} from "./SprintTitle";
+import { buildNewSprintTitle, getNewSprintOpts } from "./SprintTitle";
 
 const api = new DefaultApi(window.location.origin + "/api/v1");
 
@@ -29,7 +25,7 @@ window.onload = () => {
 
 $("#new_sprint_btn")[0].addEventListener("click", () => {
   const sprintOpts = getNewSprintOpts();
-  api
+  void api
     .createTaskList(sprintOpts)
     .done((data) => {
       sprintTemplate = data.body;
@@ -54,14 +50,14 @@ function showErrorAlertWithRefresh(text: string) {
 }
 
 function showAlert(type: string, text: string, refreshSec?: number) {
-  const alertCloseBtn = document.createElement("button") as HTMLButtonElement;
+  const alertCloseBtn = document.createElement("button");
   alertCloseBtn.type = "button";
   alertCloseBtn.className = "close";
   alertCloseBtn.setAttribute("data-dismiss", "alert");
   alertCloseBtn.setAttribute("aria-label", "Close");
   alertCloseBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
 
-  const alertDiv = document.createElement("div") as HTMLDivElement;
+  const alertDiv = document.createElement("div");
   alertDiv.className = "alert alert-dismissible fade show alert-" + type;
   alertDiv.setAttribute("role", "alert");
   alertDiv.innerText = text;
@@ -70,10 +66,11 @@ function showAlert(type: string, text: string, refreshSec?: number) {
   $("#alerts").append(alertDiv);
 
   if (refreshSec) {
-    alertDiv.innerText = text + " - refresh in " + refreshSec + "seconds";
+    alertDiv.innerText =
+      text + " - refresh in " + refreshSec.toString() + "seconds";
     let i = refreshSec - 1;
     setInterval(() => {
-      alertDiv.innerText = text + " - refresh in " + i + " seconds";
+      alertDiv.innerText = text + " - refresh in " + i.toString() + " seconds";
       i--;
       if (i === 0) {
         window.location.reload();
@@ -87,9 +84,9 @@ function showAlert(type: string, text: string, refreshSec?: number) {
 }
 
 function load_task_lists() {
-  api
+  void api
     .getTaskList(models.ListId.Sprint)
-    .fail((body) => {
+    .fail(() => {
       showErrorAlertWithRefresh("failed to load sprint tasks");
     })
     .done((data) => {
@@ -121,7 +118,7 @@ function update_task_list_header(
   const taskListHtml = $(listHtmlId(listId) + " .list_header")[0];
   taskListHtml.getElementsByClassName("title")[0].innerHTML = taskList.title;
   taskListHtml.getElementsByClassName("points")[0].innerHTML =
-    burnt + "/" + points;
+    burnt.toString() + "/" + points.toString();
 }
 
 function fill_task_list(listId: models.ListId, tasks: models.RespTask[]) {
@@ -158,7 +155,7 @@ function build_task_html(
   let points = "";
   let percent = 0;
   if (task.state !== models.RespTask.StateEnum.Canceled) {
-    points = task.burnt + "/" + task.points;
+    points = task.burnt.toString() + "/" + task.points.toString();
     percent = (100 * task.burnt) / task.points;
   }
 
@@ -171,33 +168,33 @@ function build_task_html(
     taskProperties = TaskProperty.Todo;
   }
 
-  const taskIdDiv = document.createElement("div") as HTMLDivElement;
+  const taskIdDiv = document.createElement("div");
   taskIdDiv.className = "task__id";
   taskIdDiv.innerText = task.id;
 
-  const taskTextDiv = document.createElement("div") as HTMLDivElement;
+  const taskTextDiv = document.createElement("div");
   taskTextDiv.className = "text";
   taskTextDiv.innerText = task.text;
 
-  const taskPointsDiv = document.createElement("div") as HTMLDivElement;
+  const taskPointsDiv = document.createElement("div");
   taskPointsDiv.className = "points";
   taskPointsDiv.innerText = points;
   if (percent > 0) {
     taskPointsDiv.style.background =
       "-webkit-linear-gradient(left, #f8f8f8 " +
-      percent +
+      percent.toString() +
       "%, white " +
-      percent +
+      percent.toString() +
       "%)";
   }
 
-  const taskDiv = document.createElement("div") as HTMLDivElement;
+  const taskDiv = document.createElement("div");
   taskDiv.className = "task " + taskProperties;
   taskDiv.setAttribute("type", "button");
   taskDiv.setAttribute("data-toggle", "dropdown");
   taskDiv.append(taskIdDiv, taskTextDiv, taskPointsDiv);
 
-  const dropdown = document.createElement("div") as HTMLDivElement;
+  const dropdown = document.createElement("div");
   dropdown.className = "dropdown show";
   dropdown.append(taskDiv);
 
@@ -205,7 +202,7 @@ function build_task_html(
     dropdown.append(build_dropdown_menu(listId, task));
   };
 
-  dropdown.ondblclick = (): any => {
+  dropdown.ondblclick = (): boolean => {
     dropdown.replaceWith(build_task_input_html(task, dropdown));
     return false;
   };
@@ -220,7 +217,7 @@ function build_dropdown_menu(
   return BuildDropdownMenu(
     task.state,
     () => {
-      api
+      void api
         .todoTask(task.id)
         .done(() => {
           load_task_lists();
@@ -230,7 +227,7 @@ function build_dropdown_menu(
         });
     },
     () => {
-      api
+      void api
         .doneTask(task.id)
         .done(() => {
           load_task_lists();
@@ -240,7 +237,7 @@ function build_dropdown_menu(
         });
     },
     () => {
-      api
+      void api
         .cancelTask(task.id)
         .done(() => {
           load_task_lists();
@@ -250,7 +247,7 @@ function build_dropdown_menu(
         });
     },
     () => {
-      api
+      void api
         .deleteTask(listId, task.id)
         .done(() => {
           load_task_lists();
@@ -283,12 +280,12 @@ function build_task_input_html(
         points: parseInt(pointsArr[1], 10),
         burnt: parseInt(pointsArr[0], 10),
       };
-      api
+      void api
         .updateTask(task.id, opts)
         .done(() => {
           load_task_lists();
         })
-        .fail((body) => {
+        .fail(() => {
           showErrorAlert("failed to update task");
         });
       load_task_lists();
@@ -306,13 +303,13 @@ function build_new_task_input_html(listId: models.ListId): HTMLElement {
       text,
       points: parseInt(points, 10),
     };
-    api
+    void api
       .createTask(listId, newTask)
       .done(() => {
         load_task_lists();
         focus_new_task_input(listId);
       })
-      .fail((body) => {
+      .fail(() => {
         showErrorAlert("failed to create task");
       });
   });
@@ -328,13 +325,13 @@ function build_template_task_input_html(
         text,
         points: parseInt(points, 10),
       };
-      api
+      void api
         .createTask(listId, newTask)
         .done(() => {
           load_task_lists();
           focus_new_task_input(listId);
         })
-        .fail((body) => {
+        .fail(() => {
           showErrorAlert("failed to create task");
         });
     },
@@ -389,5 +386,5 @@ function prepare_task_list(taskList: models.TaskList): void {
 }
 
 function listHtmlId(listId: models.ListId): string {
-  return "#" + listId + "_list";
+  return "#" + listId.toString() + "_list";
 }

@@ -7,7 +7,7 @@ export function BuildDropdownMenu(
   cancelEL: EventListener,
   deleteEL: EventListener
 ): HTMLDivElement {
-  const dropdownMenu = document.createElement("div") as HTMLDivElement;
+  const dropdownMenu = document.createElement("div");
   dropdownMenu.className = "dropdown-menu";
 
   switch (taskState) {
@@ -35,7 +35,7 @@ function appendItem(
   text: string,
   handler: EventListener
 ) {
-  const action = document.createElement("div") as HTMLDivElement;
+  const action = document.createElement("div");
   action.className = "dropdown-item";
   action.innerText = text;
   action.addEventListener("click", handler);

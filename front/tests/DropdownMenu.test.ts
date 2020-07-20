@@ -1,14 +1,20 @@
-describe("list elements", () => {
-  test.each`
-    type          | items
-    ${"todo"}     | ${Array("Done", "Cancel", "Delete")}
-    ${""}         | ${Array("Done", "Todo", "Cancel", "Delete")}
-    ${"done"}     | ${Array("Delete")}
-    ${"canceled"} | ${Array("Delete")}
-  `('list "$type" should contains: $items', ({ type, items }) => {
-    const BuildDropdownMenu = require("../src/DropdownMenu").BuildDropdownMenu;
+import { BuildDropdownMenu } from "../src/DropdownMenu";
+import { RespTask } from "../src/openapi_cli/index";
 
-    const menuDiv = BuildDropdownMenu(type, {}, {}, {}, {});
+describe("list elements", () => {
+  test.each<[RespTask.StateEnum, string[]]>([
+    [RespTask.StateEnum.Todo, ["Done", "Cancel", "Delete"]],
+    [RespTask.StateEnum.Empty, ["Done", "Todo", "Cancel", "Delete"]],
+    [RespTask.StateEnum.Done, ["Delete"]],
+    [RespTask.StateEnum.Canceled, ["Delete"]],
+  ])('list "%s" should contains: %s', (type, items) => {
+    const menuDiv = BuildDropdownMenu(
+      type,
+      jest.fn(),
+      jest.fn(),
+      jest.fn(),
+      jest.fn()
+    );
 
     expect(menuDiv.className).toEqual("dropdown-menu");
     expect(menuDiv.childNodes).toHaveLength(items.length);
@@ -21,15 +27,14 @@ describe("list elements", () => {
 });
 
 describe("list item actions", () => {
-  const fnMap = new Map<string, jest.Mock<any, any>>();
+  const fnMap = new Map<string, jest.Mock<unknown, unknown[]>>();
   fnMap.set("Done", jest.fn());
   fnMap.set("Todo", jest.fn());
   fnMap.set("Cancel", jest.fn());
   fnMap.set("Delete", jest.fn());
 
-  const BuildDropdownMenu = require("../src/DropdownMenu").BuildDropdownMenu;
   const menuDiv = BuildDropdownMenu(
-    "",
+    RespTask.StateEnum.Empty,
     fnMap.get("Todo"),
     fnMap.get("Done"),
     fnMap.get("Cancel"),
