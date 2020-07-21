@@ -116,7 +116,8 @@ func (h listHandler) extendSprintTemplateWithCalendarEvents(ctx context.Context,
 		return
 	}
 
-	for _, e := range events {
+	calendarTasks := make([]models.TaskTemplate, len(events))
+	for i, e := range events {
 		var taskName string
 		if !e.Date.IsZero() {
 			taskName = fmt.Sprintf("%02d.%02d - %s", e.Date.Day(), e.Date.Month(), e.Name)
@@ -126,8 +127,14 @@ func (h listHandler) extendSprintTemplateWithCalendarEvents(ctx context.Context,
 				e.Name,
 				e.StartDate.Hour(), e.StartDate.Minute())
 		}
-		tmpl.Tasks = append(tmpl.Tasks, models.TaskTemplate{Text: taskName})
+		calendarTasks[i] = models.TaskTemplate{Text: taskName}
 	}
+
+	sort.Slice(calendarTasks, func(i, j int) bool {
+		return calendarTasks[i].Text < calendarTasks[j].Text
+	})
+
+	tmpl.Tasks = append(tmpl.Tasks, calendarTasks...)
 }
 
 func (h listHandler) handleCreateTaskInList(w http.ResponseWriter, r *http.Request, listID string) {
