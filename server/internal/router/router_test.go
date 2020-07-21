@@ -1,11 +1,13 @@
 package router_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/kulti/task-list/server/internal/apitest"
+	"github.com/kulti/task-list/server/internal/generated/openapicli"
 	"github.com/kulti/task-list/server/internal/router"
 	"github.com/kulti/task-list/server/internal/storages/memstore"
 	"github.com/stretchr/testify/suite"
@@ -32,6 +34,40 @@ func (s *RouterTestSuite) TestApiRootNotFound() {
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusNotFound, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestNewSprintInvalidJSON() {
+	resp, err := http.Post(s.srv.URL+"/api/v1/list/sprint/new", "application/json", nil)
+	s.Require().NoError(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestCreateTaskInvalidJSON() {
+	resp, err := http.Post(s.srv.URL+"/api/v1/list/sprint/add", "application/json", nil)
+	s.Require().NoError(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestCreateTaskWithoutText() {
+	task := openapicli.Task{
+		Points: 10,
+	}
+	_, resp, err := s.Client().CreateTask(context.Background(), openapicli.SPRINT, task)
+	s.Require().Error(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestCreateTaskWithoutPoints() {
+	task := openapicli.Task{
+		Text: "test text",
+	}
+	_, resp, err := s.Client().CreateTask(context.Background(), openapicli.SPRINT, task)
+	s.Require().Error(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
 }
 
 func TestRouter(t *testing.T) {
