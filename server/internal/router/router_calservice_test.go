@@ -84,6 +84,26 @@ func (s *RouterCalServiceTestSuite) TestCalendarServiceErrorAffectsNothing() {
 	s.NewSprint()
 }
 
+func (s *RouterCalServiceTestSuite) TestEventsOrder() {
+	begin := time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2020, 3, 7, 0, 0, 0, 0, time.UTC)
+
+	events := []calservice.Event{
+		{Name: "test event 3", Date: begin.Add(3 * time.Hour * 24)},
+		{Name: "test event 1", Date: begin.Add(2 * time.Hour * 24)},
+		{Name: "test event 2", Date: begin.Add(3 * time.Hour * 24)},
+	}
+
+	s.calService.EXPECT().GetEvents(gomock.Any(), begin, end).Return(events, nil)
+
+	tmpl := s.createTaskList(begin, end)
+
+	s.Require().Len(tmpl.Tasks, 3)
+	s.Require().Equal("03.03 - "+events[1].Name, tmpl.Tasks[0].Text)
+	s.Require().Equal("04.03 - "+events[2].Name, tmpl.Tasks[1].Text)
+	s.Require().Equal("04.03 - "+events[0].Name, tmpl.Tasks[2].Text)
+}
+
 func (s *RouterCalServiceTestSuite) createTaskList(begin, end time.Time) openapicli.SprintTemplate {
 	opts := openapicli.SprintOpts{
 		Title: "cal service sprint",
