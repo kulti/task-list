@@ -14,7 +14,8 @@ linters:
     - dogsled
     - dupl
     - errcheck
-    - funlen
+    # - exhaustive
+    - exportloopref
     - gochecknoglobals
     - gochecknoinits
     - gocognit
@@ -25,6 +26,8 @@ linters:
     # - godox
     - goerr113
     - gofmt
+    # - gofumpt
+    - goheader
     - goimports
     - golint
     - gomnd
@@ -40,10 +43,12 @@ linters:
     - misspell
     - nakedret
     - nestif
+    - noctx
     - nolintlint
     - prealloc
     - rowserrcheck
     - scopelint
+    - sqlclosecheck
     - staticcheck
     - structcheck
     - stylecheck

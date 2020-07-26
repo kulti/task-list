@@ -30,21 +30,21 @@ func (s *RouterTestSuite) TearDownTest() {
 }
 
 func (s *RouterTestSuite) TestApiRootNotFound() {
-	resp, err := http.Get(s.srv.URL)
+	resp, err := http.Get(s.srv.URL) //nolint:noctx
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusNotFound, resp.StatusCode)
 }
 
 func (s *RouterTestSuite) TestNewSprintInvalidJSON() {
-	resp, err := http.Post(s.srv.URL+"/api/v1/list/sprint/new", "application/json", nil)
+	resp, err := http.Post(s.srv.URL+"/api/v1/list/sprint/new", "application/json", nil) //nolint:noctx
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
 }
 
 func (s *RouterTestSuite) TestCreateTaskInvalidJSON() {
-	resp, err := http.Post(s.srv.URL+"/api/v1/list/sprint/add", "application/json", nil)
+	resp, err := http.Post(s.srv.URL+"/api/v1/list/sprint/add", "application/json", nil) //nolint:noctx
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)

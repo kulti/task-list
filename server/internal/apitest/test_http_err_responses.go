@@ -11,10 +11,10 @@ func (s *APISuite) TestNotFound() {
 		"/api/v1/list/sprint/unknown", "/api/v1/list/backlog/new", "/api/v1/list/sprint/delete",
 		"/api/v1/task", "/api/v1/task/unknown"}
 
-	//nolint:scopelint
 	for _, p := range paths {
+		p := p
 		s.Run(p, func() {
-			resp, err := http.Get(s.apiURL + p)
+			resp, err := http.Get(s.apiURL + p) //nolint:noctx
 			s.Require().NoError(err)
 			resp.Body.Close()
 			s.Require().Equal(http.StatusNotFound, resp.StatusCode)
