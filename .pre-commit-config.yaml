@@ -20,3 +20,12 @@ repos:
     rev: master
     hooks:
       - id: prettier
+  - repo: local
+    hooks:
+      - id: unit-tests
+        name: unit tests
+        entry: bash -c "cd server && go test ./..."
+        language: system
+        files: \.go$
+        types: [file]
+        pass_filenames: false
