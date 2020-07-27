@@ -10,6 +10,7 @@ Method | HTTP request | Description
 [**DeleteTask**](DefaultApi.md#DeleteTask) | **Post** /list/{listId}/delete/{taskId} | 
 [**DoneTask**](DefaultApi.md#DoneTask) | **Post** /task/{taskId}/done | 
 [**GetTaskList**](DefaultApi.md#GetTaskList) | **Get** /list/{listId} | 
+[**PostponeTask**](DefaultApi.md#PostponeTask) | **Post** /task/{taskId}/postpone | 
 [**TodoTask**](DefaultApi.md#TodoTask) | **Post** /task/{taskId}/todo | 
 [**UpdateTask**](DefaultApi.md#UpdateTask) | **Post** /task/{taskId}/update | 
 
@@ -203,6 +204,38 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## PostponeTask
+
+> PostponeTask(ctx, taskId)
+
+
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**taskId** | **string**|  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
