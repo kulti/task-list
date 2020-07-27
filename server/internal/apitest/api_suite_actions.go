@@ -34,7 +34,7 @@ func (s *APISuiteActions) Client() *openapicli.DefaultApiService {
 	return s.cli.DefaultApi
 }
 
-func (s *APISuiteActions) NewSprint() {
+func (s *APISuiteActions) NewSprint(tasks ...openapicli.RespTask) {
 	s.T().Helper()
 	opts := openapicli.SprintOpts{
 		Title: s.sprintTitle,
@@ -45,7 +45,13 @@ func (s *APISuiteActions) NewSprint() {
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
-	s.Require().Empty(tmpl.Tasks)
+
+	if len(tasks) == 0 {
+		s.Require().Empty(tmpl.Tasks)
+	} else {
+		expectedTasks := s.respTasksToTemplateTasks(tasks)
+		s.Require().Equal(expectedTasks, tmpl.Tasks)
+	}
 }
 
 func (s *APISuiteActions) checkSprintTaskList(tasks ...openapicli.RespTask) {
@@ -163,4 +169,20 @@ func (s *APISuiteActions) updateTask(task openapicli.RespTask) {
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
+}
+
+func (s *APISuiteActions) postponeTask(taskID string) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.PostponeTask(s.ctx, taskID)
+	s.Require().NoError(err, s.errBody(err))
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusOK, resp.StatusCode)
+}
+
+func (s *APISuiteActions) postponeTaskWithError(taskID string, httpStatus int) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.PostponeTask(s.ctx, taskID)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(httpStatus, resp.StatusCode)
 }
