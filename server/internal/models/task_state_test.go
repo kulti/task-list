@@ -13,16 +13,18 @@ type transition map[models.SwitchTaskStateEvent]models.TaskState
 func TestNextTaskState(t *testing.T) {
 	transitions := map[models.TaskState]transition{
 		models.TaskStateSimple: {
-			models.TodoTaskEvent:   models.TaskStateTodo,
-			models.DoneTaskEvent:   models.TaskStateCompleted,
-			models.UndoneTaskEvent: models.TaskStateSimple,
-			models.CancelTaskEvent: models.TaskStateCanceled,
+			models.TodoTaskEvent:     models.TaskStateTodo,
+			models.DoneTaskEvent:     models.TaskStateCompleted,
+			models.UndoneTaskEvent:   models.TaskStateSimple,
+			models.CancelTaskEvent:   models.TaskStateCanceled,
+			models.PostponeTaskEvent: models.TaskStateSimple,
 		},
 		models.TaskStateTodo: {
-			models.TodoTaskEvent:   models.TaskStateTodo,
-			models.DoneTaskEvent:   models.TaskStateCompleted,
-			models.UndoneTaskEvent: models.TaskStateTodo,
-			models.CancelTaskEvent: models.TaskStateCanceled,
+			models.TodoTaskEvent:     models.TaskStateTodo,
+			models.DoneTaskEvent:     models.TaskStateCompleted,
+			models.UndoneTaskEvent:   models.TaskStateTodo,
+			models.CancelTaskEvent:   models.TaskStateCanceled,
+			models.PostponeTaskEvent: models.TaskStateSimple,
 		},
 		models.TaskStateCompleted: {
 			models.DoneTaskEvent:   models.TaskStateCompleted,
@@ -67,15 +69,17 @@ func TestNextTaskStateInconcistency(t *testing.T) {
 			unknownEvent: struct{}{},
 		},
 		models.TaskStateCompleted: {
-			models.TodoTaskEvent:   struct{}{},
-			models.CancelTaskEvent: struct{}{},
-			unknownEvent:           struct{}{},
+			models.TodoTaskEvent:     struct{}{},
+			models.CancelTaskEvent:   struct{}{},
+			models.PostponeTaskEvent: struct{}{},
+			unknownEvent:             struct{}{},
 		},
 		models.TaskStateCanceled: {
-			models.TodoTaskEvent:   struct{}{},
-			models.DoneTaskEvent:   struct{}{},
-			models.UndoneTaskEvent: struct{}{},
-			unknownEvent:           struct{}{},
+			models.TodoTaskEvent:     struct{}{},
+			models.DoneTaskEvent:     struct{}{},
+			models.UndoneTaskEvent:   struct{}{},
+			models.PostponeTaskEvent: struct{}{},
+			unknownEvent:             struct{}{},
 		},
 	}
 

@@ -17,5 +17,6 @@ type TaskStore interface {
 	DoneTask(ctx context.Context, taskID string) error
 	CancelTask(ctx context.Context, taskID string) error
 	UndoneTask(ctx context.Context, taskID string) error
+	PostponeTask(ctx context.Context, taskID string) error
 	GetSprintTemplate(ctx context.Context) (models.SprintTemplate, error)
 }

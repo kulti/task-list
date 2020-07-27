@@ -39,6 +39,8 @@ func (h taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleDoneTask(w, r, taskID)
 	case "cancel":
 		h.handleCancelTask(w, r, taskID)
+	case "postpone":
+		h.handlePostponeTask(w, r, taskID)
 	default:
 		http.NotFound(w, r)
 	}
@@ -98,5 +100,16 @@ func (h taskHandler) handleCancelTask(w http.ResponseWriter, r *http.Request, ta
 	}
 	if err != nil {
 		httpInternalServerError(w, "failed to update task in db", err)
+	}
+}
+
+func (h taskHandler) handlePostponeTask(w http.ResponseWriter, r *http.Request, taskID string) {
+	err := h.store.PostponeTask(r.Context(), taskID)
+	if errors.As(err, &models.StateInconsistencyErr{}) {
+		httpBadRequest(w, "failed to postpone task in db", err)
+		return
+	}
+	if err != nil {
+		httpInternalServerError(w, "failed to postpone task in db", err)
 	}
 }

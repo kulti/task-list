@@ -155,6 +155,14 @@ func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
 	return s.updateTaskState(ctx, taskID, models.CancelTaskEvent)
 }
 
+func (s *TaskStore) PostponeTask(ctx context.Context, taskID string) (resultErr error) {
+	return s.updateTaskStateWithStmt(ctx, taskID, models.PostponeTaskEvent,
+		`WITH task AS (DELETE FROM tasks WHERE id = $1 AND $2 = $2 RETURNING *)
+		INSERT INTO postponed_tasks (text, points)
+		SELECT text, points
+		FROM task`)
+}
+
 func (s *TaskStore) updateTaskState(ctx context.Context, taskID string,
 	event models.SwitchTaskStateEvent,
 ) error {
@@ -201,26 +209,30 @@ func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID string,
 }
 
 func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplate, error) {
-	rows, _ := s.conn.Query(ctx,
-		`SELECT id, text, points
+	stmts := []string{
+		`SELECT text, points
 		FROM new_sprint_task_tempate
-		ORDER BY id`)
-	defer rows.Close()
-
-	var tasks []models.TaskTemplate
-	err := rows.Err()
-	for err == nil && rows.Next() {
-		var task models.TaskTemplate
-		var taskID int64
-		err = rows.Scan(&taskID, &task.Text, &task.Points)
-		if err == nil {
-			task.ID = strconv.FormatInt(taskID, 16)
-			tasks = append(tasks, task)
-		}
+		ORDER BY id`,
+		`DELETE FROM postponed_tasks RETURNING text, points`,
 	}
 
-	if err != nil {
-		return models.SprintTemplate{}, err
+	var tasks []models.TaskTemplate
+
+	for _, stmt := range stmts {
+		rows, _ := s.conn.Query(ctx, stmt)
+		err := rows.Err()
+		for err == nil && rows.Next() {
+			var task models.TaskTemplate
+			err = rows.Scan(&task.Text, &task.Points)
+			if err == nil {
+				tasks = append(tasks, task)
+			}
+		}
+		rows.Close()
+
+		if err != nil {
+			return models.SprintTemplate{}, err
+		}
 	}
 
 	return models.SprintTemplate{Tasks: tasks}, nil
