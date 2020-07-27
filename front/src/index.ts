@@ -248,6 +248,16 @@ function build_dropdown_menu(
     },
     () => {
       void api
+        .postponeTask(task.id)
+        .done(() => {
+          load_task_lists();
+        })
+        .fail(() => {
+          showErrorAlert("failed to delete task");
+        });
+    },
+    () => {
+      void api
         .deleteTask(listId, task.id)
         .done(() => {
           load_task_lists();

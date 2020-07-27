@@ -5,6 +5,7 @@ export function BuildDropdownMenu(
   todoEL: EventListener,
   doneEl: EventListener,
   cancelEL: EventListener,
+  postponeEL: EventListener,
   deleteEL: EventListener
 ): HTMLDivElement {
   const dropdownMenu = document.createElement("div");
@@ -14,6 +15,7 @@ export function BuildDropdownMenu(
     case models.RespTask.StateEnum.Todo:
       appendItem(dropdownMenu, "Done", doneEl);
       appendItem(dropdownMenu, "Cancel", cancelEL);
+      appendItem(dropdownMenu, "Postpone", postponeEL);
       break;
     case models.RespTask.StateEnum.Done:
       break;
@@ -23,6 +25,7 @@ export function BuildDropdownMenu(
       appendItem(dropdownMenu, "Done", doneEl);
       appendItem(dropdownMenu, "Todo", todoEL);
       appendItem(dropdownMenu, "Cancel", cancelEL);
+      appendItem(dropdownMenu, "Postpone", postponeEL);
       break;
   }
 
