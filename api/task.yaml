@@ -128,6 +128,23 @@ paths:
             Bad reqest can be returned in cases when cancel is not possible for task.
             E.g. cannot cancel task that already done.
 
+  /task/{taskId}/postpone:
+    post:
+      operationId: postponeTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description:
+            Bad reqest can be returned in cases when pospone is not possible for task.
+            E.g. cannot postpone partially done task.
+
   /task/{taskId}/update:
     post:
       operationId: updateTask
