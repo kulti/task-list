@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/kulti/task-list/server/internal/apitest"
@@ -66,6 +67,14 @@ func (s *RouterTestSuite) TestCreateTaskWithoutPoints() {
 	}
 	_, resp, err := s.Client().CreateTask(context.Background(), openapicli.SPRINT, task)
 	s.Require().Error(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestUpdateTaskInvalidJSON() {
+	resp, err := http.Post(s.srv.URL+"/api/v1/task/0/update", "application/json", //nolint:noctx
+		strings.NewReader("invalid json"))
+	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
 }

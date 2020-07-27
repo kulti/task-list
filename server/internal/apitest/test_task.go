@@ -128,3 +128,23 @@ func (s *APISuite) TestUpdateTodoTask() {
 	respTask.State = taskStateTodo
 	s.checkSprintTaskList(respTask)
 }
+
+func (s *APISuite) TestPostponeTask() {
+	s.NewSprint()
+
+	respTask1 := s.createSprintTask()
+	respTask2 := s.createSprintTask()
+	s.postponeTask(respTask1.Id)
+
+	s.checkSprintTaskList(respTask2)
+
+	s.NewSprint(respTask1)
+}
+
+func (s *APISuite) TestPostponeCanceledTask() {
+	s.NewSprint()
+
+	respTask := s.createSprintTask()
+	s.cancelTask(respTask.Id)
+	s.postponeTaskWithError(respTask.Id, http.StatusBadRequest)
+}

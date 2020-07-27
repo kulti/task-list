@@ -43,3 +43,14 @@ func (s *APISuiteActions) testTask() openapicli.Task {
 	s.T().Logf("test task: %+v", t)
 	return t
 }
+
+func (s *APISuiteActions) respTasksToTemplateTasks(tasks []openapicli.RespTask) []openapicli.TaskTemplate {
+	tmplTasks := make([]openapicli.TaskTemplate, len(tasks))
+	for i := range tasks {
+		tmplTasks[i] = openapicli.TaskTemplate{
+			Text:   tasks[i].Text,
+			Points: tasks[i].Points,
+		}
+	}
+	return tmplTasks
+}
