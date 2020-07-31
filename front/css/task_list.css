@@ -51,6 +51,9 @@ div.points {
 
 .task.canceled {
   color: #dddddd;
+}
+
+.task.canceled .text {
   text-decoration-line: line-through;
 }
 

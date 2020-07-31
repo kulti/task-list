@@ -152,11 +152,11 @@ function build_task_html(
   listId: models.ListId,
   task: models.RespTask
 ): HTMLElement {
-  let points = "";
-  let percent = 0;
-  if (task.state !== models.RespTask.StateEnum.Canceled) {
-    points = task.burnt.toString() + "/" + task.points.toString();
-    percent = (100 * task.burnt) / task.points;
+  let points = task.burnt.toString() + "/" + task.points.toString();
+  let percent = (100 * task.burnt) / task.points;
+  if (task.state === models.RespTask.StateEnum.Canceled && task.burnt === 0) {
+    points = "";
+    percent = 0;
   }
 
   let taskProperties = "";
@@ -362,6 +362,9 @@ function focus_new_task_input(listId: models.ListId) {
 
 function sum_points(tasks: models.RespTask[]): number {
   return tasks.reduce((sum, current) => {
+    if (current.state == models.RespTask.StateEnum.Canceled) {
+      return sum + current.burnt;
+    }
     return sum + current.points;
   }, 0);
 }
@@ -374,20 +377,13 @@ function sum_burnt_points(tasks: models.RespTask[]): number {
 
 function prepare_task_list(taskList: models.TaskList): void {
   const fixPoints = (value: models.RespTask) => {
+    if (!value.burnt) {
+      value.burnt = 0;
+    }
+
     switch (value.state) {
       case models.RespTask.StateEnum.Done:
         value.burnt = value.points;
-        break;
-
-      case models.RespTask.StateEnum.Canceled:
-        value.points = 0;
-        value.burnt = 0;
-        break;
-
-      default:
-        if (!value.burnt) {
-          value.burnt = 0;
-        }
         break;
     }
   };
