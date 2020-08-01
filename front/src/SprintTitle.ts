@@ -3,7 +3,6 @@ import * as models from "./openapi_cli/model/models";
 export function getNewSprintOpts(): models.SprintOpts {
   const { begin, end } = getNewSprintDates();
   return {
-    title: formatSrpintTitle(begin, end),
     begin: formatSrpintDate(begin),
     end: formatSrpintDate(end),
   };

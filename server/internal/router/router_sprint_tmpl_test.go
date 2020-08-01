@@ -74,7 +74,6 @@ func (s *RouterSprintTmplTestSuite) TestGetTemplateError() {
 
 func (s *RouterSprintTmplTestSuite) createTaskList(begin, end time.Time) openapicli.SprintTemplate {
 	opts := openapicli.SprintOpts{
-		Title: "cal service sprint",
 		Begin: begin.Format("2006-01-02"),
 		End:   end.Format("2006-01-02"),
 	}

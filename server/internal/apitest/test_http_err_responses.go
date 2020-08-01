@@ -24,7 +24,6 @@ func (s *APISuite) TestNotFound() {
 
 func (s *APISuite) TestNewSprintInvalidDates() {
 	opts := openapicli.SprintOpts{
-		Title: s.sprintTitle,
 		Begin: s.sprintDate.Format("invalid date"),
 		End:   s.sprintDate.Format("2006-01-02"),
 	}

@@ -170,12 +170,9 @@ components:
     SprintOpts:
       type: object
       required:
-        - title
         - begin
         - end
       properties:
-        title:
-          type: string
         begin:
           type: string
           format: date

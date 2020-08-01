@@ -93,7 +93,6 @@ describe("build new sprint options", () => {
     mockDate(mockedDate);
 
     const opts = getNewSprintOpts();
-    expect(opts.title).toEqual("01.07 - 07.07");
     expect(opts.begin).toEqual("2019-07-01");
     expect(opts.end).toEqual("2019-07-07");
   });

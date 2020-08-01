@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -80,6 +81,9 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 		httpBadRequest(w, "failed to parse end time", err)
 		return
 	}
+
+	opts.Title = fmt.Sprintf("%02d.%02d - %02d.%02d", begin.Day(), begin.Month(),
+		end.Day(), end.Month())
 
 	err = h.store.NewSprint(r.Context(), opts)
 	if err != nil {
