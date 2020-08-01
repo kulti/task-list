@@ -7,13 +7,13 @@ import (
 
 	"github.com/rs/cors"
 
-	"github.com/kulti/task-list/server/internal/services/calservice"
+	"github.com/kulti/task-list/server/internal/models"
 	"github.com/kulti/task-list/server/internal/storages"
 )
 
-// CalService is an interface to get calendar events.
-type CalService interface {
-	GetEvents(ctx context.Context, begin, end time.Time) ([]calservice.Event, error)
+// SprintTemplateService is an interface to get sprint template.
+type SprintTemplateService interface {
+	Get(ctx context.Context, begin, end time.Time) (models.SprintTemplate, error)
 }
 
 // Router implements TaskListServer interface.
@@ -22,9 +22,9 @@ type Router struct {
 }
 
 // New returns new instacne of Router.
-func New(store storages.TaskStore, calService CalService) *Router {
+func New(store storages.TaskStore, tmplService SprintTemplateService) *Router {
 	return &Router{
-		rootHandler: newRootHandler(store, calService),
+		rootHandler: newRootHandler(store, tmplService),
 	}
 }
 
