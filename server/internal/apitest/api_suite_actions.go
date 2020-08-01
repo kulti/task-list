@@ -2,10 +2,10 @@ package apitest
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/bxcodec/faker/v3"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/kulti/task-list/server/internal/generated/openapicli"
@@ -26,7 +26,6 @@ func (s *APISuiteActions) Init(apiURL string) {
 	s.cli.ChangeBasePath(apiURL + "/api/v1")
 	s.ctx = context.Background()
 	s.apiURL = apiURL
-	s.sprintTitle = faker.Sentence()
 	s.sprintDate = time.Now()
 }
 
@@ -36,11 +35,13 @@ func (s *APISuiteActions) Client() *openapicli.DefaultApiService {
 
 func (s *APISuiteActions) NewSprint(tasks ...openapicli.RespTask) {
 	s.T().Helper()
+	sprintEndData := s.sprintDate.Add(7 * 24 * time.Hour)
 	opts := openapicli.SprintOpts{
-		Title: s.sprintTitle,
 		Begin: s.sprintDate.Format("2006-01-02"),
-		End:   s.sprintDate.Format("2006-01-02"),
+		End:   sprintEndData.Format("2006-01-02"),
 	}
+	s.sprintTitle = fmt.Sprintf("%02d.%02d - %02d.%02d", s.sprintDate.Day(), s.sprintDate.Month(),
+		sprintEndData.Day(), sprintEndData.Month())
 	tmpl, resp, err := s.cli.DefaultApi.CreateTaskList(s.ctx, opts)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
