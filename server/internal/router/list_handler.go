@@ -18,10 +18,6 @@ const (
 	backlogListID = "backlog"
 )
 
-const (
-	taskStateTodo = "todo"
-)
-
 type listHandler struct {
 	store       storages.TaskStore
 	tmplService SprintTemplateService
@@ -165,10 +161,10 @@ func (h listHandler) handleGetTaskList(w http.ResponseWriter, r *http.Request, l
 	} else {
 		sort.Slice(taskList.Tasks, func(i, j int) bool {
 			switch taskList.Tasks[i].State {
-			case taskStateTodo:
-				return taskList.Tasks[j].State != taskStateTodo
+			case models.TaskStateTodo:
+				return taskList.Tasks[j].State != models.TaskStateTodo
 			case "":
-				return taskList.Tasks[j].State != "" && taskList.Tasks[j].State != taskStateTodo
+				return taskList.Tasks[j].State != "" && taskList.Tasks[j].State != models.TaskStateTodo
 			case "done":
 				return taskList.Tasks[j].State == "canceled"
 			}
