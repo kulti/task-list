@@ -8,6 +8,7 @@ import (
 	"github.com/caarlos0/env/v6"
 	"github.com/kulti/task-list/server/internal/router"
 	"github.com/kulti/task-list/server/internal/services/calservice"
+	"github.com/kulti/task-list/server/internal/services/sprinttmpl"
 	"github.com/kulti/task-list/server/internal/storages/pgstore"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -43,7 +44,8 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 				zap.S().Fatalw("failed to connect to db", zap.Error(err))
 			}
 
-			router := router.New(taskStore, newCalendarService())
+			sprintTmpl := sprinttmpl.New(taskStore, newCalendarService())
+			router := router.New(taskStore, sprintTmpl)
 
 			err = http.Serve(listener, router.RootHandler())
 			if err != nil {
@@ -55,7 +57,7 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 	return serverCmd
 }
 
-func newCalendarService() router.CalService {
+func newCalendarService() sprinttmpl.CalService {
 	cs, err := calservice.New(calservice.Options{
 		CredentialPath:  calendarCredentialPath,
 		CalendarIDsPath: calendarIDsPath,

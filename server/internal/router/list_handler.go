@@ -1,9 +1,7 @@
 package router
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -25,14 +23,14 @@ const (
 )
 
 type listHandler struct {
-	store      storages.TaskStore
-	calService CalService
+	store       storages.TaskStore
+	tmplService SprintTemplateService
 }
 
-func newListHandler(store storages.TaskStore, calService CalService) listHandler {
+func newListHandler(store storages.TaskStore, tmplService SprintTemplateService) listHandler {
 	return listHandler{
-		store:      store,
-		calService: calService,
+		store:       store,
+		tmplService: tmplService,
 	}
 }
 
@@ -93,48 +91,12 @@ func (h listHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	tmpl, err := h.store.GetSprintTemplate(r.Context())
+	tmpl, err := h.tmplService.Get(r.Context(), begin, end)
 	if err != nil {
 		zap.L().Warn("failed to get sprint template - skip it", zap.Error(err))
 	}
 
-	h.extendSprintTemplateWithCalendarEvents(r.Context(), &tmpl, begin, end)
-
 	httpJSON(w, &tmpl)
-}
-
-func (h listHandler) extendSprintTemplateWithCalendarEvents(ctx context.Context,
-	tmpl *models.SprintTemplate, begin, end time.Time,
-) {
-	if h.calService == nil {
-		return
-	}
-
-	events, err := h.calService.GetEvents(ctx, begin, end)
-	if err != nil {
-		zap.L().Warn("failed to get calendar events - skip it", zap.Error(err))
-		return
-	}
-
-	calendarTasks := make([]models.TaskTemplate, len(events))
-	for i, e := range events {
-		var taskName string
-		if !e.Date.IsZero() {
-			taskName = fmt.Sprintf("%02d.%02d - %s", e.Date.Day(), e.Date.Month(), e.Name)
-		} else {
-			taskName = fmt.Sprintf("%02d.%02d - %s (%02d:%02d)",
-				e.StartDate.Day(), e.StartDate.Month(),
-				e.Name,
-				e.StartDate.Hour(), e.StartDate.Minute())
-		}
-		calendarTasks[i] = models.TaskTemplate{Text: taskName}
-	}
-
-	sort.Slice(calendarTasks, func(i, j int) bool {
-		return calendarTasks[i].Text < calendarTasks[j].Text
-	})
-
-	tmpl.Tasks = append(tmpl.Tasks, calendarTasks...)
 }
 
 func (h listHandler) handleCreateTaskInList(w http.ResponseWriter, r *http.Request, listID string) {
