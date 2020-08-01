@@ -96,6 +96,11 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 
 	err := row.Scan(&listID, &taskList.Title)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return models.TaskList{
+				Title: "No any sprint. Create one first.",
+			}, nil
+		}
 		return models.TaskList{}, fmt.Errorf("failed to find list: %w", err)
 	}
 
