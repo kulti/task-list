@@ -29,7 +29,7 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 		zap.S().Fatalw("failed to parse server cmd flags", zap.Error(err))
 	}
 
-	var serverCmd = &cobra.Command{
+	serverCmd := &cobra.Command{
 		Use:   "server",
 		Short: "Starts task list server",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -62,7 +62,6 @@ func newCalendarService() sprinttmpl.CalService {
 		CredentialPath:  calendarCredentialPath,
 		CalendarIDsPath: calendarIDsPath,
 	})
-
 	if err != nil {
 		zap.L().Warn("failed to create calendar service", zap.Error(err))
 		return nil

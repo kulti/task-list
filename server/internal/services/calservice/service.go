@@ -77,7 +77,6 @@ func (s *Service) getCalendarEvents(ctx context.Context, begin, end time.Time, i
 		TimeMax(end.AddDate(0, 0, 1).Format(time.RFC3339)).
 		OrderBy("startTime").
 		Do()
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve events: %w", err)
 	}

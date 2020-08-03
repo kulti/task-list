@@ -37,7 +37,7 @@ func Execute() {
 		zap.S().Fatalw("failed to parse db flags", zap.Error(err))
 	}
 
-	var rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use: "tl",
 	}
 
