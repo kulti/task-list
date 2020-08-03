@@ -164,13 +164,15 @@ func (h listHandler) handleGetTaskList(w http.ResponseWriter, r *http.Request, l
 		taskList.Tasks = []models.Task{}
 	} else {
 		sort.Slice(taskList.Tasks, func(i, j int) bool {
+			otherState := taskList.Tasks[j].State
 			switch taskList.Tasks[i].State {
 			case models.TaskStateTodo:
-				return taskList.Tasks[j].State != models.TaskStateTodo
-			case "":
-				return taskList.Tasks[j].State != "" && taskList.Tasks[j].State != models.TaskStateTodo
-			case "done":
-				return taskList.Tasks[j].State == "canceled"
+				return otherState != models.TaskStateTodo
+			case models.TaskStateSimple:
+				return otherState != models.TaskStateSimple && otherState != models.TaskStateTodo
+			case models.TaskStateCompleted:
+				return otherState == models.TaskStateCanceled
+			case models.TaskStateCanceled:
 			}
 			return false
 		})

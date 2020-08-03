@@ -51,14 +51,14 @@ func (s TaskState) NextState(ev SwitchTaskStateEvent) (TaskState, error) {
 			return TaskStateSimple, nil
 		case DoneTaskEvent:
 			return TaskStateCompleted, nil
-		default:
+		case CancelTaskEvent, PostponeTaskEvent, TodoTaskEvent:
 			return TaskStateSimple, NewStateInconsistencyErr(s, ev)
 		}
 	case TaskStateCanceled:
 		switch ev {
 		case CancelTaskEvent:
 			return TaskStateCanceled, nil
-		default:
+		case DoneTaskEvent, PostponeTaskEvent, TodoTaskEvent, UndoneTaskEvent:
 			return TaskStateSimple, NewStateInconsistencyErr(s, ev)
 		}
 	}

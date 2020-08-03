@@ -31,7 +31,6 @@ const (
 	TaskStateTodo      TaskState = "todo"
 	TaskStateCompleted TaskState = "done"
 	TaskStateCanceled  TaskState = "canceled"
-	TaskStatePostponed TaskState = "postponed"
 )
 
 // UpdateOptions represents an update options.
