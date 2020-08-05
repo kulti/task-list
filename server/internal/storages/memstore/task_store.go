@@ -9,7 +9,6 @@ import (
 
 const (
 	sprintList = "sprint"
-	todoList   = "todo"
 )
 
 type TaskStore struct {
@@ -43,23 +42,21 @@ func NewTaskStore() *TaskStore {
 		taskLists: make(map[string]*taskList),
 	}
 	ts.taskLists[sprintList] = &taskList{}
-	ts.taskLists[todoList] = &taskList{}
 	return ts
 }
 
 func (s *TaskStore) NewSprint(_ context.Context, opts models.SprintOpts) error {
 	s.taskLists[sprintList] = &taskList{title: opts.Title}
-	s.taskLists[todoList] = &taskList{title: "Todo"}
 	return nil
 }
 
-func (s *TaskStore) CreateTask(_ context.Context, task models.Task, listID string) (string, error) {
+func (s *TaskStore) CreateTask(_ context.Context, task models.Task, _ string) (string, error) {
 	task.ID = s.nextID()
 	storeTask := &storeTask{
 		Task:    task,
-		listIDs: []string{listID},
+		listIDs: []string{sprintList},
 	}
-	s.taskLists[listID].tasks = append(s.taskLists[listID].tasks, storeTask)
+	s.taskLists[sprintList].tasks = append(s.taskLists[sprintList].tasks, storeTask)
 	return task.ID, nil
 }
 
@@ -75,20 +72,21 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 	return nil
 }
 
-func (s *TaskStore) DeleteTaskFromList(_ context.Context, taskID, listID string) error {
-	for i, t := range s.taskLists[listID].tasks {
+func (s *TaskStore) DeleteTask(_ context.Context, taskID string) error {
+	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
-			s.taskLists[listID].tasks = append(s.taskLists[listID].tasks[:i], s.taskLists[listID].tasks[i+1:]...)
+			s.taskLists[sprintList].tasks =
+				append(s.taskLists[sprintList].tasks[:i], s.taskLists[sprintList].tasks[i+1:]...)
 			break
 		}
 	}
 	return nil
 }
 
-func (s *TaskStore) ListTasks(_ context.Context, listID string) (models.TaskList, error) {
+func (s *TaskStore) ListTasks(_ context.Context, _ string) (models.TaskList, error) {
 	l := models.TaskList{
-		Title: s.taskLists[listID].title,
-		Tasks: s.taskLists[listID].tasks.toModelTasks(),
+		Title: s.taskLists[sprintList].title,
+		Tasks: s.taskLists[sprintList].tasks.toModelTasks(),
 	}
 	return l, nil
 }

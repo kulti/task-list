@@ -14,6 +14,8 @@ const (
 	taskStateDone     = "done"
 	taskStateTodo     = "todo"
 	taskStateCanceled = "canceled"
+
+	currentSprintID = "current"
 )
 
 func (s *APISuiteActions) taskToRespTask(task openapicli.Task) openapicli.RespTask {

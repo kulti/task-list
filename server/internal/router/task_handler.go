@@ -39,6 +39,8 @@ func (h taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleDoneTask(w, r, taskID)
 	case "cancel":
 		h.handleCancelTask(w, r, taskID)
+	case "delete":
+		h.handleDeleteTask(w, r, taskID)
 	case "postpone":
 		h.handlePostponeTask(w, r, taskID)
 	default:
@@ -87,6 +89,13 @@ func (h taskHandler) handleDoneTask(w http.ResponseWriter, r *http.Request, task
 		httpBadRequest(w, "failed to update task in db", err)
 		return
 	}
+	if err != nil {
+		httpInternalServerError(w, "failed to update task in db", err)
+	}
+}
+
+func (h taskHandler) handleDeleteTask(w http.ResponseWriter, r *http.Request, taskID string) {
+	err := h.store.DeleteTask(r.Context(), taskID)
 	if err != nil {
 		httpInternalServerError(w, "failed to update task in db", err)
 	}
