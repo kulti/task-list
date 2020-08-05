@@ -5,7 +5,7 @@ info:
 servers:
   - url: http://127.0.0.1/api/v1
 paths:
-  /list/sprint/new:
+  /sprint:
     post:
       operationId: createTaskList
       requestBody:
@@ -22,15 +22,16 @@ paths:
               schema:
                 $ref: "#/components/schemas/SprintTemplate"
 
-  /list/{listId}:
+  /sprint/{sprintId}:
     get:
       operationId: getTaskList
       parameters:
-        - name: listId
+        - name: sprintId
           in: path
           required: true
+          description: sprint id; use "current" to get current sprint tasks
           schema:
-            $ref: "#/components/schemas/ListId"
+            type: string
       responses:
         "200":
           description: "all tasks in list"
@@ -39,15 +40,16 @@ paths:
               schema:
                 $ref: "#/components/schemas/TaskList"
 
-  /list/{listId}/add:
+  /sprint/{sprintId}/add:
     post:
       operationId: createTask
       parameters:
-        - name: listId
+        - name: sprintId
           in: path
           required: true
+          description: sprint id; use "current" to add task to current sprint
           schema:
-            $ref: "#/components/schemas/ListId"
+            type: string
       requestBody:
         description: task to add
         required: true
@@ -63,15 +65,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/RespTask"
 
-  /list/{listId}/delete/{taskId}:
+  /task/{taskId}/delete:
     post:
       operationId: deleteTask
       parameters:
-        - name: listId
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/ListId"
         - name: taskId
           in: path
           required: true
@@ -224,10 +221,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RespTask"
-
-    ListId:
-      type: string
-      enum: [sprint, backlog]
 
     UpdateOptions:
       type: object
