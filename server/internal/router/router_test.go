@@ -40,14 +40,14 @@ func (s *RouterTestSuite) TestApiRootNotFound() {
 }
 
 func (s *RouterTestSuite) TestNewSprintInvalidJSON() {
-	resp, err := http.Post(s.srv.URL+"/api/v1/list/sprint/new", "application/json", nil) //nolint:noctx
+	resp, err := http.Post(s.srv.URL+"/api/v1/sprint", "application/json", nil) //nolint:noctx
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
 }
 
 func (s *RouterTestSuite) TestCreateTaskInvalidJSON() {
-	resp, err := http.Post(s.srv.URL+"/api/v1/list/sprint/add", "application/json", nil) //nolint:noctx
+	resp, err := http.Post(s.srv.URL+"/api/v1/sprint/current/add", "application/json", nil) //nolint:noctx
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
@@ -57,7 +57,7 @@ func (s *RouterTestSuite) TestCreateTaskWithoutText() {
 	task := openapicli.Task{
 		Points: 10,
 	}
-	_, resp, err := s.Client().CreateTask(context.Background(), openapicli.SPRINT, task)
+	_, resp, err := s.Client().CreateTask(context.Background(), "current", task)
 	s.Require().Error(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
@@ -67,7 +67,7 @@ func (s *RouterTestSuite) TestCreateTaskWithoutPoints() {
 	task := openapicli.Task{
 		Text: "test text",
 	}
-	_, resp, err := s.Client().CreateTask(context.Background(), openapicli.SPRINT, task)
+	_, resp, err := s.Client().CreateTask(context.Background(), "current", task)
 	s.Require().Error(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)

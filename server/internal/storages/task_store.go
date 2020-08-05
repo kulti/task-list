@@ -9,9 +9,9 @@ import (
 // TaskStore is an interface to task storage.
 type TaskStore interface {
 	NewSprint(ctx context.Context, opts models.SprintOpts) error
-	CreateTask(ctx context.Context, task models.Task, listID string) (string, error)
-	DeleteTaskFromList(ctx context.Context, taskID, listID string) error
-	ListTasks(ctx context.Context, listID string) (models.TaskList, error)
+	CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error)
+	DeleteTask(ctx context.Context, taskID string) error
+	ListTasks(ctx context.Context, sprintID string) (models.TaskList, error)
 	UpdateTask(ctx context.Context, taskID string, points models.UpdateOptions) error
 	TodoTask(ctx context.Context, taskID string) error
 	DoneTask(ctx context.Context, taskID string) error

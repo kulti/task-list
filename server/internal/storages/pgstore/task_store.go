@@ -42,7 +42,7 @@ func (s *TaskStore) NewSprint(ctx context.Context, opts models.SprintOpts) error
 	return err
 }
 
-func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listType string) (string, error) {
+func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, sprintIDStr string) (string, error) {
 	row := s.conn.QueryRow(ctx,
 		"INSERT INTO tasks (text, points, burnt, state) VALUES($1, $2, $3, $4) RETURNING id",
 		task.Text, task.Points, task.Burnt, task.State)
@@ -52,19 +52,20 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listType s
 		return "", fmt.Errorf("failed to create task: %w", err)
 	}
 
-	row = s.conn.QueryRow(ctx,
-		"SELECT id FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1",
-		listType)
+	var sprintID int64
+	if sprintIDStr == "current" {
+		row = s.conn.QueryRow(ctx,
+			"SELECT id FROM task_lists WHERE type = 'sprint' ORDER BY created_at DESC LIMIT 1")
 
-	var listID int
-	err = row.Scan(&listID)
-	if err != nil {
-		return "", fmt.Errorf("failed to find list: %w", err)
+		err = row.Scan(&sprintID)
+		if err != nil {
+			return "", fmt.Errorf("failed to find sprint: %w", err)
+		}
 	}
 
 	_, err = s.conn.Exec(ctx,
 		"INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)",
-		taskID, listID)
+		taskID, sprintID)
 	if err != nil {
 		return "", fmt.Errorf("failed to add task to list: %w", err)
 	}
@@ -72,29 +73,29 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, listType s
 	return strconv.FormatInt(taskID, 16), nil
 }
 
-func (s *TaskStore) DeleteTaskFromList(ctx context.Context, taskID, listType string) error {
+func (s *TaskStore) DeleteTask(ctx context.Context, taskID string) error {
 	id, err := strconv.ParseInt(taskID, 16, 64)
 	if err != nil {
 		return err
 	}
-	switch listType {
-	case "sprint":
-		_, err = s.conn.Exec(ctx, "DELETE FROM tasks WHERE id = $1", id)
-	default:
-		err = errUnknownListType
-	}
+
+	_, err = s.conn.Exec(ctx, "DELETE FROM tasks WHERE id = $1", id)
+
 	return err
 }
 
-func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.TaskList, error) {
+func (s *TaskStore) ListTasks(ctx context.Context, sprintIDStr string) (models.TaskList, error) {
+	if sprintIDStr != "current" {
+		return models.TaskList{}, nil
+	}
+
 	var taskList models.TaskList
-	var listID int64
+	var sprintID int64
 
 	row := s.conn.QueryRow(ctx,
-		"SELECT id, title FROM task_lists WHERE type = $1 ORDER BY created_at DESC LIMIT 1",
-		listType)
+		"SELECT id, title FROM task_lists WHERE type = 'sprint' ORDER BY created_at DESC LIMIT 1")
 
-	err := row.Scan(&listID, &taskList.Title)
+	err := row.Scan(&sprintID, &taskList.Title)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return models.TaskList{
@@ -110,7 +111,7 @@ func (s *TaskStore) ListTasks(ctx context.Context, listType string) (models.Task
 		WHERE task_list_map.list_id = $1
 			AND tasks.id = task_list_map.task_id
 		ORDER BY tasks.id`,
-		listID)
+		sprintID)
 	defer rows.Close()
 
 	err = rows.Err()

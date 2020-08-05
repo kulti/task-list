@@ -57,14 +57,14 @@ func (s *APISuiteActions) NewSprint(tasks ...openapicli.RespTask) {
 
 func (s *APISuiteActions) checkSprintTaskList(tasks ...openapicli.RespTask) {
 	s.T().Helper()
-	s.checkTaskList(openapicli.SPRINT, s.sprintTitle, tasks...)
+	s.checkTaskList(currentSprintID, s.sprintTitle, tasks...)
 }
 
 func (s *APISuiteActions) checkTaskList(
-	listID openapicli.ListId, listTitle string, tasks ...openapicli.RespTask,
+	sprintID string, listTitle string, tasks ...openapicli.RespTask,
 ) {
 	s.T().Helper()
-	taskList, resp, err := s.cli.DefaultApi.GetTaskList(s.ctx, listID)
+	taskList, resp, err := s.cli.DefaultApi.GetTaskList(s.ctx, sprintID)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
@@ -79,23 +79,18 @@ func (s *APISuiteActions) checkTaskList(
 
 func (s *APISuiteActions) createSprintTask() openapicli.RespTask {
 	s.T().Helper()
-	return s.createTask(openapicli.SPRINT, s.testTask())
+	return s.createTask(currentSprintID, s.testTask())
 }
 
-func (s *APISuiteActions) createTask(listID openapicli.ListId, task openapicli.Task) openapicli.RespTask {
+func (s *APISuiteActions) createTask(sprintID string, task openapicli.Task) openapicli.RespTask {
 	s.T().Helper()
-	respTask, resp, err := s.cli.DefaultApi.CreateTask(s.ctx, listID, task)
+	respTask, resp, err := s.cli.DefaultApi.CreateTask(s.ctx, sprintID, task)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 	s.Require().Equal("application/json", resp.Header.Get("Content-Type"))
 
-	switch listID {
-	case openapicli.SPRINT:
-		s.Require().Empty(respTask.State)
-	default:
-		s.Fail("unsupported list id")
-	}
+	s.Require().Empty(respTask.State)
 	s.Require().NotEmpty(respTask.Id)
 
 	expectedRespTask := s.taskToRespTask(task)
@@ -108,12 +103,7 @@ func (s *APISuiteActions) createTask(listID openapicli.ListId, task openapicli.T
 
 func (s *APISuiteActions) deleteSprintTask(taskID string) {
 	s.T().Helper()
-	s.deleteTaskFromList(taskID, openapicli.SPRINT)
-}
-
-func (s *APISuiteActions) deleteTaskFromList(taskID string, listID openapicli.ListId) {
-	s.T().Helper()
-	resp, err := s.cli.DefaultApi.DeleteTask(s.ctx, listID, taskID)
+	resp, err := s.cli.DefaultApi.DeleteTask(s.ctx, taskID)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)

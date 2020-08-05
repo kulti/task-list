@@ -7,14 +7,14 @@ import (
 )
 
 type rootHandler struct {
-	listHandler listHandler
-	taskHandler taskHandler
+	sprintHandler sprintHandler
+	taskHandler   taskHandler
 }
 
 func newRootHandler(store storages.TaskStore, tmplService SprintTemplateService) rootHandler {
 	return rootHandler{
-		listHandler: newListHandler(store, tmplService),
-		taskHandler: newTaskHandler(store),
+		sprintHandler: newSprintHandler(store, tmplService),
+		taskHandler:   newTaskHandler(store),
 	}
 }
 
@@ -39,8 +39,8 @@ func (h rootHandler) handleAPI(w http.ResponseWriter, r *http.Request) {
 
 	head, r.URL.Path = shiftPath(r.URL.Path)
 	switch head {
-	case "list":
-		h.listHandler.ServeHTTP(w, r)
+	case "sprint":
+		h.sprintHandler.ServeHTTP(w, r)
 	case "task":
 		h.taskHandler.ServeHTTP(w, r)
 	default:
