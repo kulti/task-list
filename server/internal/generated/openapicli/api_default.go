@@ -94,11 +94,11 @@ func (a *DefaultApiService) CancelTask(ctx _context.Context, taskId string) (*_n
 /*
 CreateTask Method for CreateTask
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param listId
+ * @param sprintId sprint id; use \"current\" to add task to current sprint
  * @param task task to add
 @return RespTask
 */
-func (a *DefaultApiService) CreateTask(ctx _context.Context, listId ListId, task Task) (RespTask, *_nethttp.Response, error) {
+func (a *DefaultApiService) CreateTask(ctx _context.Context, sprintId string, task Task) (RespTask, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -109,8 +109,8 @@ func (a *DefaultApiService) CreateTask(ctx _context.Context, listId ListId, task
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/list/{listId}/add"
-	localVarPath = strings.Replace(localVarPath, "{"+"listId"+"}", _neturl.QueryEscape(parameterToString(listId, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/sprint/{sprintId}/add"
+	localVarPath = strings.Replace(localVarPath, "{"+"sprintId"+"}", _neturl.QueryEscape(parameterToString(sprintId, "")) , -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -188,7 +188,7 @@ func (a *DefaultApiService) CreateTaskList(ctx _context.Context, sprintOpts Spri
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/list/sprint/new"
+	localVarPath := a.client.cfg.BasePath + "/sprint"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
@@ -251,10 +251,9 @@ func (a *DefaultApiService) CreateTaskList(ctx _context.Context, sprintOpts Spri
 /*
 DeleteTask Method for DeleteTask
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param listId
  * @param taskId
 */
-func (a *DefaultApiService) DeleteTask(ctx _context.Context, listId ListId, taskId string) (*_nethttp.Response, error) {
+func (a *DefaultApiService) DeleteTask(ctx _context.Context, taskId string) (*_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -264,9 +263,7 @@ func (a *DefaultApiService) DeleteTask(ctx _context.Context, listId ListId, task
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/list/{listId}/delete/{taskId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"listId"+"}", _neturl.QueryEscape(parameterToString(listId, "")) , -1)
-
+	localVarPath := a.client.cfg.BasePath + "/task/{taskId}/delete"
 	localVarPath = strings.Replace(localVarPath, "{"+"taskId"+"}", _neturl.QueryEscape(parameterToString(taskId, "")) , -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -386,10 +383,10 @@ func (a *DefaultApiService) DoneTask(ctx _context.Context, taskId string) (*_net
 /*
 GetTaskList Method for GetTaskList
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param listId
+ * @param sprintId sprint id; use \"current\" to get current sprint tasks
 @return TaskList
 */
-func (a *DefaultApiService) GetTaskList(ctx _context.Context, listId ListId) (TaskList, *_nethttp.Response, error) {
+func (a *DefaultApiService) GetTaskList(ctx _context.Context, sprintId string) (TaskList, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -400,8 +397,8 @@ func (a *DefaultApiService) GetTaskList(ctx _context.Context, listId ListId) (Ta
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/list/{listId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"listId"+"}", _neturl.QueryEscape(parameterToString(listId, "")) , -1)
+	localVarPath := a.client.cfg.BasePath + "/sprint/{sprintId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"sprintId"+"}", _neturl.QueryEscape(parameterToString(sprintId, "")) , -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
