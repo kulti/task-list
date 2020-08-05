@@ -5,11 +5,11 @@ All URIs are relative to *http://127.0.0.1/api/v1*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**CancelTask**](DefaultApi.md#CancelTask) | **Post** /task/{taskId}/cancel | 
-[**CreateTask**](DefaultApi.md#CreateTask) | **Post** /list/{listId}/add | 
-[**CreateTaskList**](DefaultApi.md#CreateTaskList) | **Post** /list/sprint/new | 
-[**DeleteTask**](DefaultApi.md#DeleteTask) | **Post** /list/{listId}/delete/{taskId} | 
+[**CreateTask**](DefaultApi.md#CreateTask) | **Post** /sprint/{sprintId}/add | 
+[**CreateTaskList**](DefaultApi.md#CreateTaskList) | **Post** /sprint | 
+[**DeleteTask**](DefaultApi.md#DeleteTask) | **Post** /task/{taskId}/delete | 
 [**DoneTask**](DefaultApi.md#DoneTask) | **Post** /task/{taskId}/done | 
-[**GetTaskList**](DefaultApi.md#GetTaskList) | **Get** /list/{listId} | 
+[**GetTaskList**](DefaultApi.md#GetTaskList) | **Get** /sprint/{sprintId} | 
 [**PostponeTask**](DefaultApi.md#PostponeTask) | **Post** /task/{taskId}/postpone | 
 [**TodoTask**](DefaultApi.md#TodoTask) | **Post** /task/{taskId}/todo | 
 [**UpdateTask**](DefaultApi.md#UpdateTask) | **Post** /task/{taskId}/update | 
@@ -50,7 +50,7 @@ No authorization required
 
 ## CreateTask
 
-> RespTask CreateTask(ctx, listId, task)
+> RespTask CreateTask(ctx, sprintId, task)
 
 
 
@@ -60,7 +60,7 @@ No authorization required
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**listId** | [**ListId**](.md)|  | 
+**sprintId** | **string**| sprint id; use \&quot;current\&quot; to add task to current sprint | 
 **task** | [**Task**](Task.md)| task to add | 
 
 ### Return type
@@ -115,7 +115,7 @@ No authorization required
 
 ## DeleteTask
 
-> DeleteTask(ctx, listId, taskId)
+> DeleteTask(ctx, taskId)
 
 
 
@@ -125,7 +125,6 @@ No authorization required
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**listId** | [**ListId**](.md)|  | 
 **taskId** | **string**|  | 
 
 ### Return type
@@ -180,7 +179,7 @@ No authorization required
 
 ## GetTaskList
 
-> TaskList GetTaskList(ctx, listId)
+> TaskList GetTaskList(ctx, sprintId)
 
 
 
@@ -190,7 +189,7 @@ No authorization required
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**listId** | [**ListId**](.md)|  | 
+**sprintId** | **string**| sprint id; use \&quot;current\&quot; to get current sprint tasks | 
 
 ### Return type
 
