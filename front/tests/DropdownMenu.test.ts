@@ -9,10 +9,11 @@ describe("list elements", () => {
       ["Done", "Todo", "Cancel", "Postpone", "Delete"],
     ],
     [RespTask.StateEnum.Done, ["Delete"]],
-    [RespTask.StateEnum.Canceled, ["Delete"]],
+    [RespTask.StateEnum.Canceled, ["ToWork", "Delete"]],
   ])('list "%s" should contains: %s', (type, items) => {
     const menuDiv = BuildDropdownMenu(
       type,
+      jest.fn(),
       jest.fn(),
       jest.fn(),
       jest.fn(),
@@ -30,7 +31,7 @@ describe("list elements", () => {
   });
 });
 
-describe("list item actions", () => {
+describe("list simple item actions", () => {
   const fnMap = new Map<string, jest.Mock<unknown, unknown[]>>();
   fnMap.set("Done", jest.fn());
   fnMap.set("Todo", jest.fn());
@@ -43,6 +44,32 @@ describe("list item actions", () => {
     fnMap.get("Todo"),
     fnMap.get("Done"),
     fnMap.get("Cancel"),
+    fnMap.get("ToWork"),
+    fnMap.get("Postpone"),
+    fnMap.get("Delete")
+  );
+
+  expect(menuDiv.childNodes).toHaveLength(fnMap.size);
+
+  menuDiv.childNodes.forEach((menuItem: HTMLDivElement) => {
+    it("click on " + menuItem.innerText.toString(), () => {
+      menuItem.click();
+      expect(fnMap.get(menuItem.innerText)).toBeCalled();
+    });
+  });
+});
+
+describe("list cancel item actions", () => {
+  const fnMap = new Map<string, jest.Mock<unknown, unknown[]>>();
+  fnMap.set("ToWork", jest.fn());
+  fnMap.set("Delete", jest.fn());
+
+  const menuDiv = BuildDropdownMenu(
+    RespTask.StateEnum.Canceled,
+    fnMap.get("Todo"),
+    fnMap.get("Done"),
+    fnMap.get("Cancel"),
+    fnMap.get("ToWork"),
     fnMap.get("Postpone"),
     fnMap.get("Delete")
   );
