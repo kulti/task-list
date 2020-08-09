@@ -50,6 +50,23 @@ func (s *APISuite) TestCancelTask() {
 	s.checkSprintTaskList(respTask)
 }
 
+func (s *APISuite) TestBackTaskToWork() {
+	s.NewSprint()
+
+	respTask := s.createSprintTask()
+	s.cancelTask(respTask.Id)
+	s.backTaskToWork(respTask.Id)
+
+	s.checkSprintTaskList(respTask)
+}
+
+func (s *APISuite) TestBackTaskToWorkNonCanceledTask() {
+	s.NewSprint()
+
+	respTask := s.createSprintTask()
+	s.backTaskToWorkWithError(respTask.Id, http.StatusBadRequest)
+}
+
 func (s *APISuite) TestBurnPoints() {
 	s.NewSprint()
 

@@ -39,6 +39,8 @@ func (h taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleDoneTask(w, r, taskID)
 	case "cancel":
 		h.handleCancelTask(w, r, taskID)
+	case "towork":
+		h.handleBackTaskToWork(w, r, taskID)
 	case "delete":
 		h.handleDeleteTask(w, r, taskID)
 	case "postpone":
@@ -103,6 +105,17 @@ func (h taskHandler) handleDeleteTask(w http.ResponseWriter, r *http.Request, ta
 
 func (h taskHandler) handleCancelTask(w http.ResponseWriter, r *http.Request, taskID string) {
 	err := h.store.CancelTask(r.Context(), taskID)
+	if errors.As(err, &models.StateInconsistencyErr{}) {
+		httpBadRequest(w, "failed to update task in db", err)
+		return
+	}
+	if err != nil {
+		httpInternalServerError(w, "failed to update task in db", err)
+	}
+}
+
+func (h taskHandler) handleBackTaskToWork(w http.ResponseWriter, r *http.Request, taskID string) {
+	err := h.store.BackTaskToWork(r.Context(), taskID)
 	if errors.As(err, &models.StateInconsistencyErr{}) {
 		httpBadRequest(w, "failed to update task in db", err)
 		return
