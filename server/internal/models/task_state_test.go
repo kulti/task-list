@@ -32,6 +32,7 @@ func TestNextTaskState(t *testing.T) {
 		},
 		models.TaskStateCanceled: {
 			models.CancelTaskEvent: models.TaskStateCanceled,
+			models.ToWorkTaskEvent: models.TaskStateSimple,
 		},
 	}
 
@@ -60,18 +61,22 @@ func TestNextTaskStateInconcistency(t *testing.T) {
 			models.DoneTaskEvent:   struct{}{},
 			models.UndoneTaskEvent: struct{}{},
 			models.CancelTaskEvent: struct{}{},
+			models.ToWorkTaskEvent: struct{}{},
 			unknownEvent:           struct{}{},
 		},
 		models.TaskStateSimple: {
-			unknownEvent: struct{}{},
+			models.ToWorkTaskEvent: struct{}{},
+			unknownEvent:           struct{}{},
 		},
 		models.TaskStateTodo: {
-			unknownEvent: struct{}{},
+			models.ToWorkTaskEvent: struct{}{},
+			unknownEvent:           struct{}{},
 		},
 		models.TaskStateCompleted: {
 			models.TodoTaskEvent:     struct{}{},
 			models.CancelTaskEvent:   struct{}{},
 			models.PostponeTaskEvent: struct{}{},
+			models.ToWorkTaskEvent:   struct{}{},
 			unknownEvent:             struct{}{},
 		},
 		models.TaskStateCanceled: {

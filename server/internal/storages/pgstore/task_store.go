@@ -161,6 +161,10 @@ func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
 	return s.updateTaskState(ctx, taskID, models.CancelTaskEvent)
 }
 
+func (s *TaskStore) BackTaskToWork(ctx context.Context, taskID string) error {
+	return s.updateTaskState(ctx, taskID, models.ToWorkTaskEvent)
+}
+
 func (s *TaskStore) PostponeTask(ctx context.Context, taskID string) (resultErr error) {
 	return s.updateTaskStateWithStmt(ctx, taskID, models.PostponeTaskEvent,
 		`WITH task AS (DELETE FROM tasks WHERE id = $1 AND $2 = $2 RETURNING *)

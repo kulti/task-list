@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**GetTaskList**](DefaultApi.md#GetTaskList) | **Get** /sprint/{sprintId} | 
 [**PostponeTask**](DefaultApi.md#PostponeTask) | **Post** /task/{taskId}/postpone | 
 [**TodoTask**](DefaultApi.md#TodoTask) | **Post** /task/{taskId}/todo | 
+[**ToworkTask**](DefaultApi.md#ToworkTask) | **Post** /task/{taskId}/towork | 
 [**UpdateTask**](DefaultApi.md#UpdateTask) | **Post** /task/{taskId}/update | 
 
 
@@ -246,6 +247,40 @@ No authorization required
 > TodoTask(ctx, taskId)
 
 
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**taskId** | **string**|  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ToworkTask
+
+> ToworkTask(ctx, taskId)
+
+
+
+Restore canceled task back to work.
 
 ### Required Parameters
 

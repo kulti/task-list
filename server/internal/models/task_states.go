@@ -10,6 +10,7 @@ const (
 	TodoTaskEvent
 	CancelTaskEvent
 	PostponeTaskEvent
+	ToWorkTaskEvent
 )
 
 func (e SwitchTaskStateEvent) String() string {
@@ -24,6 +25,8 @@ func (e SwitchTaskStateEvent) String() string {
 		return "[cancel]"
 	case PostponeTaskEvent:
 		return "[postpone]"
+	case ToWorkTaskEvent:
+		return "[towork]"
 	default:
 		return "[unknown]"
 	}
@@ -44,6 +47,8 @@ func (s TaskState) NextState(ev SwitchTaskStateEvent) (TaskState, error) {
 			return TaskStateCanceled, nil
 		case PostponeTaskEvent:
 			return TaskStateSimple, nil
+		case ToWorkTaskEvent:
+			return TaskStateSimple, NewStateInconsistencyErr(s, ev)
 		}
 	case TaskStateCompleted:
 		switch ev {
@@ -51,13 +56,15 @@ func (s TaskState) NextState(ev SwitchTaskStateEvent) (TaskState, error) {
 			return TaskStateSimple, nil
 		case DoneTaskEvent:
 			return TaskStateCompleted, nil
-		case CancelTaskEvent, PostponeTaskEvent, TodoTaskEvent:
+		case CancelTaskEvent, PostponeTaskEvent, TodoTaskEvent, ToWorkTaskEvent:
 			return TaskStateSimple, NewStateInconsistencyErr(s, ev)
 		}
 	case TaskStateCanceled:
 		switch ev {
 		case CancelTaskEvent:
 			return TaskStateCanceled, nil
+		case ToWorkTaskEvent:
+			return TaskStateSimple, nil
 		case DoneTaskEvent, PostponeTaskEvent, TodoTaskEvent, UndoneTaskEvent:
 			return TaskStateSimple, NewStateInconsistencyErr(s, ev)
 		}

@@ -149,6 +149,22 @@ func (s *APISuiteActions) cancelTaskWithError(taskID string, httpStatus int) {
 	s.Require().Equal(httpStatus, resp.StatusCode)
 }
 
+func (s *APISuiteActions) backTaskToWork(taskID string) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.ToworkTask(s.ctx, taskID)
+	s.Require().NoError(err, s.errBody(err))
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusOK, resp.StatusCode)
+}
+
+func (s *APISuiteActions) backTaskToWorkWithError(taskID string, httpStatus int) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.ToworkTask(s.ctx, taskID)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(httpStatus, resp.StatusCode)
+}
+
 func (s *APISuiteActions) updateTask(task openapicli.RespTask) {
 	s.T().Helper()
 	opts := openapicli.UpdateOptions{

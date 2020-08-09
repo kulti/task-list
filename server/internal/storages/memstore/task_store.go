@@ -132,6 +132,15 @@ func (s *TaskStore) CancelTask(_ context.Context, taskID string) error {
 	return nil
 }
 
+func (s *TaskStore) BackTaskToWork(_ context.Context, taskID string) error {
+	for i, t := range s.taskLists[sprintList].tasks {
+		if t.ID == taskID {
+			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.ToWorkTaskEvent)
+		}
+	}
+	return nil
+}
+
 func (s *TaskStore) PostponeTask(_ context.Context, taskID string) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
