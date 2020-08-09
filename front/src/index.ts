@@ -238,6 +238,16 @@ function build_dropdown_menu(task: models.RespTask): HTMLDivElement {
     },
     () => {
       void api
+        .toworkTask(task.id)
+        .done(() => {
+          load_task_lists();
+        })
+        .fail(() => {
+          showErrorAlert("failed to back task to work");
+        });
+    },
+    () => {
+      void api
         .postponeTask(task.id)
         .done(() => {
           load_task_lists();
