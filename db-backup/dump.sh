@@ -29,3 +29,8 @@ sed -i -e 's/COPY public.task_lists /DELETE FROM public.task_lists;\'$'\nCOPY pu
 ${TMPFILENAME}
 
 mv ${TMPFILENAME} ${FILENAME}
+
+if [[ ! -z "${BACKUPDIR}" ]]; then
+    cd ${BASEDIR}
+    /upload.sh ${BACKUPDIR} "${YEAR}-${MONTH}"
+fi
