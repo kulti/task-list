@@ -16,3 +16,14 @@
     ]
 }
 ```
+
+## Deployment
+
+### Yandex Disk
+
+1. Creates application with app folder permissions here https://oauth.yandex.com/.
+2. Use any URL as a Callback URL.
+3. Make a request in browser: https://oauth.yandex.com/authorize?response_type=code&client_id=<client_id>.
+4. Allow and copy code after redirect.
+5. Convert code to token: curl -X POST -u <client_id>:<password> 'https://oauth.yandex.com/token' -d 'grant_type=authorization_code&code=<code>'.
+6. Set up the TOKEN environment variable.

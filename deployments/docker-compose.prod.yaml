@@ -6,6 +6,8 @@ services:
       - tl_pg_data:/var/lib/postgresql/data
 
   db_backup:
+    environment:
+      TOKEN: ${TOKEN}
     volumes:
       - tl_pg_backup:/backups
 
