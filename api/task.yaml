@@ -125,6 +125,22 @@ paths:
             Bad reqest can be returned in cases when cancel is not possible for task.
             E.g. cannot cancel task that already done.
 
+  /task/{taskId}/towork:
+    post:
+      operationId: toworkTask
+      description: Restore canceled task back to work.
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad reqest can be returned if try to restore to work not canceled task.
+
   /task/{taskId}/postpone:
     post:
       operationId: postponeTask
