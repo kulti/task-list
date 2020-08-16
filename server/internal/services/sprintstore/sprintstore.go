@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/kulti/task-list/server/internal/models"
+	"github.com/kulti/task-list/server/internal/storages"
 )
 
 type dbStore interface {
-	NewSprint(ctx context.Context, opts models.SprintOpts) error
+	NewSprint(ctx context.Context, opts storages.SprintOpts) error
 	CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error)
 	ListTasks(ctx context.Context, sprintID string) (models.TaskList, error)
 }
@@ -28,7 +29,7 @@ func New(dbStore dbStore) *SprintStore {
 
 // NewSprint creates a new sprint.
 func (s *SprintStore) NewSprint(ctx context.Context, begin, end time.Time) error {
-	opts := models.SprintOpts{
+	opts := storages.SprintOpts{
 		Begin: begin,
 		End:   end,
 	}
