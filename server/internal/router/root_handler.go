@@ -11,9 +11,10 @@ type rootHandler struct {
 	taskHandler   taskHandler
 }
 
-func newRootHandler(store storages.TaskStore, tmplService SprintTemplateService) rootHandler {
+func newRootHandler(store storages.TaskStore, sprintStore sprintStore, tmplService SprintTemplateService,
+) rootHandler {
 	return rootHandler{
-		sprintHandler: newSprintHandler(store, tmplService),
+		sprintHandler: newSprintHandler(sprintStore, tmplService),
 		taskHandler:   newTaskHandler(store),
 	}
 }

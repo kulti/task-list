@@ -16,15 +16,21 @@ type SprintTemplateService interface {
 	Get(ctx context.Context, begin, end time.Time) (models.SprintTemplate, error)
 }
 
+type sprintStore interface {
+	NewSprint(ctx context.Context, opts models.SprintOpts) error
+	CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error)
+	ListTasks(ctx context.Context, sprintID string) (models.TaskList, error)
+}
+
 // Router implements TaskListServer interface.
 type Router struct {
 	rootHandler rootHandler
 }
 
 // New returns new instacne of Router.
-func New(store storages.TaskStore, tmplService SprintTemplateService) *Router {
+func New(store storages.TaskStore, sprintStore sprintStore, tmplService SprintTemplateService) *Router {
 	return &Router{
-		rootHandler: newRootHandler(store, tmplService),
+		rootHandler: newRootHandler(store, sprintStore, tmplService),
 	}
 }
 

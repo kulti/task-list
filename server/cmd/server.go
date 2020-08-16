@@ -6,12 +6,14 @@ import (
 	"net/http"
 
 	"github.com/caarlos0/env/v6"
-	"github.com/kulti/task-list/server/internal/router"
-	"github.com/kulti/task-list/server/internal/services/calservice"
-	"github.com/kulti/task-list/server/internal/services/sprinttmpl"
-	"github.com/kulti/task-list/server/internal/storages/pgstore"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
+
+	"github.com/kulti/task-list/server/internal/router"
+	"github.com/kulti/task-list/server/internal/services/calservice"
+	"github.com/kulti/task-list/server/internal/services/sprintstore"
+	"github.com/kulti/task-list/server/internal/services/sprinttmpl"
+	"github.com/kulti/task-list/server/internal/storages/pgstore"
 )
 
 type serverCmdFlags struct {
@@ -44,8 +46,9 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 				zap.S().Fatalw("failed to connect to db", zap.Error(err))
 			}
 
+			sprintStore := sprintstore.New(taskStore)
 			sprintTmpl := sprinttmpl.New(taskStore, newCalendarService())
-			router := router.New(taskStore, sprintTmpl)
+			router := router.New(taskStore, sprintStore, sprintTmpl)
 
 			err = http.Serve(listener, router.RootHandler())
 			if err != nil {
