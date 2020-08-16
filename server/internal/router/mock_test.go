@@ -12,7 +12,7 @@ import (
 	time "time"
 )
 
-// MockSprintTemplateService is a mock of SprintTemplateService interface
+// MockSprintTemplateService is a mock of sprintTemplateService interface
 type MockSprintTemplateService struct {
 	ctrl     *gomock.Controller
 	recorder *MockSprintTemplateServiceMockRecorder
@@ -50,31 +50,31 @@ func (mr *MockSprintTemplateServiceMockRecorder) Get(ctx, begin, end interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockSprintTemplateService)(nil).Get), ctx, begin, end)
 }
 
-// MocksprintStore is a mock of sprintStore interface
-type MocksprintStore struct {
+// MockSprintStore is a mock of sprintStore interface
+type MockSprintStore struct {
 	ctrl     *gomock.Controller
-	recorder *MocksprintStoreMockRecorder
+	recorder *MockSprintStoreMockRecorder
 }
 
-// MocksprintStoreMockRecorder is the mock recorder for MocksprintStore
-type MocksprintStoreMockRecorder struct {
-	mock *MocksprintStore
+// MockSprintStoreMockRecorder is the mock recorder for MockSprintStore
+type MockSprintStoreMockRecorder struct {
+	mock *MockSprintStore
 }
 
-// NewMocksprintStore creates a new mock instance
-func NewMocksprintStore(ctrl *gomock.Controller) *MocksprintStore {
-	mock := &MocksprintStore{ctrl: ctrl}
-	mock.recorder = &MocksprintStoreMockRecorder{mock}
+// NewMockSprintStore creates a new mock instance
+func NewMockSprintStore(ctrl *gomock.Controller) *MockSprintStore {
+	mock := &MockSprintStore{ctrl: ctrl}
+	mock.recorder = &MockSprintStoreMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MocksprintStore) EXPECT() *MocksprintStoreMockRecorder {
+func (m *MockSprintStore) EXPECT() *MockSprintStoreMockRecorder {
 	return m.recorder
 }
 
 // NewSprint mocks base method
-func (m *MocksprintStore) NewSprint(ctx context.Context, opts models.SprintOpts) error {
+func (m *MockSprintStore) NewSprint(ctx context.Context, opts models.SprintOpts) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "NewSprint", ctx, opts)
 	ret0, _ := ret[0].(error)
@@ -82,13 +82,13 @@ func (m *MocksprintStore) NewSprint(ctx context.Context, opts models.SprintOpts)
 }
 
 // NewSprint indicates an expected call of NewSprint
-func (mr *MocksprintStoreMockRecorder) NewSprint(ctx, opts interface{}) *gomock.Call {
+func (mr *MockSprintStoreMockRecorder) NewSprint(ctx, opts interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSprint", reflect.TypeOf((*MocksprintStore)(nil).NewSprint), ctx, opts)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSprint", reflect.TypeOf((*MockSprintStore)(nil).NewSprint), ctx, opts)
 }
 
 // CreateTask mocks base method
-func (m *MocksprintStore) CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error) {
+func (m *MockSprintStore) CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTask", ctx, task, sprintID)
 	ret0, _ := ret[0].(string)
@@ -97,13 +97,13 @@ func (m *MocksprintStore) CreateTask(ctx context.Context, task models.Task, spri
 }
 
 // CreateTask indicates an expected call of CreateTask
-func (mr *MocksprintStoreMockRecorder) CreateTask(ctx, task, sprintID interface{}) *gomock.Call {
+func (mr *MockSprintStoreMockRecorder) CreateTask(ctx, task, sprintID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MocksprintStore)(nil).CreateTask), ctx, task, sprintID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockSprintStore)(nil).CreateTask), ctx, task, sprintID)
 }
 
 // ListTasks mocks base method
-func (m *MocksprintStore) ListTasks(ctx context.Context, sprintID string) (models.TaskList, error) {
+func (m *MockSprintStore) ListTasks(ctx context.Context, sprintID string) (models.TaskList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListTasks", ctx, sprintID)
 	ret0, _ := ret[0].(models.TaskList)
@@ -112,7 +112,7 @@ func (m *MocksprintStore) ListTasks(ctx context.Context, sprintID string) (model
 }
 
 // ListTasks indicates an expected call of ListTasks
-func (mr *MocksprintStoreMockRecorder) ListTasks(ctx, sprintID interface{}) *gomock.Call {
+func (mr *MockSprintStoreMockRecorder) ListTasks(ctx, sprintID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MocksprintStore)(nil).ListTasks), ctx, sprintID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MockSprintStore)(nil).ListTasks), ctx, sprintID)
 }
