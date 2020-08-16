@@ -15,10 +15,10 @@ import (
 
 type sprintHandler struct {
 	sprintStore sprintStore
-	tmplService SprintTemplateService
+	tmplService sprintTemplateService
 }
 
-func newSprintHandler(sprintStore sprintStore, tmplService SprintTemplateService) sprintHandler {
+func newSprintHandler(sprintStore sprintStore, tmplService sprintTemplateService) sprintHandler {
 	return sprintHandler{
 		sprintStore: sprintStore,
 		tmplService: tmplService,

@@ -11,8 +11,7 @@ import (
 	"github.com/kulti/task-list/server/internal/storages"
 )
 
-// SprintTemplateService is an interface to get sprint template.
-type SprintTemplateService interface {
+type sprintTemplateService interface {
 	Get(ctx context.Context, begin, end time.Time) (models.SprintTemplate, error)
 }
 
@@ -28,7 +27,7 @@ type Router struct {
 }
 
 // New returns new instacne of Router.
-func New(store storages.TaskStore, sprintStore sprintStore, tmplService SprintTemplateService) *Router {
+func New(store storages.TaskStore, sprintStore sprintStore, tmplService sprintTemplateService) *Router {
 	return &Router{
 		rootHandler: newRootHandler(store, sprintStore, tmplService),
 	}
