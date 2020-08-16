@@ -82,6 +82,14 @@ func (s *APISuiteActions) createSprintTask() openapicli.RespTask {
 	return s.createTask(currentSprintID, s.testTask())
 }
 
+func (s *APISuiteActions) CreateSprintTaskWithError(httpStatus int) {
+	s.T().Helper()
+	_, resp, err := s.cli.DefaultApi.CreateTask(s.ctx, currentSprintID, s.testTask())
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(httpStatus, resp.StatusCode)
+}
+
 func (s *APISuiteActions) createTask(sprintID string, task openapicli.Task) openapicli.RespTask {
 	s.T().Helper()
 	respTask, resp, err := s.cli.DefaultApi.CreateTask(s.ctx, sprintID, task)
