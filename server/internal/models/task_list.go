@@ -1,10 +1,12 @@
 package models
 
+import "time"
+
 // SprintOpts represents new sprint options.
 type SprintOpts struct {
-	Title string `json:"title"`
-	Begin string `json:"begin"`
-	End   string `json:"end"`
+	Title string
+	Begin time.Time
+	End   time.Time
 }
 
 // TaskList represents a task list.

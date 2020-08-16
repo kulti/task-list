@@ -16,7 +16,7 @@ type sprintTemplateService interface {
 }
 
 type sprintStore interface {
-	NewSprint(ctx context.Context, opts models.SprintOpts) error
+	NewSprint(ctx context.Context, begin, end time.Time) error
 	CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error)
 	ListTasks(ctx context.Context, sprintID string) (models.TaskList, error)
 }
