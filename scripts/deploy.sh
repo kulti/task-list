@@ -6,8 +6,6 @@ env=$1
 action=$2
 extra_args=$3
 
-echo "~${extra_args}~"
-
 function up() {
     env=$1
     docker-compose -p ${env} -f docker-compose.yaml -f docker-compose.${env}.yaml run db_migrations up
@@ -23,7 +21,6 @@ function cmd() {
 function gen_migration_name() {
     env=$1
     name=$2
-    echo "~docker-compose -p ${env} -f docker-compose.yaml -f docker-compose.${env}.yaml run db_migrations create ${name}~"
     docker-compose -p ${env} -f docker-compose.yaml -f docker-compose.${env}.yaml run db_migrations create -ext sql ${name}
 }
 
