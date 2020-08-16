@@ -10,6 +10,7 @@ import (
 	"github.com/kulti/task-list/server/internal/apitest"
 	"github.com/kulti/task-list/server/internal/generated/openapicli"
 	"github.com/kulti/task-list/server/internal/router"
+	"github.com/kulti/task-list/server/internal/services/sprintstore"
 	"github.com/kulti/task-list/server/internal/services/sprinttmpl"
 	"github.com/kulti/task-list/server/internal/storages/memstore"
 	"github.com/stretchr/testify/suite"
@@ -22,7 +23,8 @@ type RouterTestSuite struct {
 
 func (s *RouterTestSuite) SetupTest() {
 	store := memstore.NewTaskStore()
-	r := router.New(store, sprinttmpl.New(store, nil))
+	sprintStore := sprintstore.New(store)
+	r := router.New(store, sprintStore, sprinttmpl.New(store, nil))
 	s.srv = httptest.NewServer(r.RootHandler())
 
 	s.Init(s.srv.URL)

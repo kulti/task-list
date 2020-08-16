@@ -11,17 +11,16 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/kulti/task-list/server/internal/models"
-	"github.com/kulti/task-list/server/internal/storages"
 )
 
 type sprintHandler struct {
-	store       storages.TaskStore
+	sprintStore sprintStore
 	tmplService SprintTemplateService
 }
 
-func newSprintHandler(store storages.TaskStore, tmplService SprintTemplateService) sprintHandler {
+func newSprintHandler(sprintStore sprintStore, tmplService SprintTemplateService) sprintHandler {
 	return sprintHandler{
-		store:       store,
+		sprintStore: sprintStore,
 		tmplService: tmplService,
 	}
 }
@@ -77,7 +76,7 @@ func (h sprintHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request
 	opts.Title = fmt.Sprintf("%02d.%02d - %02d.%02d", begin.Day(), begin.Month(),
 		end.Day(), end.Month())
 
-	err = h.store.NewSprint(r.Context(), opts)
+	err = h.sprintStore.NewSprint(r.Context(), opts)
 	if err != nil {
 		httpInternalServerError(w, "failed to create new sprint", err)
 		return
@@ -98,7 +97,7 @@ func (h sprintHandler) handleCreateTaskInSprint(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	id, err := h.store.CreateTask(r.Context(), task, sprintID)
+	id, err := h.sprintStore.CreateTask(r.Context(), task, sprintID)
 	if err != nil {
 		httpInternalServerError(w, "failed to create task", err)
 		return
@@ -132,7 +131,7 @@ func (h sprintHandler) handleGetTaskList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	taskList, err := h.store.ListTasks(r.Context(), sprintID)
+	taskList, err := h.sprintStore.ListTasks(r.Context(), sprintID)
 	if err != nil {
 		httpInternalServerError(w, "failed to get task list from db", err)
 		return

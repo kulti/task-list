@@ -16,6 +16,7 @@ import (
 	"github.com/kulti/task-list/server/internal/generated/openapicli"
 	"github.com/kulti/task-list/server/internal/models"
 	"github.com/kulti/task-list/server/internal/router"
+	"github.com/kulti/task-list/server/internal/services/sprintstore"
 	"github.com/kulti/task-list/server/internal/storages/memstore"
 )
 
@@ -30,7 +31,9 @@ func (s *RouterSprintTmplTestSuite) SetupTest() {
 	s.mockCtrl = gomock.NewController(s.T())
 	s.tmplService = NewMockSprintTemplateService(s.mockCtrl)
 
-	r := router.New(memstore.NewTaskStore(), s.tmplService)
+	store := memstore.NewTaskStore()
+	sprintStore := sprintstore.New(store)
+	r := router.New(store, sprintStore, s.tmplService)
 	s.srv = httptest.NewServer(r.RootHandler())
 
 	s.Init(s.srv.URL)
