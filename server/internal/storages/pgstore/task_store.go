@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 
 	"github.com/kulti/task-list/server/internal/models"
+	"github.com/kulti/task-list/server/internal/storages"
 )
 
 type TaskStore struct {
@@ -36,7 +37,7 @@ func (s *TaskStore) Close() {
 	}
 }
 
-func (s *TaskStore) NewSprint(ctx context.Context, opts models.SprintOpts) error {
+func (s *TaskStore) NewSprint(ctx context.Context, opts storages.SprintOpts) error {
 	_, err := s.conn.Exec(ctx,
 		"INSERT INTO task_lists (type, title, created_at, begin, \"end\") VALUES ($1, $2, $3, $4, $5)",
 		"sprint", opts.Title, time.Now(), opts.Begin, opts.End)

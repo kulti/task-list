@@ -12,6 +12,7 @@ import (
 
 	"github.com/kulti/task-list/server/internal/models"
 	"github.com/kulti/task-list/server/internal/services/sprintstore"
+	"github.com/kulti/task-list/server/internal/storages"
 )
 
 //nolint:lll
@@ -41,7 +42,7 @@ func (s *SprintStoreSuite) TestNewSprint() {
 	end := time.Date(2020, 6, 2, 0, 0, 0, 0, time.UTC)
 	ctx := context.Background()
 
-	opts := models.SprintOpts{
+	opts := storages.SprintOpts{
 		Title: "26.05 - 02.06",
 		Begin: begin,
 		End:   end,

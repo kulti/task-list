@@ -8,6 +8,7 @@ import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	models "github.com/kulti/task-list/server/internal/models"
+	storages "github.com/kulti/task-list/server/internal/storages"
 	reflect "reflect"
 )
 
@@ -35,7 +36,7 @@ func (m *MockDBStore) EXPECT() *MockDBStoreMockRecorder {
 }
 
 // NewSprint mocks base method
-func (m *MockDBStore) NewSprint(ctx context.Context, opts models.SprintOpts) error {
+func (m *MockDBStore) NewSprint(ctx context.Context, opts storages.SprintOpts) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "NewSprint", ctx, opts)
 	ret0, _ := ret[0].(error)

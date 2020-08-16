@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/kulti/task-list/server/internal/models"
+	"github.com/kulti/task-list/server/internal/storages"
 )
 
 const (
@@ -45,7 +46,7 @@ func NewTaskStore() *TaskStore {
 	return ts
 }
 
-func (s *TaskStore) NewSprint(_ context.Context, opts models.SprintOpts) error {
+func (s *TaskStore) NewSprint(_ context.Context, opts storages.SprintOpts) error {
 	s.taskLists[sprintList] = &taskList{title: opts.Title}
 	return nil
 }
