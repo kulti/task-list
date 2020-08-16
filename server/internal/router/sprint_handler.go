@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -54,7 +53,11 @@ func (h sprintHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request
 
 	jsDecoder := json.NewDecoder(r.Body)
 
-	var opts models.SprintOpts
+	var opts struct {
+		Begin string `json:"begin"`
+		End   string `json:"end"`
+	}
+
 	err := jsDecoder.Decode(&opts)
 	if err != nil {
 		httpBadRequest(w, "failed to parse new sprint body", err)
@@ -73,10 +76,7 @@ func (h sprintHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	opts.Title = fmt.Sprintf("%02d.%02d - %02d.%02d", begin.Day(), begin.Month(),
-		end.Day(), end.Month())
-
-	err = h.sprintStore.NewSprint(r.Context(), opts)
+	err = h.sprintStore.NewSprint(r.Context(), begin, end)
 	if err != nil {
 		httpInternalServerError(w, "failed to create new sprint", err)
 		return

@@ -74,17 +74,17 @@ func (m *MockSprintStore) EXPECT() *MockSprintStoreMockRecorder {
 }
 
 // NewSprint mocks base method
-func (m *MockSprintStore) NewSprint(ctx context.Context, opts models.SprintOpts) error {
+func (m *MockSprintStore) NewSprint(ctx context.Context, begin, end time.Time) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NewSprint", ctx, opts)
+	ret := m.ctrl.Call(m, "NewSprint", ctx, begin, end)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // NewSprint indicates an expected call of NewSprint
-func (mr *MockSprintStoreMockRecorder) NewSprint(ctx, opts interface{}) *gomock.Call {
+func (mr *MockSprintStoreMockRecorder) NewSprint(ctx, begin, end interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSprint", reflect.TypeOf((*MockSprintStore)(nil).NewSprint), ctx, opts)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewSprint", reflect.TypeOf((*MockSprintStore)(nil).NewSprint), ctx, begin, end)
 }
 
 // CreateTask mocks base method

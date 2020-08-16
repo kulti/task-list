@@ -2,6 +2,8 @@ package sprintstore
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/kulti/task-list/server/internal/models"
 )
@@ -25,7 +27,14 @@ func New(dbStore dbStore) *SprintStore {
 }
 
 // NewSprint creates a new sprint.
-func (s *SprintStore) NewSprint(ctx context.Context, opts models.SprintOpts) error {
+func (s *SprintStore) NewSprint(ctx context.Context, begin, end time.Time) error {
+	opts := models.SprintOpts{
+		Begin: begin,
+		End:   end,
+	}
+	opts.Title = fmt.Sprintf("%02d.%02d - %02d.%02d", begin.Day(), begin.Month(),
+		end.Day(), end.Month())
+
 	return s.dbStore.NewSprint(ctx, opts)
 }
 
