@@ -3,6 +3,7 @@ package sprintstore
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/kulti/task-list/server/internal/models"
@@ -11,8 +12,8 @@ import (
 
 type dbStore interface {
 	NewSprint(ctx context.Context, opts storages.SprintOpts) error
-	CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error)
-	ListTasks(ctx context.Context, sprintID string) (models.TaskList, error)
+	CreateTask(ctx context.Context, task storages.Task, sprintID string) (int64, error)
+	ListTasks(ctx context.Context, sprintID string) (storages.TaskList, error)
 }
 
 // SprintStore provides methods to create sprint, create and list tasks in sprint.
@@ -41,10 +42,35 @@ func (s *SprintStore) NewSprint(ctx context.Context, begin, end time.Time) error
 
 // CreateTask creates a new task in the sprint.
 func (s *SprintStore) CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error) {
-	return s.dbStore.CreateTask(ctx, task, sprintID)
+	newTask := storages.Task{
+		Text:   task.Text,
+		State:  task.State,
+		Points: task.Points,
+		Burnt:  task.Burnt,
+	}
+	newTaskID, err := s.dbStore.CreateTask(ctx, newTask, sprintID)
+	return strconv.FormatInt(newTaskID, 16), err
 }
 
 // ListTasks lists tasks in the sprint.
 func (s *SprintStore) ListTasks(ctx context.Context, sprintID string) (models.TaskList, error) {
-	return s.dbStore.ListTasks(ctx, sprintID)
+	dbTaskList, err := s.dbStore.ListTasks(ctx, sprintID)
+	if err != nil {
+		return models.TaskList{}, err
+	}
+
+	taskList := models.TaskList{
+		Title: dbTaskList.Title,
+		Tasks: make([]models.Task, len(dbTaskList.Tasks)),
+	}
+	for i, task := range dbTaskList.Tasks {
+		taskList.Tasks[i] = models.Task{
+			ID:     strconv.FormatInt(task.ID, 16),
+			Text:   task.Text,
+			State:  task.State,
+			Points: task.Points,
+			Burnt:  task.Burnt,
+		}
+	}
+	return taskList, nil
 }

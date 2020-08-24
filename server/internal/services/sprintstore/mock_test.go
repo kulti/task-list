@@ -7,7 +7,6 @@ package sprintstore_test
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	models "github.com/kulti/task-list/server/internal/models"
 	storages "github.com/kulti/task-list/server/internal/storages"
 	reflect "reflect"
 )
@@ -50,10 +49,10 @@ func (mr *MockDBStoreMockRecorder) NewSprint(ctx, opts interface{}) *gomock.Call
 }
 
 // CreateTask mocks base method
-func (m *MockDBStore) CreateTask(ctx context.Context, task models.Task, sprintID string) (string, error) {
+func (m *MockDBStore) CreateTask(ctx context.Context, task storages.Task, sprintID string) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTask", ctx, task, sprintID)
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +64,10 @@ func (mr *MockDBStoreMockRecorder) CreateTask(ctx, task, sprintID interface{}) *
 }
 
 // ListTasks mocks base method
-func (m *MockDBStore) ListTasks(ctx context.Context, sprintID string) (models.TaskList, error) {
+func (m *MockDBStore) ListTasks(ctx context.Context, sprintID string) (storages.TaskList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListTasks", ctx, sprintID)
-	ret0, _ := ret[0].(models.TaskList)
+	ret0, _ := ret[0].(storages.TaskList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
