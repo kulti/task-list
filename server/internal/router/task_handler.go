@@ -6,14 +6,13 @@ import (
 	"net/http"
 
 	"github.com/kulti/task-list/server/internal/models"
-	"github.com/kulti/task-list/server/internal/storages"
 )
 
 type taskHandler struct {
-	store storages.TaskStore
+	store taskStore
 }
 
-func newTaskHandler(store storages.TaskStore) taskHandler {
+func newTaskHandler(store taskStore) taskHandler {
 	return taskHandler{
 		store: store,
 	}

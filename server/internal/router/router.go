@@ -8,7 +8,6 @@ import (
 	"github.com/rs/cors"
 
 	"github.com/kulti/task-list/server/internal/models"
-	"github.com/kulti/task-list/server/internal/storages"
 )
 
 type sprintTemplateService interface {
@@ -21,13 +20,24 @@ type sprintStore interface {
 	ListTasks(ctx context.Context, sprintID string) (models.TaskList, error)
 }
 
+type taskStore interface {
+	DeleteTask(ctx context.Context, taskID string) error
+	UpdateTask(ctx context.Context, taskID string, points models.UpdateOptions) error
+	TodoTask(ctx context.Context, taskID string) error
+	DoneTask(ctx context.Context, taskID string) error
+	CancelTask(ctx context.Context, taskID string) error
+	BackTaskToWork(ctx context.Context, taskID string) error
+	UndoneTask(ctx context.Context, taskID string) error
+	PostponeTask(ctx context.Context, taskID string) error
+}
+
 // Router implements TaskListServer interface.
 type Router struct {
 	rootHandler rootHandler
 }
 
 // New returns new instacne of Router.
-func New(store storages.TaskStore, sprintStore sprintStore, tmplService sprintTemplateService) *Router {
+func New(store taskStore, sprintStore sprintStore, tmplService sprintTemplateService) *Router {
 	return &Router{
 		rootHandler: newRootHandler(store, sprintStore, tmplService),
 	}

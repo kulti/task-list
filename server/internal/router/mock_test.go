@@ -116,3 +116,138 @@ func (mr *MockSprintStoreMockRecorder) ListTasks(ctx, sprintID interface{}) *gom
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MockSprintStore)(nil).ListTasks), ctx, sprintID)
 }
+
+// MockTaskStore is a mock of taskStore interface
+type MockTaskStore struct {
+	ctrl     *gomock.Controller
+	recorder *MockTaskStoreMockRecorder
+}
+
+// MockTaskStoreMockRecorder is the mock recorder for MockTaskStore
+type MockTaskStoreMockRecorder struct {
+	mock *MockTaskStore
+}
+
+// NewMockTaskStore creates a new mock instance
+func NewMockTaskStore(ctrl *gomock.Controller) *MockTaskStore {
+	mock := &MockTaskStore{ctrl: ctrl}
+	mock.recorder = &MockTaskStoreMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockTaskStore) EXPECT() *MockTaskStoreMockRecorder {
+	return m.recorder
+}
+
+// DeleteTask mocks base method
+func (m *MockTaskStore) DeleteTask(ctx context.Context, taskID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteTask", ctx, taskID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteTask indicates an expected call of DeleteTask
+func (mr *MockTaskStoreMockRecorder) DeleteTask(ctx, taskID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTask", reflect.TypeOf((*MockTaskStore)(nil).DeleteTask), ctx, taskID)
+}
+
+// UpdateTask mocks base method
+func (m *MockTaskStore) UpdateTask(ctx context.Context, taskID string, points models.UpdateOptions) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateTask", ctx, taskID, points)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateTask indicates an expected call of UpdateTask
+func (mr *MockTaskStoreMockRecorder) UpdateTask(ctx, taskID, points interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTask", reflect.TypeOf((*MockTaskStore)(nil).UpdateTask), ctx, taskID, points)
+}
+
+// TodoTask mocks base method
+func (m *MockTaskStore) TodoTask(ctx context.Context, taskID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TodoTask", ctx, taskID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// TodoTask indicates an expected call of TodoTask
+func (mr *MockTaskStoreMockRecorder) TodoTask(ctx, taskID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TodoTask", reflect.TypeOf((*MockTaskStore)(nil).TodoTask), ctx, taskID)
+}
+
+// DoneTask mocks base method
+func (m *MockTaskStore) DoneTask(ctx context.Context, taskID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DoneTask", ctx, taskID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DoneTask indicates an expected call of DoneTask
+func (mr *MockTaskStoreMockRecorder) DoneTask(ctx, taskID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DoneTask", reflect.TypeOf((*MockTaskStore)(nil).DoneTask), ctx, taskID)
+}
+
+// CancelTask mocks base method
+func (m *MockTaskStore) CancelTask(ctx context.Context, taskID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CancelTask", ctx, taskID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CancelTask indicates an expected call of CancelTask
+func (mr *MockTaskStoreMockRecorder) CancelTask(ctx, taskID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelTask", reflect.TypeOf((*MockTaskStore)(nil).CancelTask), ctx, taskID)
+}
+
+// BackTaskToWork mocks base method
+func (m *MockTaskStore) BackTaskToWork(ctx context.Context, taskID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BackTaskToWork", ctx, taskID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BackTaskToWork indicates an expected call of BackTaskToWork
+func (mr *MockTaskStoreMockRecorder) BackTaskToWork(ctx, taskID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BackTaskToWork", reflect.TypeOf((*MockTaskStore)(nil).BackTaskToWork), ctx, taskID)
+}
+
+// UndoneTask mocks base method
+func (m *MockTaskStore) UndoneTask(ctx context.Context, taskID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UndoneTask", ctx, taskID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UndoneTask indicates an expected call of UndoneTask
+func (mr *MockTaskStoreMockRecorder) UndoneTask(ctx, taskID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UndoneTask", reflect.TypeOf((*MockTaskStore)(nil).UndoneTask), ctx, taskID)
+}
+
+// PostponeTask mocks base method
+func (m *MockTaskStore) PostponeTask(ctx context.Context, taskID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PostponeTask", ctx, taskID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PostponeTask indicates an expected call of PostponeTask
+func (mr *MockTaskStoreMockRecorder) PostponeTask(ctx, taskID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostponeTask", reflect.TypeOf((*MockTaskStore)(nil).PostponeTask), ctx, taskID)
+}
