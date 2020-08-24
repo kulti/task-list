@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -44,14 +43,14 @@ func (s *TaskStore) NewSprint(ctx context.Context, opts storages.SprintOpts) err
 	return err
 }
 
-func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, sprintIDStr string) (string, error) {
+func (s *TaskStore) CreateTask(ctx context.Context, task storages.Task, sprintIDStr string) (int64, error) {
 	row := s.conn.QueryRow(ctx,
 		"INSERT INTO tasks (text, points, burnt, state) VALUES($1, $2, $3, $4) RETURNING id",
 		task.Text, task.Points, task.Burnt, task.State)
 	var taskID int64
 	err := row.Scan(&taskID)
 	if err != nil {
-		return "", fmt.Errorf("failed to create task: %w", err)
+		return -1, fmt.Errorf("failed to create task: %w", err)
 	}
 
 	var sprintID int64
@@ -61,7 +60,7 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, sprintIDSt
 
 		err = row.Scan(&sprintID)
 		if err != nil {
-			return "", fmt.Errorf("failed to find sprint: %w", err)
+			return -1, fmt.Errorf("failed to find sprint: %w", err)
 		}
 	}
 
@@ -69,29 +68,23 @@ func (s *TaskStore) CreateTask(ctx context.Context, task models.Task, sprintIDSt
 		"INSERT INTO task_list_map (task_id, list_id) VALUES ($1, $2)",
 		taskID, sprintID)
 	if err != nil {
-		return "", fmt.Errorf("failed to add task to list: %w", err)
+		return -1, fmt.Errorf("failed to add task to list: %w", err)
 	}
 
-	return strconv.FormatInt(taskID, 16), nil
+	return taskID, nil
 }
 
-func (s *TaskStore) DeleteTask(ctx context.Context, taskID string) error {
-	id, err := strconv.ParseInt(taskID, 16, 64)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.conn.Exec(ctx, "DELETE FROM tasks WHERE id = $1", id)
-
+func (s *TaskStore) DeleteTask(ctx context.Context, taskID int64) error {
+	_, err := s.conn.Exec(ctx, "DELETE FROM tasks WHERE id = $1", taskID)
 	return err
 }
 
-func (s *TaskStore) ListTasks(ctx context.Context, sprintIDStr string) (models.TaskList, error) {
+func (s *TaskStore) ListTasks(ctx context.Context, sprintIDStr string) (storages.TaskList, error) {
 	if sprintIDStr != "current" {
-		return models.TaskList{}, nil
+		return storages.TaskList{}, nil
 	}
 
-	var taskList models.TaskList
+	var taskList storages.TaskList
 	var sprintID int64
 
 	row := s.conn.QueryRow(ctx,
@@ -100,11 +93,11 @@ func (s *TaskStore) ListTasks(ctx context.Context, sprintIDStr string) (models.T
 	err := row.Scan(&sprintID, &taskList.Title)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return models.TaskList{
+			return storages.TaskList{
 				Title: "No any sprint. Create one first.",
 			}, nil
 		}
-		return models.TaskList{}, fmt.Errorf("failed to find list: %w", err)
+		return storages.TaskList{}, fmt.Errorf("failed to find list: %w", err)
 	}
 
 	rows, _ := s.conn.Query(ctx,
@@ -118,56 +111,49 @@ func (s *TaskStore) ListTasks(ctx context.Context, sprintIDStr string) (models.T
 
 	err = rows.Err()
 	for err == nil && rows.Next() {
-		var task models.Task
-		var taskID int64
-		err = rows.Scan(&taskID, &task.Text, &task.Points, &task.Burnt, &task.State)
+		var task storages.Task
+		err = rows.Scan(&task.ID, &task.Text, &task.Points, &task.Burnt, &task.State)
 		if err == nil {
-			task.ID = strconv.FormatInt(taskID, 16)
 			taskList.Tasks = append(taskList.Tasks, task)
 		}
 	}
 
 	if err != nil {
-		return models.TaskList{}, err
+		return storages.TaskList{}, err
 	}
 
 	return taskList, nil
 }
 
-func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.UpdateOptions) error {
-	id, err := strconv.ParseInt(taskID, 16, 64)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.conn.Exec(ctx,
+func (s *TaskStore) UpdateTask(ctx context.Context, taskID int64, opts models.UpdateOptions) error {
+	_, err := s.conn.Exec(ctx,
 		"UPDATE tasks SET text = $2, points = $3, burnt = $4 WHERE id = $1",
-		id, opts.Text, opts.Points, opts.Burnt)
+		taskID, opts.Text, opts.Points, opts.Burnt)
 	return err
 }
 
-func (s *TaskStore) DoneTask(ctx context.Context, taskID string) error {
+func (s *TaskStore) DoneTask(ctx context.Context, taskID int64) error {
 	return s.updateTaskStateWithStmt(ctx, taskID, models.DoneTaskEvent,
 		"UPDATE tasks SET state = $2, burnt=points WHERE id = $1")
 }
 
-func (s *TaskStore) UndoneTask(ctx context.Context, taskID string) error {
+func (s *TaskStore) UndoneTask(ctx context.Context, taskID int64) error {
 	return s.updateTaskState(ctx, taskID, models.UndoneTaskEvent)
 }
 
-func (s *TaskStore) TodoTask(ctx context.Context, taskID string) error {
+func (s *TaskStore) TodoTask(ctx context.Context, taskID int64) error {
 	return s.updateTaskState(ctx, taskID, models.TodoTaskEvent)
 }
 
-func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
+func (s *TaskStore) CancelTask(ctx context.Context, taskID int64) error {
 	return s.updateTaskState(ctx, taskID, models.CancelTaskEvent)
 }
 
-func (s *TaskStore) BackTaskToWork(ctx context.Context, taskID string) error {
+func (s *TaskStore) BackTaskToWork(ctx context.Context, taskID int64) error {
 	return s.updateTaskState(ctx, taskID, models.ToWorkTaskEvent)
 }
 
-func (s *TaskStore) PostponeTask(ctx context.Context, taskID string) (resultErr error) {
+func (s *TaskStore) PostponeTask(ctx context.Context, taskID int64) (resultErr error) {
 	return s.updateTaskStateWithStmt(ctx, taskID, models.PostponeTaskEvent,
 		`WITH task AS (DELETE FROM tasks WHERE id = $1 AND $2 = $2 RETURNING *)
 		INSERT INTO postponed_tasks (text, points)
@@ -175,20 +161,15 @@ func (s *TaskStore) PostponeTask(ctx context.Context, taskID string) (resultErr 
 		FROM task`)
 }
 
-func (s *TaskStore) updateTaskState(ctx context.Context, taskID string,
+func (s *TaskStore) updateTaskState(ctx context.Context, taskID int64,
 	event models.SwitchTaskStateEvent,
 ) error {
 	return s.updateTaskStateWithStmt(ctx, taskID, event, "UPDATE tasks SET state = $2 WHERE id = $1")
 }
 
-func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID string,
+func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID int64,
 	event models.SwitchTaskStateEvent, stmt string,
 ) (resultErr error) {
-	id, err := strconv.ParseInt(taskID, 16, 64)
-	if err != nil {
-		return err
-	}
-
 	tx, err := s.conn.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
@@ -201,7 +182,7 @@ func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID string,
 		}
 	}()
 
-	row := tx.QueryRow(ctx, "SELECT state FROM tasks WHERE id = $1 FOR NO KEY UPDATE", id)
+	row := tx.QueryRow(ctx, "SELECT state FROM tasks WHERE id = $1 FOR NO KEY UPDATE", taskID)
 	var curState models.TaskState
 	err = row.Scan(&curState)
 	if err == nil || errors.Is(err, pgx.ErrNoRows) {
@@ -210,7 +191,7 @@ func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID string,
 			return err
 		}
 
-		if _, err := tx.Exec(ctx, stmt, id, state); err != nil {
+		if _, err := tx.Exec(ctx, stmt, taskID, state); err != nil {
 			return fmt.Errorf("failed to execute update: %w", err)
 		}
 	} else if err != nil {

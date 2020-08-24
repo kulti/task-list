@@ -2,7 +2,6 @@ package memstore
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/kulti/task-list/server/internal/models"
 	"github.com/kulti/task-list/server/internal/storages"
@@ -25,8 +24,8 @@ type taskList struct {
 
 type storeTasks []*storeTask
 
-func (st storeTasks) toModelTasks() []models.Task {
-	mt := make([]models.Task, len(st))
+func (st storeTasks) toModelTasks() []storages.Task {
+	mt := make([]storages.Task, len(st))
 	for i, t := range st {
 		mt[i] = t.Task
 	}
@@ -34,7 +33,7 @@ func (st storeTasks) toModelTasks() []models.Task {
 }
 
 type storeTask struct {
-	models.Task
+	storages.Task
 	listIDs []string
 }
 
@@ -51,7 +50,7 @@ func (s *TaskStore) NewSprint(_ context.Context, opts storages.SprintOpts) error
 	return nil
 }
 
-func (s *TaskStore) CreateTask(_ context.Context, task models.Task, _ string) (string, error) {
+func (s *TaskStore) CreateTask(_ context.Context, task storages.Task, _ string) (int64, error) {
 	task.ID = s.nextID()
 	storeTask := &storeTask{
 		Task:    task,
@@ -61,7 +60,7 @@ func (s *TaskStore) CreateTask(_ context.Context, task models.Task, _ string) (s
 	return task.ID, nil
 }
 
-func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.UpdateOptions) error {
+func (s *TaskStore) UpdateTask(ctx context.Context, taskID int64, opts models.UpdateOptions) error {
 	for _, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
 			t.Text = opts.Text
@@ -73,7 +72,7 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 	return nil
 }
 
-func (s *TaskStore) DeleteTask(_ context.Context, taskID string) error {
+func (s *TaskStore) DeleteTask(_ context.Context, taskID int64) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
 			s.taskLists[sprintList].tasks =
@@ -84,15 +83,15 @@ func (s *TaskStore) DeleteTask(_ context.Context, taskID string) error {
 	return nil
 }
 
-func (s *TaskStore) ListTasks(_ context.Context, _ string) (models.TaskList, error) {
-	l := models.TaskList{
+func (s *TaskStore) ListTasks(_ context.Context, _ string) (storages.TaskList, error) {
+	l := storages.TaskList{
 		Title: s.taskLists[sprintList].title,
 		Tasks: s.taskLists[sprintList].tasks.toModelTasks(),
 	}
 	return l, nil
 }
 
-func (s *TaskStore) DoneTask(_ context.Context, taskID string) error {
+func (s *TaskStore) DoneTask(_ context.Context, taskID int64) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
 			err := s.changeTaskState(s.taskLists[sprintList].tasks[i], models.DoneTaskEvent)
@@ -106,7 +105,7 @@ func (s *TaskStore) DoneTask(_ context.Context, taskID string) error {
 	return nil
 }
 
-func (s *TaskStore) UndoneTask(_ context.Context, taskID string) error {
+func (s *TaskStore) UndoneTask(_ context.Context, taskID int64) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
 			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.UndoneTaskEvent)
@@ -115,7 +114,7 @@ func (s *TaskStore) UndoneTask(_ context.Context, taskID string) error {
 	return nil
 }
 
-func (s *TaskStore) TodoTask(_ context.Context, taskID string) error {
+func (s *TaskStore) TodoTask(_ context.Context, taskID int64) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
 			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.TodoTaskEvent)
@@ -124,7 +123,7 @@ func (s *TaskStore) TodoTask(_ context.Context, taskID string) error {
 	return nil
 }
 
-func (s *TaskStore) CancelTask(_ context.Context, taskID string) error {
+func (s *TaskStore) CancelTask(_ context.Context, taskID int64) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
 			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.CancelTaskEvent)
@@ -133,7 +132,7 @@ func (s *TaskStore) CancelTask(_ context.Context, taskID string) error {
 	return nil
 }
 
-func (s *TaskStore) BackTaskToWork(_ context.Context, taskID string) error {
+func (s *TaskStore) BackTaskToWork(_ context.Context, taskID int64) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
 			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.ToWorkTaskEvent)
@@ -142,7 +141,7 @@ func (s *TaskStore) BackTaskToWork(_ context.Context, taskID string) error {
 	return nil
 }
 
-func (s *TaskStore) PostponeTask(_ context.Context, taskID string) error {
+func (s *TaskStore) PostponeTask(_ context.Context, taskID int64) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
 			_, err := t.State.NextState(models.PostponeTaskEvent)
@@ -167,9 +166,9 @@ func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplat
 	return tmpl, nil
 }
 
-func (s *TaskStore) nextID() string {
+func (s *TaskStore) nextID() int64 {
 	s.lastID++
-	return strconv.FormatInt(s.lastID, 16)
+	return s.lastID
 }
 
 func (s *TaskStore) changeTaskState(task *storeTask, event models.SwitchTaskStateEvent) error {

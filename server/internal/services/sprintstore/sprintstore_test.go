@@ -3,6 +3,9 @@ package sprintstore_test
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math/rand"
+	"strconv"
 	"testing"
 	"time"
 
@@ -19,6 +22,22 @@ import (
 //go:generate mockgen -package sprintstore_test -destination mock_test.go -source sprintstore.go -mock_names dbStore=MockDBStore
 
 var errTest = errors.New("test error")
+
+type taskMatcher struct {
+	models.Task
+}
+
+func (m taskMatcher) Matches(x interface{}) bool {
+	task, ok := x.(storages.Task)
+	if !ok {
+		return false
+	}
+	return task.Text == m.Text
+}
+
+func (m taskMatcher) String() string {
+	return fmt.Sprintf("is equal to %+v", m.Task)
+}
 
 type SprintStoreSuite struct {
 	suite.Suite
@@ -62,25 +81,25 @@ func (s *SprintStoreSuite) TestCreateTask() {
 		Text: faker.Sentence(),
 	}
 	ctx := context.Background()
-	taskID := faker.Word()
+	dbTaskID := rand.Int63()
 
-	s.dbStore.EXPECT().CreateTask(ctx, task, sprintID).Return(taskID, nil)
+	s.dbStore.EXPECT().CreateTask(ctx, taskMatcher{task}, sprintID).Return(dbTaskID, nil)
 	newTaskID, err := s.store.CreateTask(ctx, task, sprintID)
 	s.Require().NoError(err)
-	s.Require().Equal(taskID, newTaskID)
+	s.Require().Equal(strconv.FormatInt(dbTaskID, 16), newTaskID)
 
-	s.dbStore.EXPECT().CreateTask(ctx, task, sprintID).Return(taskID, errTest)
+	s.dbStore.EXPECT().CreateTask(ctx, taskMatcher{task}, sprintID).Return(dbTaskID, errTest)
 	_, err = s.store.CreateTask(ctx, task, sprintID)
 	s.Require().Error(err, errTest.Error())
 }
 
 func (s *SprintStoreSuite) TestListTasks() {
 	sprintID := faker.Sentence()
-	taskList := models.TaskList{
+	taskList := storages.TaskList{
 		Title: faker.Sentence(),
 	}
 	for i := 0; i < 3; i++ {
-		taskList.Tasks = append(taskList.Tasks, models.Task{
+		taskList.Tasks = append(taskList.Tasks, storages.Task{
 			Text: faker.Sentence(),
 		})
 	}
@@ -89,7 +108,11 @@ func (s *SprintStoreSuite) TestListTasks() {
 	s.dbStore.EXPECT().ListTasks(ctx, sprintID).Return(taskList, nil)
 	retTaskList, err := s.store.ListTasks(ctx, sprintID)
 	s.Require().NoError(err)
-	s.Require().Equal(taskList, retTaskList)
+	s.Require().Equal(taskList.Title, retTaskList.Title)
+	s.Require().Len(retTaskList.Tasks, len(taskList.Tasks))
+	for i := range taskList.Tasks {
+		s.Require().Equal(taskList.Tasks[i].Text, retTaskList.Tasks[i].Text)
+	}
 
 	s.dbStore.EXPECT().ListTasks(ctx, sprintID).Return(taskList, errTest)
 	_, err = s.store.ListTasks(ctx, sprintID)
