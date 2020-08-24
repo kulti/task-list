@@ -2,8 +2,6 @@ package router
 
 import (
 	"net/http"
-
-	"github.com/kulti/task-list/server/internal/storages"
 )
 
 type rootHandler struct {
@@ -11,7 +9,7 @@ type rootHandler struct {
 	taskHandler   taskHandler
 }
 
-func newRootHandler(store storages.TaskStore, sprintStore sprintStore, tmplService sprintTemplateService,
+func newRootHandler(store taskStore, sprintStore sprintStore, tmplService sprintTemplateService,
 ) rootHandler {
 	return rootHandler{
 		sprintHandler: newSprintHandler(sprintStore, tmplService),

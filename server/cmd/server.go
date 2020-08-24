@@ -13,6 +13,7 @@ import (
 	"github.com/kulti/task-list/server/internal/services/calservice"
 	"github.com/kulti/task-list/server/internal/services/sprintstore"
 	"github.com/kulti/task-list/server/internal/services/sprinttmpl"
+	"github.com/kulti/task-list/server/internal/services/taskstore"
 	"github.com/kulti/task-list/server/internal/storages/pgstore"
 )
 
@@ -41,13 +42,14 @@ func newServerCmd(dbFlags dbFlags) *cobra.Command {
 			}
 			zap.S().Infow("listen at", "addr", listener.Addr().String())
 
-			taskStore, err := pgstore.New(dbFlags.URL())
+			dbStore, err := pgstore.New(dbFlags.URL())
 			if err != nil {
 				zap.S().Fatalw("failed to connect to db", zap.Error(err))
 			}
 
-			sprintStore := sprintstore.New(taskStore)
-			sprintTmpl := sprinttmpl.New(taskStore, newCalendarService())
+			sprintStore := sprintstore.New(dbStore)
+			taskStore := taskstore.New(dbStore)
+			sprintTmpl := sprinttmpl.New(dbStore, newCalendarService())
 			router := router.New(taskStore, sprintStore, sprintTmpl)
 
 			err = http.Serve(listener, router.RootHandler())
