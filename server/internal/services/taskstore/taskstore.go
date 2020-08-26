@@ -40,7 +40,14 @@ func (s *TaskStore) DeleteTask(ctx context.Context, taskID string) error {
 // UpdateTask updates task text and points.
 func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.UpdateOptions) error {
 	return s.doWithTaskIDConvert(taskID, func(taskID int64) error {
-		return s.dbStore.UpdateTask(ctx, taskID, opts)
+		if err := s.dbStore.UpdateTask(ctx, taskID, opts); err != nil {
+			return err
+		}
+
+		if opts.Burnt == opts.Points {
+			return s.dbStore.DoneTask(ctx, taskID)
+		}
+		return s.dbStore.UndoneTask(ctx, taskID)
 	})
 }
 
@@ -69,13 +76,6 @@ func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
 func (s *TaskStore) BackTaskToWork(ctx context.Context, taskID string) error {
 	return s.doWithTaskIDConvert(taskID, func(taskID int64) error {
 		return s.dbStore.BackTaskToWork(ctx, taskID)
-	})
-}
-
-// UndoneTask chage task state to "". Crappy method - will be removed soon.
-func (s *TaskStore) UndoneTask(ctx context.Context, taskID string) error {
-	return s.doWithTaskIDConvert(taskID, func(taskID int64) error {
-		return s.dbStore.UndoneTask(ctx, taskID)
 	})
 }
 
