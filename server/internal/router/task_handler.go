@@ -12,9 +12,9 @@ type taskHandler struct {
 	store taskStore
 }
 
-func newTaskHandler(store taskStore) taskHandler {
+func newTaskHandler(taskStore taskStore) taskHandler {
 	return taskHandler{
-		store: store,
+		store: taskStore,
 	}
 }
 

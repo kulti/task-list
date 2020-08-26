@@ -37,9 +37,9 @@ type Router struct {
 }
 
 // New returns new instacne of Router.
-func New(store taskStore, sprintStore sprintStore, tmplService sprintTemplateService) *Router {
+func New(taskStore taskStore, sprintStore sprintStore, tmplService sprintTemplateService) *Router {
 	return &Router{
-		rootHandler: newRootHandler(store, sprintStore, tmplService),
+		rootHandler: newRootHandler(taskStore, sprintStore, tmplService),
 	}
 }
 
