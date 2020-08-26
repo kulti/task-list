@@ -224,20 +224,6 @@ func (mr *MockTaskStoreMockRecorder) BackTaskToWork(ctx, taskID interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BackTaskToWork", reflect.TypeOf((*MockTaskStore)(nil).BackTaskToWork), ctx, taskID)
 }
 
-// UndoneTask mocks base method
-func (m *MockTaskStore) UndoneTask(ctx context.Context, taskID string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UndoneTask", ctx, taskID)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UndoneTask indicates an expected call of UndoneTask
-func (mr *MockTaskStoreMockRecorder) UndoneTask(ctx, taskID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UndoneTask", reflect.TypeOf((*MockTaskStore)(nil).UndoneTask), ctx, taskID)
-}
-
 // PostponeTask mocks base method
 func (m *MockTaskStore) PostponeTask(ctx context.Context, taskID string) error {
 	m.ctrl.T.Helper()

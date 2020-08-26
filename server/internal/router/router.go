@@ -27,7 +27,6 @@ type taskStore interface {
 	DoneTask(ctx context.Context, taskID string) error
 	CancelTask(ctx context.Context, taskID string) error
 	BackTaskToWork(ctx context.Context, taskID string) error
-	UndoneTask(ctx context.Context, taskID string) error
 	PostponeTask(ctx context.Context, taskID string) error
 }
 
