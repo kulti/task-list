@@ -60,12 +60,15 @@ func (s *TaskStore) CreateTask(_ context.Context, task storages.Task, _ string) 
 	return task.ID, nil
 }
 
-func (s *TaskStore) UpdateTask(ctx context.Context, taskID int64, opts models.UpdateOptions) error {
-	for _, t := range s.taskLists[sprintList].tasks {
+func (s *TaskStore) UpdateTask(ctx context.Context, taskID int64, fn storages.UpdateTaskFn) error {
+	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
-			t.Text = opts.Text
-			t.Burnt = opts.Burnt
-			t.Points = opts.Points
+			task, err := fn(t.Task)
+			if err != nil {
+				return err
+			}
+
+			s.taskLists[sprintList].tasks[i].Task = task
 			break
 		}
 	}
@@ -91,64 +94,16 @@ func (s *TaskStore) ListTasks(_ context.Context, _ string) (storages.TaskList, e
 	return l, nil
 }
 
-func (s *TaskStore) DoneTask(_ context.Context, taskID int64) error {
+func (s *TaskStore) PostponeTask(_ context.Context, taskID int64, fn storages.UpdateTaskFn) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
-			err := s.changeTaskState(s.taskLists[sprintList].tasks[i], models.DoneTaskEvent)
+			task, err := fn(t.Task)
 			if err != nil {
 				return err
 			}
-			s.taskLists[sprintList].tasks[i].Burnt = s.taskLists[sprintList].tasks[i].Points
-			break
-		}
-	}
-	return nil
-}
 
-func (s *TaskStore) UndoneTask(_ context.Context, taskID int64) error {
-	for i, t := range s.taskLists[sprintList].tasks {
-		if t.ID == taskID {
-			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.UndoneTaskEvent)
-		}
-	}
-	return nil
-}
-
-func (s *TaskStore) TodoTask(_ context.Context, taskID int64) error {
-	for i, t := range s.taskLists[sprintList].tasks {
-		if t.ID == taskID {
-			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.TodoTaskEvent)
-		}
-	}
-	return nil
-}
-
-func (s *TaskStore) CancelTask(_ context.Context, taskID int64) error {
-	for i, t := range s.taskLists[sprintList].tasks {
-		if t.ID == taskID {
-			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.CancelTaskEvent)
-		}
-	}
-	return nil
-}
-
-func (s *TaskStore) BackTaskToWork(_ context.Context, taskID int64) error {
-	for i, t := range s.taskLists[sprintList].tasks {
-		if t.ID == taskID {
-			return s.changeTaskState(s.taskLists[sprintList].tasks[i], models.ToWorkTaskEvent)
-		}
-	}
-	return nil
-}
-
-func (s *TaskStore) PostponeTask(_ context.Context, taskID int64) error {
-	for i, t := range s.taskLists[sprintList].tasks {
-		if t.ID == taskID {
-			_, err := t.State.NextState(models.PostponeTaskEvent)
-			if err != nil {
-				return err
-			}
-			s.postponedTasks = append(s.postponedTasks, models.TaskTemplate{Text: t.Text, Points: t.Points})
+			s.postponedTasks = append(s.postponedTasks,
+				models.TaskTemplate{Text: task.Text, Points: task.Points})
 			s.taskLists[sprintList].tasks = append(s.taskLists[sprintList].tasks[:i],
 				s.taskLists[sprintList].tasks[i+1:]...)
 			break
@@ -169,13 +124,4 @@ func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplat
 func (s *TaskStore) nextID() int64 {
 	s.lastID++
 	return s.lastID
-}
-
-func (s *TaskStore) changeTaskState(task *storeTask, event models.SwitchTaskStateEvent) error {
-	state, err := task.State.NextState(event)
-	if err != nil {
-		return err
-	}
-	task.State = state
-	return nil
 }

@@ -4,97 +4,88 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/kulti/task-list/server/internal/models"
 	"github.com/stretchr/testify/require"
+
+	"github.com/kulti/task-list/server/internal/models"
 )
 
-type transition map[models.SwitchTaskStateEvent]models.TaskState
-
-func TestNextTaskState(t *testing.T) {
-	transitions := map[models.TaskState]transition{
+func TestValidateStateSwitch(t *testing.T) {
+	transitions := map[models.TaskState][]models.SwitchTaskStateEvent{
 		models.TaskStateSimple: {
-			models.TodoTaskEvent:     models.TaskStateTodo,
-			models.DoneTaskEvent:     models.TaskStateCompleted,
-			models.UndoneTaskEvent:   models.TaskStateSimple,
-			models.CancelTaskEvent:   models.TaskStateCanceled,
-			models.PostponeTaskEvent: models.TaskStateSimple,
+			models.TodoTaskEvent,
+			models.DoneTaskEvent,
+			models.CancelTaskEvent,
+			models.PostponeTaskEvent,
 		},
 		models.TaskStateTodo: {
-			models.TodoTaskEvent:     models.TaskStateTodo,
-			models.DoneTaskEvent:     models.TaskStateCompleted,
-			models.UndoneTaskEvent:   models.TaskStateTodo,
-			models.CancelTaskEvent:   models.TaskStateCanceled,
-			models.PostponeTaskEvent: models.TaskStateSimple,
+			models.TodoTaskEvent,
+			models.DoneTaskEvent,
+			models.CancelTaskEvent,
+			models.PostponeTaskEvent,
 		},
 		models.TaskStateCompleted: {
-			models.DoneTaskEvent:   models.TaskStateCompleted,
-			models.UndoneTaskEvent: models.TaskStateSimple,
+			models.DoneTaskEvent,
+			models.ToWorkTaskEvent,
 		},
 		models.TaskStateCanceled: {
-			models.CancelTaskEvent: models.TaskStateCanceled,
-			models.ToWorkTaskEvent: models.TaskStateSimple,
+			models.CancelTaskEvent,
+			models.ToWorkTaskEvent,
 		},
 	}
 
 	for state, tr := range transitions {
-		for ev, expNextState := range tr {
+		for _, ev := range tr {
 			state := state
 			ev := ev
-			expNextState := expNextState
 			t.Run(string(state)+" -> "+ev.String(), func(t *testing.T) {
 				t.Parallel()
-				nextState, err := state.NextState(ev)
-				require.NoError(t, err)
-				require.Equal(t, expNextState, nextState)
+				require.NoError(t, state.ValidateStateSwitch(ev))
 			})
 		}
 	}
 }
 
-func TestNextTaskStateInconcistency(t *testing.T) {
+func TestValidateStateSwitchInconcistency(t *testing.T) {
 	unknownState := models.TaskState(-1)
 	unknownEvent := models.SwitchTaskStateEvent(-1)
 
-	transitions := map[models.TaskState]map[models.SwitchTaskStateEvent]struct{}{
+	transitions := map[models.TaskState][]models.SwitchTaskStateEvent{
 		unknownState: {
-			models.TodoTaskEvent:   struct{}{},
-			models.DoneTaskEvent:   struct{}{},
-			models.UndoneTaskEvent: struct{}{},
-			models.CancelTaskEvent: struct{}{},
-			models.ToWorkTaskEvent: struct{}{},
-			unknownEvent:           struct{}{},
+			models.TodoTaskEvent,
+			models.DoneTaskEvent,
+			models.CancelTaskEvent,
+			models.ToWorkTaskEvent,
+			unknownEvent,
 		},
 		models.TaskStateSimple: {
-			models.ToWorkTaskEvent: struct{}{},
-			unknownEvent:           struct{}{},
+			models.ToWorkTaskEvent,
+			unknownEvent,
 		},
 		models.TaskStateTodo: {
-			models.ToWorkTaskEvent: struct{}{},
-			unknownEvent:           struct{}{},
+			models.ToWorkTaskEvent,
+			unknownEvent,
 		},
 		models.TaskStateCompleted: {
-			models.TodoTaskEvent:     struct{}{},
-			models.CancelTaskEvent:   struct{}{},
-			models.PostponeTaskEvent: struct{}{},
-			models.ToWorkTaskEvent:   struct{}{},
-			unknownEvent:             struct{}{},
+			models.TodoTaskEvent,
+			models.CancelTaskEvent,
+			models.PostponeTaskEvent,
+			unknownEvent,
 		},
 		models.TaskStateCanceled: {
-			models.TodoTaskEvent:     struct{}{},
-			models.DoneTaskEvent:     struct{}{},
-			models.UndoneTaskEvent:   struct{}{},
-			models.PostponeTaskEvent: struct{}{},
-			unknownEvent:             struct{}{},
+			models.TodoTaskEvent,
+			models.DoneTaskEvent,
+			models.PostponeTaskEvent,
+			unknownEvent,
 		},
 	}
 
 	for state, tr := range transitions {
-		for ev := range tr {
+		for _, ev := range tr {
 			state := state
 			ev := ev
 			t.Run(string(state)+" -> "+ev.String(), func(t *testing.T) {
 				t.Parallel()
-				_, err := state.NextState(ev)
+				err := state.ValidateStateSwitch(ev)
 				require.Error(t, err)
 				require.True(t, errors.As(err, &models.StateInconsistencyErr{}))
 			})
