@@ -15,7 +15,7 @@ func (s *APISuite) TestNotFound() {
 	for _, p := range paths {
 		p := p
 		s.Run(p, func() {
-			resp, err := http.Get(s.apiURL + p) //nolint:noctx
+			resp, err := http.Get(s.apiURL + p)
 			s.Require().NoError(err)
 			resp.Body.Close()
 			s.Require().Equal(http.StatusNotFound, resp.StatusCode)

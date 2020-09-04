@@ -18,7 +18,6 @@ import (
 	"github.com/kulti/task-list/server/internal/storages"
 )
 
-//nolint:lll
 //go:generate mockgen -package sprintstore_test -destination mock_test.go -source sprintstore.go -mock_names dbStore=MockDBStore
 
 var errTest = errors.New("test error")
