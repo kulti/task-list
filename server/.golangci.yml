@@ -64,3 +64,17 @@ linters:
 linters-settings:
   lll:
     line-length: 110
+  goimports:
+    local-prefixes: github.com/kulti/task-list/server
+
+issues:
+  exclude-rules:
+    - path: (_test\.go|apitest)
+      linters:
+        - gosec # security is not make sense in tests
+        - noctx # it's ok to do simple http request without context in tests
+
+    # Exclude lll issues for long lines with go:generate
+    - linters:
+        - lll
+      source: "^//go:generate "

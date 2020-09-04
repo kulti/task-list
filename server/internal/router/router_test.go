@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
 	"github.com/kulti/task-list/server/internal/apitest"
 	"github.com/kulti/task-list/server/internal/generated/openapicli"
 	"github.com/kulti/task-list/server/internal/router"
@@ -14,7 +16,6 @@ import (
 	"github.com/kulti/task-list/server/internal/services/sprinttmpl"
 	"github.com/kulti/task-list/server/internal/services/taskstore"
 	"github.com/kulti/task-list/server/internal/storages/memstore"
-	"github.com/stretchr/testify/suite"
 )
 
 type RouterTestSuite struct {
@@ -37,21 +38,21 @@ func (s *RouterTestSuite) TearDownTest() {
 }
 
 func (s *RouterTestSuite) TestApiRootNotFound() {
-	resp, err := http.Get(s.srv.URL) //nolint:noctx
+	resp, err := http.Get(s.srv.URL)
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusNotFound, resp.StatusCode)
 }
 
 func (s *RouterTestSuite) TestNewSprintInvalidJSON() {
-	resp, err := http.Post(s.srv.URL+"/api/v1/sprint", "application/json", nil) //nolint:noctx
+	resp, err := http.Post(s.srv.URL+"/api/v1/sprint", "application/json", nil)
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
 }
 
 func (s *RouterTestSuite) TestCreateTaskInvalidJSON() {
-	resp, err := http.Post(s.srv.URL+"/api/v1/sprint/current/add", "application/json", nil) //nolint:noctx
+	resp, err := http.Post(s.srv.URL+"/api/v1/sprint/current/add", "application/json", nil)
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
@@ -78,7 +79,7 @@ func (s *RouterTestSuite) TestCreateTaskWithoutPoints() {
 }
 
 func (s *RouterTestSuite) TestUpdateTaskInvalidJSON() {
-	resp, err := http.Post(s.srv.URL+"/api/v1/task/0/update", "application/json", //nolint:noctx
+	resp, err := http.Post(s.srv.URL+"/api/v1/task/0/update", "application/json",
 		strings.NewReader("invalid json"))
 	s.Require().NoError(err)
 	resp.Body.Close()
