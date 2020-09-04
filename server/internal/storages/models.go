@@ -27,3 +27,6 @@ type Task struct {
 	Points int32
 	Burnt  int32
 }
+
+// UpdateTaskFn should returns an updated task or error.
+type UpdateTaskFn func(Task) (Task, error)

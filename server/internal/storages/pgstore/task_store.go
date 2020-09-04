@@ -125,50 +125,8 @@ func (s *TaskStore) ListTasks(ctx context.Context, sprintIDStr string) (storages
 	return taskList, nil
 }
 
-func (s *TaskStore) UpdateTask(ctx context.Context, taskID int64, opts models.UpdateOptions) error {
-	_, err := s.conn.Exec(ctx,
-		"UPDATE tasks SET text = $2, points = $3, burnt = $4 WHERE id = $1",
-		taskID, opts.Text, opts.Points, opts.Burnt)
-	return err
-}
-
-func (s *TaskStore) DoneTask(ctx context.Context, taskID int64) error {
-	return s.updateTaskStateWithStmt(ctx, taskID, models.DoneTaskEvent,
-		"UPDATE tasks SET state = $2, burnt=points WHERE id = $1")
-}
-
-func (s *TaskStore) UndoneTask(ctx context.Context, taskID int64) error {
-	return s.updateTaskState(ctx, taskID, models.UndoneTaskEvent)
-}
-
-func (s *TaskStore) TodoTask(ctx context.Context, taskID int64) error {
-	return s.updateTaskState(ctx, taskID, models.TodoTaskEvent)
-}
-
-func (s *TaskStore) CancelTask(ctx context.Context, taskID int64) error {
-	return s.updateTaskState(ctx, taskID, models.CancelTaskEvent)
-}
-
-func (s *TaskStore) BackTaskToWork(ctx context.Context, taskID int64) error {
-	return s.updateTaskState(ctx, taskID, models.ToWorkTaskEvent)
-}
-
-func (s *TaskStore) PostponeTask(ctx context.Context, taskID int64) (resultErr error) {
-	return s.updateTaskStateWithStmt(ctx, taskID, models.PostponeTaskEvent,
-		`WITH task AS (DELETE FROM tasks WHERE id = $1 AND $2 = $2 RETURNING *)
-		INSERT INTO postponed_tasks (text, points)
-		SELECT text, points
-		FROM task`)
-}
-
-func (s *TaskStore) updateTaskState(ctx context.Context, taskID int64,
-	event models.SwitchTaskStateEvent,
-) error {
-	return s.updateTaskStateWithStmt(ctx, taskID, event, "UPDATE tasks SET state = $2 WHERE id = $1")
-}
-
-func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID int64,
-	event models.SwitchTaskStateEvent, stmt string,
+func (s *TaskStore) UpdateTask(
+	ctx context.Context, taskID int64, fn storages.UpdateTaskFn,
 ) (resultErr error) {
 	tx, err := s.conn.Begin(ctx)
 	if err != nil {
@@ -182,20 +140,80 @@ func (s *TaskStore) updateTaskStateWithStmt(ctx context.Context, taskID int64,
 		}
 	}()
 
-	row := tx.QueryRow(ctx, "SELECT state FROM tasks WHERE id = $1 FOR NO KEY UPDATE", taskID)
-	var curState models.TaskState
-	err = row.Scan(&curState)
-	if err == nil || errors.Is(err, pgx.ErrNoRows) {
-		state, err := curState.NextState(event)
+	row := tx.QueryRow(ctx,
+		`SELECT text, points, burnt, state
+		 FROM tasks
+		 WHERE id = $1
+		 FOR NO KEY UPDATE`, taskID)
+	var task storages.Task
+	err = row.Scan(&task.Text, &task.Points, &task.Burnt, &task.State)
+	if err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return fmt.Errorf("failed to scan: %w", err)
+		}
+	} else {
+		task, err := fn(task)
 		if err != nil {
 			return err
 		}
 
-		if _, err := tx.Exec(ctx, stmt, taskID, state); err != nil {
+		_, err = tx.Exec(ctx,
+			`UPDATE tasks
+			 SET text = $2, points = $3, burnt = $4, state = $5
+			 WHERE id = $1`,
+			taskID, task.Text, task.Points, task.Burnt, task.State)
+		if err != nil {
 			return fmt.Errorf("failed to execute update: %w", err)
 		}
-	} else if err != nil {
-		return fmt.Errorf("failed to scan: %w", err)
+	}
+
+	return tx.Commit(ctx)
+}
+
+func (s *TaskStore) PostponeTask(
+	ctx context.Context, taskID int64, fn storages.UpdateTaskFn,
+) (resultErr error) {
+	tx, err := s.conn.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	defer func() {
+		rollbackErr := tx.Rollback(ctx)
+		if resultErr == nil && !errors.Is(rollbackErr, pgx.ErrTxClosed) {
+			resultErr = fmt.Errorf("failed to rollback: %w", rollbackErr)
+		}
+	}()
+
+	row := tx.QueryRow(ctx,
+		`SELECT text, points, burnt, state
+		 FROM tasks
+		 WHERE id = $1`, taskID)
+
+	var task storages.Task
+	err = row.Scan(&task.Text, &task.Points, &task.Burnt, &task.State)
+	if err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return fmt.Errorf("failed to scan: %w", err)
+		}
+		return tx.Commit(ctx)
+	}
+
+	task, err = fn(task)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(ctx, "DELETE FROM tasks WHERE id = $1", taskID)
+	if err != nil {
+		return fmt.Errorf("failed to execute delete: %w", err)
+	}
+
+	_, err = tx.Exec(ctx,
+		"INSERT INTO postponed_tasks (text, points) VALUES($1, $2)",
+		task.Text, task.Points)
+	if err != nil {
+		return fmt.Errorf("failed to execute insert: %w", err)
 	}
 
 	return tx.Commit(ctx)
