@@ -109,12 +109,20 @@ func (s *APISuiteActions) createTask(sprintID string, task openapicli.Task) open
 	return respTask
 }
 
-func (s *APISuiteActions) deleteSprintTask(taskID string) {
+func (s *APISuiteActions) deleteTask(taskID string) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.DeleteTask(s.ctx, taskID)
 	s.Require().NoError(err, s.errBody(err))
 	defer resp.Body.Close()
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
+}
+
+func (s *APISuiteActions) DeleteTaskWithError(taskID string, httpStatus int) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.DeleteTask(s.ctx, taskID)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(httpStatus, resp.StatusCode)
 }
 
 func (s *APISuiteActions) todoTask(taskID string) {
@@ -125,6 +133,14 @@ func (s *APISuiteActions) todoTask(taskID string) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
+func (s *APISuiteActions) TodoTaskWithError(taskID string, httpStatus int) {
+	s.T().Helper()
+	resp, err := s.cli.DefaultApi.TodoTask(s.ctx, taskID)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(httpStatus, resp.StatusCode)
+}
+
 func (s *APISuiteActions) doneTask(taskID string) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.DoneTask(s.ctx, taskID)
@@ -133,7 +149,7 @@ func (s *APISuiteActions) doneTask(taskID string) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *APISuiteActions) doneTaskWithError(taskID string, httpStatus int) {
+func (s *APISuiteActions) DoneTaskWithError(taskID string, httpStatus int) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.DoneTask(s.ctx, taskID)
 	s.Require().Error(err)
@@ -149,7 +165,7 @@ func (s *APISuiteActions) cancelTask(taskID string) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *APISuiteActions) cancelTaskWithError(taskID string, httpStatus int) {
+func (s *APISuiteActions) CancelTaskWithError(taskID string, httpStatus int) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.CancelTask(s.ctx, taskID)
 	s.Require().Error(err)
@@ -165,7 +181,7 @@ func (s *APISuiteActions) backTaskToWork(taskID string) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *APISuiteActions) backTaskToWorkWithError(taskID string, httpStatus int) {
+func (s *APISuiteActions) BackTaskToWorkWithError(taskID string, httpStatus int) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.ToworkTask(s.ctx, taskID)
 	s.Require().Error(err)
@@ -186,6 +202,15 @@ func (s *APISuiteActions) updateTask(task openapicli.RespTask) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
+func (s *APISuiteActions) UpdateTaskWithError(taskID string, httpStatus int) {
+	s.T().Helper()
+	opts := openapicli.UpdateOptions{}
+	resp, err := s.cli.DefaultApi.UpdateTask(s.ctx, taskID, opts)
+	s.Require().Error(err)
+	defer resp.Body.Close()
+	s.Require().Equal(httpStatus, resp.StatusCode)
+}
+
 func (s *APISuiteActions) postponeTask(taskID string) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.PostponeTask(s.ctx, taskID)
@@ -194,7 +219,7 @@ func (s *APISuiteActions) postponeTask(taskID string) {
 	s.Require().Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *APISuiteActions) postponeTaskWithError(taskID string, httpStatus int) {
+func (s *APISuiteActions) PostponeTaskWithError(taskID string, httpStatus int) {
 	s.T().Helper()
 	resp, err := s.cli.DefaultApi.PostponeTask(s.ctx, taskID)
 	s.Require().Error(err)

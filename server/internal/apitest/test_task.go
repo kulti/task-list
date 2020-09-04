@@ -14,7 +14,7 @@ func (s *APISuite) TestDeleteTask() {
 	s.NewSprint()
 
 	respTask := s.createSprintTask()
-	s.deleteSprintTask(respTask.Id)
+	s.deleteTask(respTask.Id)
 
 	s.checkSprintTaskList()
 }
@@ -64,7 +64,7 @@ func (s *APISuite) TestBackTaskToWorkNonCanceledTask() {
 	s.NewSprint()
 
 	respTask := s.createSprintTask()
-	s.backTaskToWorkWithError(respTask.Id, http.StatusBadRequest)
+	s.BackTaskToWorkWithError(respTask.Id, http.StatusBadRequest)
 }
 
 func (s *APISuite) TestBurnPoints() {
@@ -106,7 +106,7 @@ func (s *APISuite) TestCancelTaskThatAlreadyDone() {
 	respTask := s.createSprintTask()
 	s.doneTask(respTask.Id)
 
-	s.cancelTaskWithError(respTask.Id, http.StatusBadRequest)
+	s.CancelTaskWithError(respTask.Id, http.StatusBadRequest)
 }
 
 func (s *APISuite) TestDoneTaskThatAlreadyCanceled() {
@@ -115,7 +115,7 @@ func (s *APISuite) TestDoneTaskThatAlreadyCanceled() {
 	respTask := s.createSprintTask()
 	s.cancelTask(respTask.Id)
 
-	s.doneTaskWithError(respTask.Id, http.StatusBadRequest)
+	s.DoneTaskWithError(respTask.Id, http.StatusBadRequest)
 }
 
 func (s *APISuite) TestUpdateDoneTask() {
@@ -163,5 +163,5 @@ func (s *APISuite) TestPostponeCanceledTask() {
 
 	respTask := s.createSprintTask()
 	s.cancelTask(respTask.Id)
-	s.postponeTaskWithError(respTask.Id, http.StatusBadRequest)
+	s.PostponeTaskWithError(respTask.Id, http.StatusBadRequest)
 }
