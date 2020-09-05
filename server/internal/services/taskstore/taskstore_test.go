@@ -182,10 +182,27 @@ func (s *TaskStoreSuite) TestUpdateTaskInconcistency() {
 
 func (s *TaskStoreSuite) TestPostpone() {
 	s.Run("ok", func() {
+		s.task.Burnt = 0
 		s.dbStore.EXPECT().
 			PostponeTask(s.ctx, s.task.ID, gomock.Any()).
-			DoAndReturn(func(_ context.Context, _ int64, fn storages.UpdateTaskFn) error {
-				_, err := fn(s.task)
+			DoAndReturn(func(_ context.Context, _ int64, fn storages.PostponeTaskFn) error {
+				_, ut, err := fn(s.task)
+				s.Require().Zero(ut)
+				return err
+			})
+
+		s.Require().NoError(s.store.PostponeTask(s.ctx, s.taskIDStr))
+	})
+
+	s.Run("partially_done", func() {
+		s.task.Burnt = s.task.Points - 1
+		s.dbStore.EXPECT().
+			PostponeTask(s.ctx, s.task.ID, gomock.Any()).
+			DoAndReturn(func(_ context.Context, _ int64, fn storages.PostponeTaskFn) error {
+				pt, ut, err := fn(s.task)
+				s.Require().Equal(s.task.Points-s.task.Burnt, pt.Points)
+				s.task.State = models.TaskStateCanceled
+				s.Require().Equal(s.task, ut)
 				return err
 			})
 
@@ -210,8 +227,8 @@ func (s *TaskStoreSuite) TestPostpone() {
 
 		s.dbStore.EXPECT().
 			PostponeTask(s.ctx, s.task.ID, gomock.Any()).
-			DoAndReturn(func(_ context.Context, _ int64, fn storages.UpdateTaskFn) error {
-				_, err := fn(s.task)
+			DoAndReturn(func(_ context.Context, _ int64, fn storages.PostponeTaskFn) error {
+				_, _, err := fn(s.task)
 				return err
 			})
 		err := s.store.PostponeTask(s.ctx, s.taskIDStr)
