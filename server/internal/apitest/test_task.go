@@ -158,6 +158,24 @@ func (s *APISuite) TestPostponeTask() {
 	s.NewSprint(respTask1)
 }
 
+func (s *APISuite) TestPostponePartiallyDoneTask() {
+	s.NewSprint()
+
+	respTask1 := s.createSprintTask()
+	respTask2 := s.createSprintTask()
+
+	respTask1.Burnt = respTask1.Points - 1
+	s.updateTask(respTask1)
+
+	s.postponeTask(respTask1.Id)
+
+	respTask1.State = taskStateCanceled
+	s.checkSprintTaskList(respTask2, respTask1)
+
+	respTask1.Points = 1
+	s.NewSprint(respTask1)
+}
+
 func (s *APISuite) TestPostponeCanceledTask() {
 	s.NewSprint()
 

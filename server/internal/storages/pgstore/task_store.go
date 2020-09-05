@@ -171,7 +171,7 @@ func (s *TaskStore) UpdateTask(
 }
 
 func (s *TaskStore) PostponeTask(
-	ctx context.Context, taskID int64, fn storages.UpdateTaskFn,
+	ctx context.Context, taskID int64, fn storages.PostponeTaskFn,
 ) (resultErr error) {
 	tx, err := s.conn.Begin(ctx)
 	if err != nil {
@@ -199,19 +199,30 @@ func (s *TaskStore) PostponeTask(
 		return tx.Commit(ctx)
 	}
 
-	task, err = fn(task)
+	postponedTask, updatedTask, err := fn(task)
 	if err != nil {
 		return err
 	}
 
-	_, err = tx.Exec(ctx, "DELETE FROM tasks WHERE id = $1", taskID)
-	if err != nil {
-		return fmt.Errorf("failed to execute delete: %w", err)
+	if updatedTask.Points == 0 {
+		_, err = tx.Exec(ctx, "DELETE FROM tasks WHERE id = $1", taskID)
+		if err != nil {
+			return fmt.Errorf("failed to execute delete: %w", err)
+		}
+	} else {
+		_, err = tx.Exec(ctx,
+			`UPDATE tasks
+		 SET text = $2, points = $3, burnt = $4, state = $5
+		 WHERE id = $1`,
+			taskID, updatedTask.Text, updatedTask.Points, updatedTask.Burnt, updatedTask.State)
+		if err != nil {
+			return fmt.Errorf("failed to execute update: %w", err)
+		}
 	}
 
 	_, err = tx.Exec(ctx,
 		"INSERT INTO postponed_tasks (text, points) VALUES($1, $2)",
-		task.Text, task.Points)
+		postponedTask.Text, postponedTask.Points)
 	if err != nil {
 		return fmt.Errorf("failed to execute insert: %w", err)
 	}

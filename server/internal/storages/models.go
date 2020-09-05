@@ -30,3 +30,8 @@ type Task struct {
 
 // UpdateTaskFn should returns an updated task or error.
 type UpdateTaskFn func(Task) (Task, error)
+
+// PostponeTaskFn should returns a postponend task and probably updated task or error.
+// Postpone operation can split task into two. The first part should be postponed,
+// the second should be updated.
+type PostponeTaskFn func(Task) (Task, Task, error)

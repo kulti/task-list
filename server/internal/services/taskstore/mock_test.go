@@ -49,7 +49,7 @@ func (mr *MockDBStoreMockRecorder) UpdateTask(ctx, taskID, fn interface{}) *gomo
 }
 
 // PostponeTask mocks base method
-func (m *MockDBStore) PostponeTask(ctx context.Context, taskID int64, fn storages.UpdateTaskFn) error {
+func (m *MockDBStore) PostponeTask(ctx context.Context, taskID int64, fn storages.PostponeTaskFn) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PostponeTask", ctx, taskID, fn)
 	ret0, _ := ret[0].(error)

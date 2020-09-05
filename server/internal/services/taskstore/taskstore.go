@@ -10,7 +10,7 @@ import (
 
 type dbStore interface {
 	UpdateTask(ctx context.Context, taskID int64, fn storages.UpdateTaskFn) error
-	PostponeTask(ctx context.Context, taskID int64, fn storages.UpdateTaskFn) error
+	PostponeTask(ctx context.Context, taskID int64, fn storages.PostponeTaskFn) error
 	DeleteTask(ctx context.Context, taskID int64) error
 }
 
@@ -117,11 +117,23 @@ func (s *TaskStore) BackTaskToWork(ctx context.Context, taskID string) error {
 // It looks like to cancel and move task to the next sprint template.
 func (s *TaskStore) PostponeTask(ctx context.Context, taskID string) error {
 	return s.doWithTaskIDConvert(taskID, func(taskID int64) error {
-		return s.dbStore.PostponeTask(ctx, taskID, func(task storages.Task) (storages.Task, error) {
+		return s.dbStore.PostponeTask(ctx, taskID, func(task storages.Task) (storages.Task, storages.Task, error) {
 			if err := task.State.ValidateStateSwitch(models.PostponeTaskEvent); err != nil {
-				return storages.Task{}, err
+				return storages.Task{}, storages.Task{}, err
 			}
-			return task, nil
+
+			if task.Burnt == 0 {
+				return task, storages.Task{}, nil
+			}
+
+			postponedTask := task
+			updatedTask := task
+
+			postponedTask.Burnt = 0
+			postponedTask.Points = task.Points - task.Burnt
+			updatedTask.State = models.TaskStateCanceled
+
+			return postponedTask, updatedTask, nil
 		})
 	})
 }

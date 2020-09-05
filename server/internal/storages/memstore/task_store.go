@@ -94,18 +94,23 @@ func (s *TaskStore) ListTasks(_ context.Context, _ string) (storages.TaskList, e
 	return l, nil
 }
 
-func (s *TaskStore) PostponeTask(_ context.Context, taskID int64, fn storages.UpdateTaskFn) error {
+func (s *TaskStore) PostponeTask(_ context.Context, taskID int64, fn storages.PostponeTaskFn) error {
 	for i, t := range s.taskLists[sprintList].tasks {
 		if t.ID == taskID {
-			task, err := fn(t.Task)
+			postponedTask, updatedTask, err := fn(t.Task)
 			if err != nil {
 				return err
 			}
 
 			s.postponedTasks = append(s.postponedTasks,
-				models.TaskTemplate{Text: task.Text, Points: task.Points})
-			s.taskLists[sprintList].tasks = append(s.taskLists[sprintList].tasks[:i],
-				s.taskLists[sprintList].tasks[i+1:]...)
+				models.TaskTemplate{Text: postponedTask.Text, Points: postponedTask.Points})
+
+			if updatedTask.Points != 0 {
+				s.taskLists[sprintList].tasks[i].Task = updatedTask
+			} else {
+				s.taskLists[sprintList].tasks = append(s.taskLists[sprintList].tasks[:i],
+					s.taskLists[sprintList].tasks[i+1:]...)
+			}
 			break
 		}
 	}
