@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"sort"
 	"time"
 
 	"go.uber.org/zap"
@@ -135,24 +134,6 @@ func (h sprintHandler) handleGetTaskList(w http.ResponseWriter, r *http.Request,
 	if err != nil {
 		httpInternalServerError(w, "failed to get task list from db", err)
 		return
-	}
-
-	if len(taskList.Tasks) == 0 {
-		taskList.Tasks = []models.Task{}
-	} else {
-		sort.Slice(taskList.Tasks, func(i, j int) bool {
-			otherState := taskList.Tasks[j].State
-			switch taskList.Tasks[i].State {
-			case models.TaskStateTodo:
-				return otherState != models.TaskStateTodo
-			case models.TaskStateSimple:
-				return otherState != models.TaskStateSimple && otherState != models.TaskStateTodo
-			case models.TaskStateCompleted:
-				return otherState == models.TaskStateCanceled
-			case models.TaskStateCanceled:
-			}
-			return false
-		})
 	}
 
 	httpJSON(w, &taskList)
