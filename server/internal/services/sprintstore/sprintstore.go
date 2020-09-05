@@ -74,23 +74,23 @@ func (s *SprintStore) ListTasks(ctx context.Context, sprintID string) (models.Ta
 		}
 	}
 
-	if len(taskList.Tasks) == 0 {
-		taskList.Tasks = []models.Task{}
-	} else {
-		sort.Slice(taskList.Tasks, func(i, j int) bool {
-			otherState := taskList.Tasks[j].State
-			switch taskList.Tasks[i].State {
-			case models.TaskStateTodo:
-				return otherState != models.TaskStateTodo
-			case models.TaskStateSimple:
-				return otherState != models.TaskStateSimple && otherState != models.TaskStateTodo
-			case models.TaskStateCompleted:
-				return otherState == models.TaskStateCanceled
-			case models.TaskStateCanceled:
-			}
-			return false
-		})
-	}
+	sort.Slice(taskList.Tasks, func(i, j int) bool {
+		otherState := taskList.Tasks[j].State
+		if otherState == taskList.Tasks[i].State {
+			return taskList.Tasks[i].Text < taskList.Tasks[j].Text
+		}
+
+		switch taskList.Tasks[i].State {
+		case models.TaskStateTodo:
+			return true
+		case models.TaskStateSimple:
+			return otherState != models.TaskStateTodo
+		case models.TaskStateCompleted:
+			return otherState == models.TaskStateCanceled
+		case models.TaskStateCanceled:
+		}
+		return false
+	})
 
 	return taskList, nil
 }
