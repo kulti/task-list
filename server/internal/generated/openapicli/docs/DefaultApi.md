@@ -9,8 +9,10 @@ Method | HTTP request | Description
 [**CreateTaskList**](DefaultApi.md#CreateTaskList) | **Post** /sprint | 
 [**DeleteTask**](DefaultApi.md#DeleteTask) | **Post** /task/{taskId}/delete | 
 [**DoneTask**](DefaultApi.md#DoneTask) | **Post** /task/{taskId}/done | 
+[**GetSprintTemplate**](DefaultApi.md#GetSprintTemplate) | **Get** /new_sprint_template | 
 [**GetTaskList**](DefaultApi.md#GetTaskList) | **Get** /sprint/{sprintId} | 
 [**PostponeTask**](DefaultApi.md#PostponeTask) | **Post** /task/{taskId}/postpone | 
+[**SetSprintTemplate**](DefaultApi.md#SetSprintTemplate) | **Post** /new_sprint_template | 
 [**TodoTask**](DefaultApi.md#TodoTask) | **Post** /task/{taskId}/todo | 
 [**ToworkTask**](DefaultApi.md#ToworkTask) | **Post** /task/{taskId}/towork | 
 [**UpdateTask**](DefaultApi.md#UpdateTask) | **Post** /task/{taskId}/update | 
@@ -178,6 +180,34 @@ No authorization required
 [[Back to README]](../README.md)
 
 
+## GetSprintTemplate
+
+> SprintTemplate GetSprintTemplate(ctx, )
+
+
+
+### Required Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**SprintTemplate**](SprintTemplate.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## GetTaskList
 
 > TaskList GetTaskList(ctx, sprintId)
@@ -235,6 +265,38 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## SetSprintTemplate
+
+> SetSprintTemplate(ctx, sprintTemplate)
+
+
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**sprintTemplate** | [**SprintTemplate**](SprintTemplate.md)|  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
 - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
