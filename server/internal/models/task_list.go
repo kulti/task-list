@@ -44,3 +44,9 @@ type TaskTemplate struct {
 	Text   string `json:"text"`
 	Points int32  `json:"points"`
 }
+
+// PostponedTask represents a postponed task.
+type PostponedTask struct {
+	Text   string `json:"text"`
+	Points int32  `json:"points"`
+}

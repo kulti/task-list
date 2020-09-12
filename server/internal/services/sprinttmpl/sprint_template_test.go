@@ -21,6 +21,7 @@ type SprintTemplateTestSuite struct {
 	calService *MockCalService
 	store      *MockStore
 	tmpl       *sprinttmpl.Service
+	ctx        context.Context
 }
 
 func (s *SprintTemplateTestSuite) SetupTest() {
@@ -28,28 +29,21 @@ func (s *SprintTemplateTestSuite) SetupTest() {
 	s.calService = NewMockCalService(s.mockCtrl)
 	s.store = NewMockStore(s.mockCtrl)
 	s.tmpl = sprinttmpl.New(s.store, s.calService)
+	s.ctx = context.Background()
 }
 
 func (s *SprintTemplateTestSuite) TearDownTest() {
 	s.mockCtrl.Finish()
 }
 
-func (s *SprintTemplateTestSuite) TestSprintTemplateHasSomeTasks() {
+func (s *SprintTemplateTestSuite) TestHasSomeTasks() {
 	begin := time.Date(2020, 7, 6, 0, 0, 0, 0, time.UTC)
 	end := begin.Add(7 * 24 * time.Hour)
 
-	expectedTmpl := models.SprintTemplate{
-		Tasks: []models.TaskTemplate{
-			{Text: faker.Sentence(), Points: 0},
-			{Text: faker.Sentence(), Points: 2},
-		},
-	}
+	expectedTmpl := s.setupTemplateAndPostponed()
+	s.calService.EXPECT().GetEvents(s.ctx, begin, end)
 
-	ctx := context.Background()
-	s.store.EXPECT().GetSprintTemplate(ctx).Return(expectedTmpl, nil)
-	s.calService.EXPECT().GetEvents(ctx, begin, end)
-
-	tmpl, err := s.tmpl.Get(ctx, begin, end)
+	tmpl, err := s.tmpl.Get(s.ctx, begin, end)
 	s.Require().NoError(err)
 	s.Equal(expectedTmpl, tmpl)
 }
@@ -58,11 +52,21 @@ func (s *SprintTemplateTestSuite) TestSprintTemplateError() {
 	begin := time.Date(2020, 7, 6, 0, 0, 0, 0, time.UTC)
 	end := begin.Add(7 * 24 * time.Hour)
 
-	ctx := context.Background()
-	s.store.EXPECT().GetSprintTemplate(ctx).Return(models.SprintTemplate{}, errGetTemplate)
+	s.store.EXPECT().GetSprintTemplate(s.ctx).Return(models.SprintTemplate{}, errGetTemplate)
 
-	_, err := s.tmpl.Get(ctx, begin, end)
+	_, err := s.tmpl.Get(s.ctx, begin, end)
 	s.Require().Equal(errGetTemplate, err)
+}
+
+func (s *SprintTemplateTestSuite) TestPopPostponedTaskError() {
+	begin := time.Date(2020, 7, 6, 0, 0, 0, 0, time.UTC)
+	end := begin.Add(7 * 24 * time.Hour)
+
+	s.store.EXPECT().GetSprintTemplate(s.ctx)
+	s.store.EXPECT().PopPostponedTasks(s.ctx).Return(nil, errPopPostponed)
+
+	_, err := s.tmpl.Get(s.ctx, begin, end)
+	s.Require().Equal(errPopPostponed, err)
 }
 
 func (s *SprintTemplateTestSuite) TestAllDayEvents() {
@@ -74,11 +78,11 @@ func (s *SprintTemplateTestSuite) TestAllDayEvents() {
 		{Name: faker.Sentence(), Date: begin.Add(5 * time.Hour * 24)},
 	}
 
-	ctx := context.Background()
-	s.store.EXPECT().GetSprintTemplate(ctx)
-	s.calService.EXPECT().GetEvents(ctx, begin, end).Return(events, nil)
+	s.store.EXPECT().GetSprintTemplate(s.ctx)
+	s.store.EXPECT().PopPostponedTasks(s.ctx)
+	s.calService.EXPECT().GetEvents(s.ctx, begin, end).Return(events, nil)
 
-	tmpl, err := s.tmpl.Get(ctx, begin, end)
+	tmpl, err := s.tmpl.Get(s.ctx, begin, end)
 	s.Require().NoError(err)
 
 	s.Require().Len(tmpl.Tasks, 2)
@@ -95,11 +99,11 @@ func (s *SprintTemplateTestSuite) TestAtTimeEvents() {
 		{Name: faker.Sentence(), StartDate: begin.Add(3 * time.Hour * 24).Add(7 * time.Hour)},
 	}
 
-	ctx := context.Background()
-	s.store.EXPECT().GetSprintTemplate(ctx)
-	s.calService.EXPECT().GetEvents(ctx, begin, end).Return(events, nil)
+	s.store.EXPECT().GetSprintTemplate(s.ctx)
+	s.store.EXPECT().PopPostponedTasks(s.ctx)
+	s.calService.EXPECT().GetEvents(s.ctx, begin, end).Return(events, nil)
 
-	tmpl, err := s.tmpl.Get(ctx, begin, end)
+	tmpl, err := s.tmpl.Get(s.ctx, begin, end)
 	s.Require().NoError(err)
 
 	s.Require().Len(tmpl.Tasks, 2)
@@ -111,18 +115,11 @@ func (s *SprintTemplateTestSuite) TestCalendarServiceErrorAffectsNothing() {
 	begin := time.Date(2020, 3, 31, 0, 0, 0, 0, time.UTC)
 	end := begin.Add(7 * 24 * time.Hour)
 
-	expectedTmpl := models.SprintTemplate{
-		Tasks: []models.TaskTemplate{
-			{Text: faker.Sentence(), Points: 0},
-			{Text: faker.Sentence(), Points: 2},
-		},
-	}
+	expectedTmpl := s.setupTemplateAndPostponed()
 
-	ctx := context.Background()
-	s.store.EXPECT().GetSprintTemplate(ctx).Return(expectedTmpl, nil)
-	s.calService.EXPECT().GetEvents(ctx, begin, end).Return(nil, errCalService)
+	s.calService.EXPECT().GetEvents(s.ctx, begin, end).Return(nil, errCalService)
 
-	tmpl, err := s.tmpl.Get(ctx, begin, end)
+	tmpl, err := s.tmpl.Get(s.ctx, begin, end)
 	s.Require().NoError(err)
 	s.Equal(expectedTmpl, tmpl)
 }
@@ -131,18 +128,10 @@ func (s *SprintTemplateTestSuite) TestMissingCalendarServiceAffectsNothing() {
 	begin := time.Date(2020, 3, 31, 0, 0, 0, 0, time.UTC)
 	end := begin.Add(7 * 24 * time.Hour)
 
-	expectedTmpl := models.SprintTemplate{
-		Tasks: []models.TaskTemplate{
-			{Text: faker.Sentence(), Points: 0},
-			{Text: faker.Sentence(), Points: 2},
-		},
-	}
-
-	ctx := context.Background()
-	s.store.EXPECT().GetSprintTemplate(ctx).Return(expectedTmpl, nil)
+	expectedTmpl := s.setupTemplateAndPostponed()
 
 	tmplWithouCalService := sprinttmpl.New(s.store, nil)
-	tmpl, err := tmplWithouCalService.Get(ctx, begin, end)
+	tmpl, err := tmplWithouCalService.Get(s.ctx, begin, end)
 	s.Require().NoError(err)
 	s.Equal(expectedTmpl, tmpl)
 }
@@ -174,13 +163,39 @@ func (s *SprintTemplateTestSuite) TestEventsOrder() {
 		},
 	}
 
-	ctx := context.Background()
-	s.store.EXPECT().GetSprintTemplate(ctx).Return(sprintTmplTasks, nil)
-	s.calService.EXPECT().GetEvents(ctx, begin, end).Return(events, nil)
+	s.store.EXPECT().GetSprintTemplate(s.ctx).Return(sprintTmplTasks, nil)
+	s.store.EXPECT().PopPostponedTasks(s.ctx)
+	s.calService.EXPECT().GetEvents(s.ctx, begin, end).Return(events, nil)
 
-	tmpl, err := s.tmpl.Get(ctx, begin, end)
+	tmpl, err := s.tmpl.Get(s.ctx, begin, end)
 	s.Require().NoError(err)
 	s.Require().Equal(expectedTmpl, tmpl)
+}
+
+func (s *SprintTemplateTestSuite) setupTemplateAndPostponed() models.SprintTemplate {
+	tmpl := models.SprintTemplate{
+		Tasks: []models.TaskTemplate{
+			{Text: faker.Sentence(), Points: 0},
+			{Text: faker.Sentence(), Points: 2},
+		},
+	}
+	postponedTasks := []models.PostponedTask{
+		{Text: faker.Sentence(), Points: 1},
+		{Text: faker.Sentence(), Points: 3},
+	}
+
+	expectedTmpl := tmpl
+	for _, task := range postponedTasks {
+		expectedTmpl.Tasks = append(expectedTmpl.Tasks, models.TaskTemplate{
+			Text:   task.Text,
+			Points: task.Points,
+		})
+	}
+
+	s.store.EXPECT().GetSprintTemplate(s.ctx).Return(tmpl, nil)
+	s.store.EXPECT().PopPostponedTasks(s.ctx).Return(postponedTasks, nil)
+
+	return expectedTmpl
 }
 
 func TestSprintTemplateTestSuite(t *testing.T) {
@@ -188,6 +203,7 @@ func TestSprintTemplateTestSuite(t *testing.T) {
 }
 
 var (
-	errGetTemplate = errors.New("store error")
-	errCalService  = errors.New("calendar service error")
+	errGetTemplate  = errors.New("get template error")
+	errPopPostponed = errors.New("pop postponed error")
+	errCalService   = errors.New("calendar service error")
 )
