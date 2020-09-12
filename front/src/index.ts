@@ -3,6 +3,11 @@ import * as models from "./openapi_cli/model/models";
 import { BuildDropdownMenu } from "./DropdownMenu";
 import { BuildTaskEditor, TaskEditorFocus, TaskEditorTask } from "./TaskEditor";
 import { buildNewSprintTitle, getNewSprintOpts } from "./SprintTitle";
+import {
+  showErrorAlertWithRefresh,
+  showSuccessAlert,
+  showErrorAlert,
+} from "./Alerts";
 
 const api = new DefaultApi(window.location.origin + "/api/v1");
 const sprintId = "current";
@@ -37,52 +42,6 @@ $("#new_sprint_btn")[0].addEventListener("click", () => {
       showErrorAlert("failed to create sprint");
     });
 });
-
-function showSuccessAlert(text: string) {
-  showAlert("success", text);
-}
-
-function showErrorAlert(text: string) {
-  showAlert("danger", text);
-}
-
-function showErrorAlertWithRefresh(text: string) {
-  showAlert("danger", text, 5);
-}
-
-function showAlert(type: string, text: string, refreshSec?: number) {
-  const alertCloseBtn = document.createElement("button");
-  alertCloseBtn.type = "button";
-  alertCloseBtn.className = "close";
-  alertCloseBtn.setAttribute("data-dismiss", "alert");
-  alertCloseBtn.setAttribute("aria-label", "Close");
-  alertCloseBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
-
-  const alertDiv = document.createElement("div");
-  alertDiv.className = "alert alert-dismissible fade show alert-" + type;
-  alertDiv.setAttribute("role", "alert");
-  alertDiv.innerText = text;
-  alertDiv.appendChild(alertCloseBtn);
-
-  $("#alerts").append(alertDiv);
-
-  if (refreshSec) {
-    alertDiv.innerText =
-      text + " - refresh in " + refreshSec.toString() + "seconds";
-    let i = refreshSec - 1;
-    setInterval(() => {
-      alertDiv.innerText = text + " - refresh in " + i.toString() + " seconds";
-      i--;
-      if (i === 0) {
-        window.location.reload();
-      }
-    }, 1000);
-  } else {
-    setTimeout(() => {
-      alertDiv.remove();
-    }, 2000);
-  }
-}
 
 function load_task_lists() {
   void api
