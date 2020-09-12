@@ -14,7 +14,8 @@ const (
 type TaskStore struct {
 	taskLists      map[string]*taskList
 	lastID         int64
-	postponedTasks []models.TaskTemplate
+	postponedTasks []models.PostponedTask
+	sprintTemplate models.SprintTemplate
 }
 
 type taskList struct {
@@ -103,7 +104,7 @@ func (s *TaskStore) PostponeTask(_ context.Context, taskID int64, fn storages.Po
 			}
 
 			s.postponedTasks = append(s.postponedTasks,
-				models.TaskTemplate{Text: postponedTask.Text, Points: postponedTask.Points})
+				models.PostponedTask{Text: postponedTask.Text, Points: postponedTask.Points})
 
 			if updatedTask.Points != 0 {
 				s.taskLists[sprintList].tasks[i].Task = updatedTask
@@ -117,13 +118,14 @@ func (s *TaskStore) PostponeTask(_ context.Context, taskID int64, fn storages.Po
 	return nil
 }
 
-func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplate, error) {
-	tmpl := models.SprintTemplate{
-		Tasks: s.postponedTasks,
-	}
+func (s *TaskStore) PopPostponedTasks(ctx context.Context) ([]models.PostponedTask, error) {
+	postponedTasks := s.postponedTasks
 	s.postponedTasks = nil
+	return postponedTasks, nil
+}
 
-	return tmpl, nil
+func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplate, error) {
+	return s.sprintTemplate, nil
 }
 
 func (s *TaskStore) nextID() int64 {

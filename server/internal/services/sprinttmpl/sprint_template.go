@@ -26,6 +26,7 @@ type CalService interface {
 // Store is an interface to get sprint template from persistent storage.
 type Store interface {
 	GetSprintTemplate(ctx context.Context) (models.SprintTemplate, error)
+	PopPostponedTasks(ctx context.Context) ([]models.PostponedTask, error)
 }
 
 // New creates a new instance of sprint template service.
@@ -43,6 +44,18 @@ func (s *Service) Get(ctx context.Context, begin, end time.Time) (models.SprintT
 	tmpl, err := s.store.GetSprintTemplate(ctx)
 	if err != nil {
 		return models.SprintTemplate{}, err
+	}
+
+	postponedTasks, err := s.store.PopPostponedTasks(ctx)
+	if err != nil {
+		return models.SprintTemplate{}, err
+	}
+
+	for _, task := range postponedTasks {
+		tmpl.Tasks = append(tmpl.Tasks, models.TaskTemplate{
+			Text:   task.Text,
+			Points: task.Points,
+		})
 	}
 
 	s.extendSprintTemplateWithCalendarEvents(ctx, &tmpl, begin, end)
