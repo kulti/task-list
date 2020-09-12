@@ -3,6 +3,7 @@ import * as models from "./openapi_cli/model/models";
 import { BuildDropdownMenu } from "./DropdownMenu";
 import { BuildTaskEditor, TaskEditorFocus, TaskEditorTask } from "./TaskEditor";
 import { buildNewSprintTitle, getNewSprintOpts } from "./SprintTitle";
+import { BuildSprintTemplateEditor } from "./SprintTemplate";
 import {
   showErrorAlertWithRefresh,
   showSuccessAlert,
@@ -40,6 +41,37 @@ $("#new_sprint_btn")[0].addEventListener("click", () => {
     })
     .fail(() => {
       showErrorAlert("failed to create sprint");
+    });
+});
+
+$("#edit_sprint_template_btn")[0].addEventListener("click", () => {
+  const taskListHeader = $(".list_header")[0];
+  const taskList = $(".tasks")[0];
+
+  void api
+    .getSprintTemplate()
+    .fail(() => {
+      showErrorAlert("failed to get sprint template");
+    })
+    .done((data) => {
+      taskListHeader.getElementsByClassName("title")[0].innerHTML =
+        "New Sprint Template";
+      taskList.innerHTML = "";
+
+      taskList.append(
+        BuildSprintTemplateEditor(
+          data.body,
+          (template: models.SprintTemplate) => {
+            void api
+              .setSprintTemplate(template)
+              .fail(() => {
+                showErrorAlert("failed to set sprint template");
+              })
+              .done(load_task_lists);
+          },
+          load_task_lists
+        )
+      );
     });
 });
 
