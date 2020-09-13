@@ -9,7 +9,7 @@ import (
 func (s *APISuite) TestNotFound() {
 	paths := []string{
 		"/unknown", "/api/v2", "/api/v1/unknown", "/api/v1/sprint/current/unknown", "/api/v1/task",
-		"/api/v1/task/unknown",
+		"/api/v1/task/unknown", "/api/v1/new_sprint_template/unknown",
 	}
 
 	for _, p := range paths {

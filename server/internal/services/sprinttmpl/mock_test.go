@@ -103,3 +103,17 @@ func (mr *MockStoreMockRecorder) PopPostponedTasks(ctx interface{}) *gomock.Call
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PopPostponedTasks", reflect.TypeOf((*MockStore)(nil).PopPostponedTasks), ctx)
 }
+
+// SetSprintTemplate mocks base method
+func (m *MockStore) SetSprintTemplate(ctx context.Context, tmpl models.SprintTemplate) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetSprintTemplate", ctx, tmpl)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetSprintTemplate indicates an expected call of SetSprintTemplate
+func (mr *MockStoreMockRecorder) SetSprintTemplate(ctx, tmpl interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSprintTemplate", reflect.TypeOf((*MockStore)(nil).SetSprintTemplate), ctx, tmpl)
+}

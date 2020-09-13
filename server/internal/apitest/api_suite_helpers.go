@@ -46,6 +46,15 @@ func (s *APISuiteActions) testTask() openapicli.Task {
 	return t
 }
 
+func (s *APISuiteActions) testRespTask() openapicli.RespTask {
+	tt := s.testTask()
+	t := openapicli.RespTask{
+		Text:   tt.Text,
+		Points: tt.Points,
+	}
+	return t
+}
+
 func (s *APISuiteActions) respTasksToTemplateTasks(tasks []openapicli.RespTask) []openapicli.TaskTemplate {
 	tmplTasks := make([]openapicli.TaskTemplate, len(tasks))
 	for i := range tasks {

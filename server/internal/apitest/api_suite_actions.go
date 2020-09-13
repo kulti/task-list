@@ -77,6 +77,30 @@ func (s *APISuiteActions) checkTaskList(
 	}
 }
 
+func (s *APISuiteActions) checkSprintTemplate(tasks ...openapicli.RespTask) {
+	s.T().Helper()
+	tmpl, resp, err := s.cli.DefaultApi.GetSprintTemplate(s.ctx)
+	s.Require().NoError(err, s.errBody(err))
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusOK, resp.StatusCode)
+	s.Require().Equal("application/json", resp.Header.Get("Content-Type"))
+
+	if len(tasks) != 0 || len(tmpl.Tasks) != 0 {
+		s.Require().Equal(s.respTasksToTemplateTasks(tasks), tmpl.Tasks)
+	}
+}
+
+func (s *APISuiteActions) setSprintTemplate(tasks ...openapicli.RespTask) {
+	s.T().Helper()
+	tmpl := openapicli.SprintTemplate{
+		Tasks: s.respTasksToTemplateTasks(tasks),
+	}
+	resp, err := s.cli.DefaultApi.SetSprintTemplate(s.ctx, tmpl)
+	s.Require().NoError(err, s.errBody(err))
+	defer resp.Body.Close()
+	s.Require().Equal(http.StatusOK, resp.StatusCode)
+}
+
 func (s *APISuiteActions) createSprintTask() openapicli.RespTask {
 	s.T().Helper()
 	return s.createTask(currentSprintID, s.testTask())

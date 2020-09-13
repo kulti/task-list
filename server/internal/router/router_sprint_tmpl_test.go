@@ -64,17 +64,39 @@ func (s *RouterSprintTmplTestSuite) TestSomeTasks() {
 	s.Require().Equal(expectedTmpl, s.openapiTmplToModels(tmpl))
 }
 
-var errGetTml = errors.New("failed to get sprint template")
+var (
+	errGet            = errors.New("failed to get sprint template")
+	errGetNewTemplate = errors.New("failed to get new sprint template")
+	errSetNewTemplate = errors.New("failed to set new sprint template")
+)
 
 func (s *RouterSprintTmplTestSuite) TestGetTemplateError() {
 	begin := time.Date(2029, 8, 21, 0, 0, 0, 0, time.UTC)
 	end := begin.Add(7 * 24 * time.Hour)
 
-	s.tmplService.EXPECT().Get(gomock.Any(), begin, end).Return(models.SprintTemplate{}, errGetTml)
+	s.tmplService.EXPECT().Get(gomock.Any(), begin, end).Return(models.SprintTemplate{}, errGet)
 
 	tmpl := s.createTaskList(begin, end)
 
 	s.Require().Equal(models.SprintTemplate{}, s.openapiTmplToModels(tmpl))
+}
+
+func (s *RouterSprintTmplTestSuite) TestGetNewSprintTemplateError() {
+	s.tmplService.EXPECT().GetNewSprintTemplate(gomock.Any()).Return(models.SprintTemplate{}, errGetNewTemplate)
+
+	_, resp, err := s.Client().GetSprintTemplate(context.Background())
+	s.Require().Error(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusInternalServerError, resp.StatusCode)
+}
+
+func (s *RouterSprintTmplTestSuite) TestSetNewSprintTemplateError() {
+	s.tmplService.EXPECT().SetNewSprintTemplate(gomock.Any(), gomock.Any()).Return(errSetNewTemplate)
+
+	resp, err := s.Client().SetSprintTemplate(context.Background(), openapicli.SprintTemplate{})
+	s.Require().Error(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusInternalServerError, resp.StatusCode)
 }
 
 func (s *RouterSprintTmplTestSuite) createTaskList(begin, end time.Time) openapicli.SprintTemplate {
