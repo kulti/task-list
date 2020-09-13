@@ -5,15 +5,18 @@ import (
 )
 
 type rootHandler struct {
-	sprintHandler sprintHandler
-	taskHandler   taskHandler
+	sprintHandler         sprintHandler
+	sprintTemplateHandler sprintTemplateHandler
+	taskHandler           taskHandler
 }
 
-func newRootHandler(taskStore taskStore, sprintStore sprintStore, tmplService sprintTemplateService,
+func newRootHandler(
+	taskStore taskStore, sprintStore sprintStore, tmplService sprintTemplateService,
 ) rootHandler {
 	return rootHandler{
-		sprintHandler: newSprintHandler(sprintStore, tmplService),
-		taskHandler:   newTaskHandler(taskStore),
+		sprintHandler:         newSprintHandler(sprintStore, tmplService),
+		sprintTemplateHandler: newSprintTemplateHandler(tmplService),
+		taskHandler:           newTaskHandler(taskStore),
 	}
 }
 
@@ -38,6 +41,8 @@ func (h rootHandler) handleAPI(w http.ResponseWriter, r *http.Request) {
 
 	head, r.URL.Path = shiftPath(r.URL.Path)
 	switch head {
+	case "new_sprint_template":
+		h.sprintTemplateHandler.ServeHTTP(w, r)
 	case "sprint":
 		h.sprintHandler.ServeHTTP(w, r)
 	case "task":

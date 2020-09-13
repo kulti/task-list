@@ -50,6 +50,35 @@ func (mr *MockSprintTemplateServiceMockRecorder) Get(ctx, begin, end interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockSprintTemplateService)(nil).Get), ctx, begin, end)
 }
 
+// GetNewSprintTemplate mocks base method
+func (m *MockSprintTemplateService) GetNewSprintTemplate(arg0 context.Context) (models.SprintTemplate, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNewSprintTemplate", arg0)
+	ret0, _ := ret[0].(models.SprintTemplate)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNewSprintTemplate indicates an expected call of GetNewSprintTemplate
+func (mr *MockSprintTemplateServiceMockRecorder) GetNewSprintTemplate(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNewSprintTemplate", reflect.TypeOf((*MockSprintTemplateService)(nil).GetNewSprintTemplate), arg0)
+}
+
+// SetNewSprintTemplate mocks base method
+func (m *MockSprintTemplateService) SetNewSprintTemplate(arg0 context.Context, arg1 models.SprintTemplate) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetNewSprintTemplate", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetNewSprintTemplate indicates an expected call of SetNewSprintTemplate
+func (mr *MockSprintTemplateServiceMockRecorder) SetNewSprintTemplate(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetNewSprintTemplate", reflect.TypeOf((*MockSprintTemplateService)(nil).SetNewSprintTemplate), arg0, arg1)
+}
+
 // MockSprintStore is a mock of sprintStore interface
 type MockSprintStore struct {
 	ctrl     *gomock.Controller

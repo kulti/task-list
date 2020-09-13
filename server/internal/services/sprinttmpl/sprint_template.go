@@ -27,6 +27,7 @@ type CalService interface {
 type Store interface {
 	GetSprintTemplate(ctx context.Context) (models.SprintTemplate, error)
 	PopPostponedTasks(ctx context.Context) ([]models.PostponedTask, error)
+	SetSprintTemplate(ctx context.Context, tmpl models.SprintTemplate) error
 }
 
 // New creates a new instance of sprint template service.
@@ -95,4 +96,14 @@ func (s *Service) extendSprintTemplateWithCalendarEvents(ctx context.Context,
 	})
 
 	tmpl.Tasks = append(tmpl.Tasks, calendarTasks...)
+}
+
+// GetNewSprintTemplate returns task from a new sprint template.
+func (s *Service) GetNewSprintTemplate(ctx context.Context) (models.SprintTemplate, error) {
+	return s.store.GetSprintTemplate(ctx)
+}
+
+// SetNewSprintTemplate updates a new sprint template.
+func (s *Service) SetNewSprintTemplate(ctx context.Context, tmpl models.SprintTemplate) error {
+	return s.store.SetSprintTemplate(ctx, tmpl)
 }

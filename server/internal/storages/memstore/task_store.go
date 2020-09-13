@@ -128,6 +128,11 @@ func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplat
 	return s.sprintTemplate, nil
 }
 
+func (s *TaskStore) SetSprintTemplate(ctx context.Context, tmpl models.SprintTemplate) error {
+	s.sprintTemplate = tmpl
+	return nil
+}
+
 func (s *TaskStore) nextID() int64 {
 	s.lastID++
 	return s.lastID

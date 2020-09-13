@@ -273,3 +273,32 @@ func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplat
 
 	return models.SprintTemplate{Tasks: tasks}, nil
 }
+
+func (s *TaskStore) SetSprintTemplate(ctx context.Context, tmpl models.SprintTemplate) (resultErr error) {
+	tx, err := s.conn.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	defer func() {
+		rollbackErr := tx.Rollback(ctx)
+		if resultErr == nil && !errors.Is(rollbackErr, pgx.ErrTxClosed) {
+			resultErr = fmt.Errorf("failed to rollback: %w", rollbackErr)
+		}
+	}()
+
+	_, err = tx.Exec(ctx, `DELETE FROM new_sprint_task_tempate `)
+	if err != nil {
+		return fmt.Errorf("failed to cleanup new sprint template: %w", err)
+	}
+
+	for _, task := range tmpl.Tasks {
+		_, err := tx.Exec(ctx, `INSERT INTO new_sprint_task_tempate (text, points) VALUES ($1, $2)`,
+			task.Text, task.Points)
+		if err != nil {
+			return fmt.Errorf("failed to insert task %q with points %d: %w", task.Text, task.Points, err)
+		}
+	}
+
+	return tx.Commit(ctx)
+}

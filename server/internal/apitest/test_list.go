@@ -10,6 +10,38 @@ func (s *APISuite) TestEmptyList() {
 	s.NewSprint()
 
 	s.checkSprintTaskList()
+	s.checkSprintTemplate()
+}
+
+func (s *APISuite) TestNewSprintTemplate() {
+	tasks := []openapicli.RespTask{
+		s.testRespTask(),
+		s.testRespTask(),
+	}
+
+	s.setSprintTemplate(tasks...)
+	s.NewSprint(tasks...)
+	s.checkSprintTemplate(tasks...)
+}
+
+func (s *APISuite) TestUpdateSprintTemplate() {
+	tasks := []openapicli.RespTask{
+		s.testRespTask(),
+		s.testRespTask(),
+	}
+
+	s.setSprintTemplate(tasks...)
+	s.NewSprint(tasks...)
+	s.checkSprintTemplate(tasks...)
+
+	tasks = []openapicli.RespTask{
+		s.testRespTask(),
+		s.testRespTask(),
+	}
+
+	s.setSprintTemplate(tasks...)
+	s.NewSprint(tasks...)
+	s.checkSprintTemplate(tasks...)
 }
 
 func (s *APISuite) TestSortList() {

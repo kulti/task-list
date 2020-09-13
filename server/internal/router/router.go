@@ -12,6 +12,8 @@ import (
 
 type sprintTemplateService interface {
 	Get(ctx context.Context, begin, end time.Time) (models.SprintTemplate, error)
+	GetNewSprintTemplate(context.Context) (models.SprintTemplate, error)
+	SetNewSprintTemplate(context.Context, models.SprintTemplate) error
 }
 
 type sprintStore interface {

@@ -27,7 +27,8 @@ func (s *RouterTestSuite) SetupTest() {
 	store := memstore.NewTaskStore()
 	taskStore := taskstore.New(store)
 	sprintStore := sprintstore.New(store)
-	r := router.New(taskStore, sprintStore, sprinttmpl.New(store, nil))
+	sprinttmplSrv := sprinttmpl.New(store, nil)
+	r := router.New(taskStore, sprintStore, sprinttmplSrv)
 	s.srv = httptest.NewServer(r.RootHandler())
 
 	s.Init(s.srv.URL)
@@ -84,6 +85,21 @@ func (s *RouterTestSuite) TestUpdateTaskInvalidJSON() {
 	s.Require().NoError(err)
 	resp.Body.Close()
 	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestNewSprintTemplateInvalidJSON() {
+	resp, err := http.Post(s.srv.URL+"/api/v1/new_sprint_template", "application/json",
+		strings.NewReader("invalid json"))
+	s.Require().NoError(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusBadRequest, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestNewSprintTemplateMethdoNotAllowed() {
+	resp, err := http.Head(s.srv.URL + "/api/v1/new_sprint_template")
+	s.Require().NoError(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusMethodNotAllowed, resp.StatusCode)
 }
 
 func TestRouter(t *testing.T) {

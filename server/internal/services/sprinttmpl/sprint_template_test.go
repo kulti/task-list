@@ -198,6 +198,33 @@ func (s *SprintTemplateTestSuite) setupTemplateAndPostponed() models.SprintTempl
 	return expectedTmpl
 }
 
+func (s *SprintTemplateTestSuite) TestGetNewSprintTemplate() {
+	expectedTmpl := models.SprintTemplate{
+		Tasks: []models.TaskTemplate{
+			{Text: faker.Sentence(), Points: 0},
+			{Text: faker.Sentence(), Points: 2},
+		},
+	}
+	s.store.EXPECT().GetSprintTemplate(s.ctx).Return(expectedTmpl, nil)
+
+	tmpl, err := s.tmpl.GetNewSprintTemplate(s.ctx)
+	s.Require().NoError(err)
+	s.Equal(expectedTmpl, tmpl)
+}
+
+func (s *SprintTemplateTestSuite) TestSetNewSprintTemplate() {
+	tmpl := models.SprintTemplate{
+		Tasks: []models.TaskTemplate{
+			{Text: faker.Sentence(), Points: 0},
+			{Text: faker.Sentence(), Points: 2},
+		},
+	}
+	s.store.EXPECT().SetSprintTemplate(s.ctx, tmpl)
+
+	err := s.tmpl.SetNewSprintTemplate(s.ctx, tmpl)
+	s.Require().NoError(err)
+}
+
 func TestSprintTemplateTestSuite(t *testing.T) {
 	suite.Run(t, new(SprintTemplateTestSuite))
 }
