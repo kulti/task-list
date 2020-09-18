@@ -21,7 +21,7 @@ up)
     eval "${compose} run db_migrations up"
     eval "${compose} up -d"
     ;;
-down|ps|logs|exec|start|stop|restart)
+down|ps|logs|exec|start|stop|restart|pull)
     args=$*
     eval "${compose} ${cmd} ${args}"
     ;;
