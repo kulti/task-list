@@ -102,6 +102,40 @@ func (s *RouterTestSuite) TestNewSprintTemplateMethdoNotAllowed() {
 	s.Require().Equal(http.StatusMethodNotAllowed, resp.StatusCode)
 }
 
+func (s *RouterTestSuite) TestCreateSprintMethdoNotAllowed() {
+	resp, err := http.Get(s.srv.URL + "/api/v1/sprint")
+	s.Require().NoError(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusMethodNotAllowed, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestCreateSprintTaskMethdoNotAllowed() {
+	resp, err := http.Get(s.srv.URL + "/api/v1/sprint/anyid/add")
+	s.Require().NoError(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusMethodNotAllowed, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestGetSprintListMethdoNotAllowed() {
+	resp, err := http.Post(s.srv.URL+"/api/v1/sprint/anyid", "", nil)
+	s.Require().NoError(err)
+	resp.Body.Close()
+	s.Require().Equal(http.StatusMethodNotAllowed, resp.StatusCode)
+}
+
+func (s *RouterTestSuite) TestTaskActionsMethdoNotAllowed() {
+	actions := []string{"update", "todo", "done", "cancel", "towork", "delete", "postpone"}
+	for _, action := range actions {
+		action := action
+		s.Run(action, func() {
+			resp, err := http.Get(s.srv.URL + "/api/v1/task/anyid/" + action)
+			s.Require().NoError(err)
+			resp.Body.Close()
+			s.Require().Equal(http.StatusMethodNotAllowed, resp.StatusCode)
+		})
+	}
+}
+
 func TestRouter(t *testing.T) {
 	suite.Run(t, new(RouterTestSuite))
 }

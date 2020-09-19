@@ -31,22 +31,33 @@ func (h taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	action, r.URL.Path = shiftPath(r.URL.Path)
 	switch action {
 	case "update":
-		h.handleUpdateTask(w, r, taskID)
+		h.handleWithMethodPost(w, r, taskID, h.handleUpdateTask)
 	case "todo":
-		h.handleTodoTask(w, r, taskID)
+		h.handleWithMethodPost(w, r, taskID, h.handleTodoTask)
 	case "done":
-		h.handleDoneTask(w, r, taskID)
+		h.handleWithMethodPost(w, r, taskID, h.handleDoneTask)
 	case "cancel":
-		h.handleCancelTask(w, r, taskID)
+		h.handleWithMethodPost(w, r, taskID, h.handleCancelTask)
 	case "towork":
-		h.handleBackTaskToWork(w, r, taskID)
+		h.handleWithMethodPost(w, r, taskID, h.handleBackTaskToWork)
 	case "delete":
-		h.handleDeleteTask(w, r, taskID)
+		h.handleWithMethodPost(w, r, taskID, h.handleDeleteTask)
 	case "postpone":
-		h.handlePostponeTask(w, r, taskID)
+		h.handleWithMethodPost(w, r, taskID, h.handlePostponeTask)
 	default:
 		http.NotFound(w, r)
 	}
+}
+
+func (h taskHandler) handleWithMethodPost(
+	w http.ResponseWriter, r *http.Request, taskID string,
+	fn func(w http.ResponseWriter, r *http.Request, taskID string),
+) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	fn(w, r, taskID)
 }
 
 func (h taskHandler) handleUpdateTask(w http.ResponseWriter, r *http.Request, taskID string) {

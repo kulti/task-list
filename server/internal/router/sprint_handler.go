@@ -90,6 +90,11 @@ func (h sprintHandler) handleCreateSprint(w http.ResponseWriter, r *http.Request
 }
 
 func (h sprintHandler) handleCreateTaskInSprint(w http.ResponseWriter, r *http.Request, sprintID string) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	task, err := h.parseTask(r.Body)
 	if err != nil {
 		httpBadRequest(w, "failed to parse task body", err)
