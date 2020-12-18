@@ -218,7 +218,7 @@ func (s *TaskStoreSuite) TestPostpone() {
 	s.Run("invalid_task_id", func() {
 		s.Require().EqualError(
 			s.store.PostponeTask(s.ctx, "invalidID"),
-			`strconv.ParseInt: parsing "invalidID": invalid syntax`,
+			`failed to parse taskID "invalidID": strconv.ParseInt: parsing "invalidID": invalid syntax`,
 		)
 	})
 
@@ -262,7 +262,8 @@ func (s *TaskStoreSuite) checkTaskAfterUpdate(
 	})
 
 	s.Run("invalid_task_id", func() {
-		s.Require().EqualError(fn(s.ctx, "invalidID"), `strconv.ParseInt: parsing "invalidID": invalid syntax`)
+		s.Require().EqualError(fn(s.ctx, "invalidID"),
+			`failed to parse taskID "invalidID": strconv.ParseInt: parsing "invalidID": invalid syntax`)
 	})
 }
 
@@ -282,5 +283,6 @@ func (s *TaskStoreSuite) checkUpdateInconcistency(fn func(context.Context, strin
 var errTest = errors.New(faker.Sentence())
 
 func TestTaskStore(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(TaskStoreSuite))
 }

@@ -78,5 +78,6 @@ func (s *RouterSprintStoreSuite) TestListTasksError() {
 }
 
 func TestRouterSprintStoreErrors(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(RouterSprintStoreSuite))
 }

@@ -10,6 +10,8 @@ import (
 )
 
 func TestValidateStateSwitch(t *testing.T) {
+	t.Parallel()
+
 	transitions := map[models.TaskState][]models.SwitchTaskStateEvent{
 		models.TaskStateSimple: {
 			models.TodoTaskEvent,
@@ -33,6 +35,7 @@ func TestValidateStateSwitch(t *testing.T) {
 		},
 	}
 
+	//nolint:paralleltest // because of false-positive (https://github.com/kunwardeep/paralleltest/issues/8)
 	for state, tr := range transitions {
 		for _, ev := range tr {
 			state := state
@@ -46,7 +49,9 @@ func TestValidateStateSwitch(t *testing.T) {
 }
 
 func TestValidateStateSwitchInconcistency(t *testing.T) {
-	unknownState := models.TaskState(-1)
+	t.Parallel()
+
+	unknownState := models.TaskState("unknown")
 	unknownEvent := models.SwitchTaskStateEvent(-1)
 
 	transitions := map[models.TaskState][]models.SwitchTaskStateEvent{
@@ -79,6 +84,7 @@ func TestValidateStateSwitchInconcistency(t *testing.T) {
 		},
 	}
 
+	//nolint:paralleltest // because of false-positive (https://github.com/kunwardeep/paralleltest/issues/8)
 	for state, tr := range transitions {
 		for _, ev := range tr {
 			state := state

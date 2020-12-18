@@ -137,5 +137,6 @@ func (s *RouterTestSuite) TestTaskActionsMethdoNotAllowed() {
 }
 
 func TestRouter(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(RouterTestSuite))
 }

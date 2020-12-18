@@ -55,7 +55,7 @@ func (s *SprintTemplateTestSuite) TestSprintTemplateError() {
 	s.store.EXPECT().GetSprintTemplate(s.ctx).Return(models.SprintTemplate{}, errGetTemplate)
 
 	_, err := s.tmpl.Get(s.ctx, begin, end)
-	s.Require().Equal(errGetTemplate, err)
+	s.Require().Truef(errors.Is(err, errGetTemplate), "actual error: %v", err)
 }
 
 func (s *SprintTemplateTestSuite) TestPopPostponedTaskError() {
@@ -66,7 +66,7 @@ func (s *SprintTemplateTestSuite) TestPopPostponedTaskError() {
 	s.store.EXPECT().PopPostponedTasks(s.ctx).Return(nil, errPopPostponed)
 
 	_, err := s.tmpl.Get(s.ctx, begin, end)
-	s.Require().Equal(errPopPostponed, err)
+	s.Require().Truef(errors.Is(err, errPopPostponed), "actual error: %v", err)
 }
 
 func (s *SprintTemplateTestSuite) TestAllDayEvents() {
@@ -226,6 +226,7 @@ func (s *SprintTemplateTestSuite) TestSetNewSprintTemplate() {
 }
 
 func TestSprintTemplateTestSuite(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(SprintTemplateTestSuite))
 }
 

@@ -2,6 +2,7 @@ package taskstore
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/kulti/task-list/server/internal/models"
@@ -40,12 +41,12 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 		if opts.Points == opts.Burnt {
 			newState = models.TaskStateCompleted
 			if err := task.State.ValidateStateSwitch(models.DoneTaskEvent); err != nil {
-				return storages.Task{}, err
+				return storages.Task{}, fmt.Errorf("failed to mark task as done via update: %w", err)
 			}
 		} else if task.State == models.TaskStateCompleted {
 			newState = models.TaskStateSimple
 			if err := task.State.ValidateStateSwitch(models.ToWorkTaskEvent); err != nil {
-				return storages.Task{}, err
+				return storages.Task{}, fmt.Errorf("failed to back task to work via update: %w", err)
 			}
 		}
 
@@ -64,7 +65,7 @@ func (s *TaskStore) UpdateTask(ctx context.Context, taskID string, opts models.U
 func (s *TaskStore) TodoTask(ctx context.Context, taskID string) error {
 	return s.updateWithTaskIDConvert(ctx, taskID, func(task storages.Task) (storages.Task, error) {
 		if err := task.State.ValidateStateSwitch(models.TodoTaskEvent); err != nil {
-			return storages.Task{}, err
+			return storages.Task{}, fmt.Errorf("failed to mark task as todo: %w", err)
 		}
 
 		newTask := task
@@ -77,7 +78,7 @@ func (s *TaskStore) TodoTask(ctx context.Context, taskID string) error {
 func (s *TaskStore) DoneTask(ctx context.Context, taskID string) error {
 	return s.updateWithTaskIDConvert(ctx, taskID, func(task storages.Task) (storages.Task, error) {
 		if err := task.State.ValidateStateSwitch(models.DoneTaskEvent); err != nil {
-			return storages.Task{}, err
+			return storages.Task{}, fmt.Errorf("failed to mark task as done: %w", err)
 		}
 
 		newTask := task
@@ -91,7 +92,7 @@ func (s *TaskStore) DoneTask(ctx context.Context, taskID string) error {
 func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
 	return s.updateWithTaskIDConvert(ctx, taskID, func(task storages.Task) (storages.Task, error) {
 		if err := task.State.ValidateStateSwitch(models.CancelTaskEvent); err != nil {
-			return storages.Task{}, err
+			return storages.Task{}, fmt.Errorf("failed to cancel task: %w", err)
 		}
 
 		newTask := task
@@ -104,7 +105,7 @@ func (s *TaskStore) CancelTask(ctx context.Context, taskID string) error {
 func (s *TaskStore) BackTaskToWork(ctx context.Context, taskID string) error {
 	return s.updateWithTaskIDConvert(ctx, taskID, func(task storages.Task) (storages.Task, error) {
 		if err := task.State.ValidateStateSwitch(models.ToWorkTaskEvent); err != nil {
-			return storages.Task{}, err
+			return storages.Task{}, fmt.Errorf("failed to back task to work: %w", err)
 		}
 
 		newTask := task
@@ -119,7 +120,7 @@ func (s *TaskStore) PostponeTask(ctx context.Context, taskID string) error {
 	return s.doWithTaskIDConvert(taskID, func(taskID int64) error {
 		return s.dbStore.PostponeTask(ctx, taskID, func(task storages.Task) (storages.Task, storages.Task, error) {
 			if err := task.State.ValidateStateSwitch(models.PostponeTaskEvent); err != nil {
-				return storages.Task{}, storages.Task{}, err
+				return storages.Task{}, storages.Task{}, fmt.Errorf("failed to postpone task: %w", err)
 			}
 
 			if task.Burnt == 0 {
@@ -149,7 +150,7 @@ func (s *TaskStore) updateWithTaskIDConvert(
 func (s *TaskStore) doWithTaskIDConvert(taskID string, fn func(taskID int64) error) error {
 	id, err := strconv.ParseInt(taskID, 16, 64)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse taskID %q: %w", taskID, err)
 	}
 
 	return fn(id)

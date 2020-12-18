@@ -50,14 +50,17 @@ func (s *SprintStore) CreateTask(ctx context.Context, task models.Task, sprintID
 		Burnt:  task.Burnt,
 	}
 	newTaskID, err := s.dbStore.CreateTask(ctx, newTask, sprintID)
-	return strconv.FormatInt(newTaskID, 16), err
+	if err != nil {
+		return "", fmt.Errorf("failed to store task in db: %w", err)
+	}
+	return strconv.FormatInt(newTaskID, 16), nil
 }
 
 // ListTasks lists tasks in the sprint.
 func (s *SprintStore) ListTasks(ctx context.Context, sprintID string) (models.TaskList, error) {
 	dbTaskList, err := s.dbStore.ListTasks(ctx, sprintID)
 	if err != nil {
-		return models.TaskList{}, err
+		return models.TaskList{}, fmt.Errorf("failed to get tasks list from store: %w", err)
 	}
 
 	taskList := models.TaskList{

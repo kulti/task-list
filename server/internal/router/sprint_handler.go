@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -117,7 +118,7 @@ func (h sprintHandler) parseTask(r io.Reader) (models.Task, error) {
 	var task models.Task
 	err := jsDecoder.Decode(&task)
 	if err != nil {
-		return models.Task{}, err
+		return models.Task{}, fmt.Errorf("failed to decode task: %w", err)
 	}
 	if task.Text == "" {
 		return models.Task{}, errMissingArgText
