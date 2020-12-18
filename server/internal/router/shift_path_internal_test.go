@@ -1,4 +1,3 @@
-//nolint:testpackage
 package router
 
 import (
@@ -8,6 +7,8 @@ import (
 )
 
 func TestShiftPath(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		path string
 		head string
@@ -24,6 +25,7 @@ func TestShiftPath(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.path, func(t *testing.T) {
+			t.Parallel()
 			head, tail := shiftPath(tc.path)
 			assert.Equal(t, tc.head, head)
 			assert.Equal(t, tc.tail, tail)

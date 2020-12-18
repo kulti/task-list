@@ -123,5 +123,6 @@ func (s *SprintStoreSuite) TestListTasks() {
 }
 
 func TestSprintStore(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(SprintStoreSuite))
 }

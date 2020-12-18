@@ -80,5 +80,6 @@ func (s *RouterTaskStoreSuite) TestPostponeTaskError() {
 }
 
 func TestRouterTaskStoreErrors(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(RouterTaskStoreSuite))
 }

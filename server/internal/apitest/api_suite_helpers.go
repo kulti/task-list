@@ -2,6 +2,7 @@ package apitest
 
 import (
 	"encoding/json"
+	"errors"
 	"math"
 	"math/rand"
 
@@ -31,7 +32,8 @@ func (s *APISuiteActions) taskToRespTask(task openapicli.Task) openapicli.RespTa
 }
 
 func (s *APISuiteActions) errBody(err error) string {
-	if apiErr, ok := err.(openapicli.GenericOpenAPIError); ok {
+	var apiErr openapicli.GenericOpenAPIError
+	if errors.As(err, &apiErr) {
 		return string(apiErr.Body())
 	}
 	return ""

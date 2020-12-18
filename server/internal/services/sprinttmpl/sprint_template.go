@@ -44,12 +44,12 @@ func New(store Store, calService CalService) *Service {
 func (s *Service) Get(ctx context.Context, begin, end time.Time) (models.SprintTemplate, error) {
 	tmpl, err := s.store.GetSprintTemplate(ctx)
 	if err != nil {
-		return models.SprintTemplate{}, err
+		return models.SprintTemplate{}, fmt.Errorf("failed to get sprint template: %w", err)
 	}
 
 	postponedTasks, err := s.store.PopPostponedTasks(ctx)
 	if err != nil {
-		return models.SprintTemplate{}, err
+		return models.SprintTemplate{}, fmt.Errorf("failed to get postponed tasks: %w", err)
 	}
 
 	for _, task := range postponedTasks {

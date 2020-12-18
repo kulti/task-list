@@ -14,15 +14,19 @@ linters:
     - dogsled
     - dupl
     - errcheck
+    - errorlint
     # - exhaustive
+    # - exhaustivestruct
     - exportloopref
+    - funlen
+    - gci
     - gochecknoglobals
     - gochecknoinits
     - gocognit
     - goconst
     - gocritic
     - gocyclo
-    - godot
+    # - godot # because of panic (should be fixed in next release)
     # - godox
     - goerr113
     - gofmt
@@ -43,8 +47,10 @@ linters:
     - misspell
     - nakedret
     - nestif
+    # - nlreturn
     - noctx
     - nolintlint
+    - paralleltest
     - prealloc
     - rowserrcheck
     - scopelint
@@ -53,18 +59,22 @@ linters:
     - structcheck
     - stylecheck
     - testpackage
+    - tparallel
     - typecheck
     - unconvert
     - unparam
     - unused
     - varcheck
     - whitespace
+    - wrapcheck
     # - wsl
 
 linters-settings:
   lll:
     line-length: 110
   goimports:
+    local-prefixes: github.com/kulti/task-list/server
+  gci:
     local-prefixes: github.com/kulti/task-list/server
 
 issues:

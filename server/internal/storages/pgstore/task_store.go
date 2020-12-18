@@ -40,7 +40,10 @@ func (s *TaskStore) NewSprint(ctx context.Context, opts storages.SprintOpts) err
 	_, err := s.conn.Exec(ctx,
 		"INSERT INTO task_lists (type, title, created_at, begin, \"end\") VALUES ($1, $2, $3, $4, $5)",
 		"sprint", opts.Title, time.Now(), opts.Begin, opts.End)
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to insert task list %q: %w", opts.Title, err)
+	}
+	return nil
 }
 
 func (s *TaskStore) CreateTask(ctx context.Context, task storages.Task, sprintIDStr string) (int64, error) {
@@ -50,7 +53,7 @@ func (s *TaskStore) CreateTask(ctx context.Context, task storages.Task, sprintID
 	var taskID int64
 	err := row.Scan(&taskID)
 	if err != nil {
-		return -1, fmt.Errorf("failed to create task: %w", err)
+		return -1, fmt.Errorf("failed to insert task: %w", err)
 	}
 
 	var sprintID int64
@@ -76,7 +79,10 @@ func (s *TaskStore) CreateTask(ctx context.Context, task storages.Task, sprintID
 
 func (s *TaskStore) DeleteTask(ctx context.Context, taskID int64) error {
 	_, err := s.conn.Exec(ctx, "DELETE FROM tasks WHERE id = $1", taskID)
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to delete task: %w", err)
+	}
+	return nil
 }
 
 func (s *TaskStore) ListTasks(ctx context.Context, sprintIDStr string) (storages.TaskList, error) {
@@ -119,7 +125,7 @@ func (s *TaskStore) ListTasks(ctx context.Context, sprintIDStr string) (storages
 	}
 
 	if err != nil {
-		return storages.TaskList{}, err
+		return storages.TaskList{}, fmt.Errorf("failed to query tasks: %w", err)
 	}
 
 	return taskList, nil
@@ -245,7 +251,7 @@ func (s *TaskStore) PopPostponedTasks(ctx context.Context) ([]models.PostponedTa
 	rows.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query postponed tasks: %w", err)
 	}
 
 	return tasks, nil
@@ -268,7 +274,7 @@ func (s *TaskStore) GetSprintTemplate(ctx context.Context) (models.SprintTemplat
 	rows.Close()
 
 	if err != nil {
-		return models.SprintTemplate{}, err
+		return models.SprintTemplate{}, fmt.Errorf("failed to query sprint template: %w", err)
 	}
 
 	return models.SprintTemplate{Tasks: tasks}, nil

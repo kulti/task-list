@@ -127,5 +127,6 @@ func (s *RouterSprintTmplTestSuite) openapiTmplToModels(
 }
 
 func TestRouterWithSprintTemplateService(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(RouterSprintTmplTestSuite))
 }
