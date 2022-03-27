@@ -63,6 +63,6 @@ jobs:
       - name: Set up mockgen
         run: GO111MODULE=on go get github.com/golang/mock/mockgen@v1.4.3
       - uses: actions/setup-python@v2
-      - uses: pre-commit/action@v2.0.0
+      - uses: pre-commit/action@v2.0.3
         env:
           SKIP: unit-tests
